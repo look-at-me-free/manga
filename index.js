@@ -18,7 +18,7 @@
 
   // Between pattern (3 slots per between block, every 6 items)
   const BETWEEN_EVERY = 1;
-  const BETWEEN_SLOTS = 3;
+  const BETWEEN_SLOTS = 4;
 
   const $  = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
