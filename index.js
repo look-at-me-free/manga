@@ -1,318 +1,263 @@
-/* ========= SETTINGS ========= */
+(() => {
+  // ====== EDIT THIS LIST ======
+  // title: what the user sees
+  // url: direct PDF view link (or whatever you embed)
+  // id: optional small tag shown under title (volume/chapter label)
+  const ITEMS = [
+    // EXAMPLE:
+    // { title: "Tracksuit Dragon Ball Full Color — Volume 1", id: "DBFC-001", url: "https://drive.google.com/file/d/XXXX/view?usp=sharing" },
+  ];
 
-// Local text file name (put next to index.html)
-const DATA_FILE = "drive_files.txt";
+  // Between-ad zone
+  const BETWEEN_ZONE = "5865236";
 
-// Insert a mid-feed ad after every N entries.
-// 1 = after every entry, 2 = every 2 entries, 0 = disable.
-const AD_EVERY = 1;
+  // How often to place between-ads (every N entries)
+  const BETWEEN_EVERY = 6;
 
-// ExoClick zone ids you gave me
-const ZONES = {
-  topBanner: 5865232,
-  between: 5865236,
-  left: 5865238,
-  right: 5865240,
-  // Popunder is a separate big script; see note at bottom
-  // popunder: 5865234
-};
+  // Open 3 on load: first, middle, last
+  const OPEN_PROGRESSIVE = true;
 
-// The <ins class="..."> class ExoClick gave you
-const EXO_INS_CLASS = "eas6a97888e2";
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-// ExoClick loader (load ONCE)
-const EXO_LOADER_SRC = "https://a.magsrv.com/ad-provider.js";
-
-/* ============================ */
-
-function escapeHtml(s){
-  return String(s)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#39;");
-}
-
-// Ensure we load the ExoClick loader only once
-function ensureExoLoader(){
-  if (document.querySelector(`script[src="${EXO_LOADER_SRC}"]`)) return;
-  const s = document.createElement("script");
-  s.async = true;
-  s.type = "application/javascript";
-  s.src = EXO_LOADER_SRC;
-  document.head.appendChild(s);
-}
-
-// Create a real ExoClick banner slot element for a zone
-function makeExoSlot(zoneId){
-  ensureExoLoader();
-
-  const wrap = document.createElement("div");
-  wrap.className = "between-ad"; // works for mid ads; harmless elsewhere
-
-  // Important: We add the <ins> and then push serve
-  wrap.innerHTML = `
-    <ins class="${EXO_INS_CLASS}" data-zoneid="${zoneId}"></ins>
-  `;
-
-  // push serve after insertion into DOM (safer)
-  queueMicrotask(() => {
-    try{
-      (window.AdProvider = window.AdProvider || []).push({ serve: {} });
-    }catch(_){}
-  });
-
-  return wrap;
-}
-
-// Replace placeholder boxes with real zones
-function mountFixedAds(){
-  // TOP AD SLOT placeholder lives here:
-  const top = document.querySelector(".top-ad .ad-slot");
-  if(top){
-    top.classList.remove("ad-slot");
-    top.innerHTML = "";
-    top.appendChild(makeExoSlot(ZONES.topBanner));
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
   }
 
-  // LEFT AD placeholder: first rail
-  const rails = Array.from(document.querySelectorAll(".layout .rail"));
-  const leftRail = rails[0]?.querySelector(".ad-slot");
-  if(leftRail){
-    leftRail.classList.remove("ad-slot");
-    leftRail.innerHTML = "";
-    leftRail.appendChild(makeExoSlot(ZONES.left));
-  }
+  // Convert .exo-slot placeholders into <ins data-zoneid="..."> and serve ads.
+  function initMagsrvAds(root=document){
+    const slots = $$(".exo-slot[data-zone]", root);
+    for(const slot of slots){
+      if(slot.dataset.inited) continue;
+      slot.dataset.inited = "1";
 
-  // RIGHT AD placeholder: second rail
-  const rightRail = rails[1]?.querySelector(".ad-slot");
-  if(rightRail){
-    rightRail.classList.remove("ad-slot");
-    rightRail.innerHTML = "";
-    rightRail.appendChild(makeExoSlot(ZONES.right));
-  }
-}
-
-// Between-ad factory (mid feed)
-function makeBetweenAd(){
-  const div = document.createElement("div");
-  div.className = "between-ad";
-  div.appendChild(makeExoSlot(ZONES.between));
-  return div;
-}
-
-// Extract a chapter number from common title patterns.
-// Returns a number; if nothing found returns Infinity so it sinks.
-function extractChapterNumber(title){
-  const t = (title || "").toLowerCase();
-
-  let m = t.match(/\bchapter\D{0,8}(\d{1,5})\b/);
-  if(m) return parseInt(m[1], 10);
-
-  m = t.match(/\bch\D{0,8}(\d{1,5})\b/);
-  if(m) return parseInt(m[1], 10);
-
-  m = t.match(/\bvol(?:ume)?\D{0,8}(\d{1,4})\b/);
-  if(m) return parseInt(m[1], 10);
-
-  m = t.match(/\b(\d{1,5})\b/);
-  if(m) return parseInt(m[1], 10);
-
-  return Infinity;
-}
-
-// Parse drive_files.txt lines.
-// Supported:
-//   FILE_ID | Title
-//   FILE_ID
-function parseDriveFileText(txt){
-  const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  const items = [];
-
-  for(const line of lines){
-    const parts = line.split("|");
-    const id = (parts[0] || "").trim();
-    const title = parts.slice(1).join("|").trim();
-
-    if(!id) continue;
-
-    items.push({ id, title: title || "" });
-  }
-
-  return items;
-}
-
-function normalizeTitle(item, index){
-  if(item.title && item.title.trim()) return item.title.trim();
-  return `Chapter ${index + 1}`;
-}
-
-function sortNumerically(items){
-  return [...items].sort((a,b) => {
-    const an = extractChapterNumber(a.title);
-    const bn = extractChapterNumber(b.title);
-    if(an !== bn) return an - bn;
-
-    const at = (a.title || "").toLowerCase();
-    const bt = (b.title || "").toLowerCase();
-    if(at < bt) return -1;
-    if(at > bt) return 1;
-
-    return String(a.id||"").localeCompare(String(b.id||""));
-  });
-}
-
-function filterItems(items, q){
-  if(!q) return items;
-  const needle = q.toLowerCase();
-  return items.filter(it => {
-    const hay = `${it.id} ${it.title || ""}`.toLowerCase();
-    return hay.includes(needle);
-  });
-}
-
-function makeCard(item, displayIndex){
-  const id = item.id;
-  const title = normalizeTitle(item, displayIndex);
-  const src = `https://drive.google.com/file/d/${id}/preview`;
-
-  const d = document.createElement("details");
-
-  d.innerHTML = `
-    <summary>
-      <div class="leftstack">
-        <div class="doc">${escapeHtml(title)}</div>
-        <div class="id">${escapeHtml(id)}</div>
-      </div>
-
-      <div class="actions">
-        <span class="pill primary expandPill">EXPAND <span class="chev"></span></span>
-        <a class="pill" target="_blank" rel="noopener" href="${src}">OPEN</a>
-      </div>
-    </summary>
-
-    <div class="content">
-      <iframe loading="lazy" src="${src}"></iframe>
-    </div>
-  `;
-
-  const pill = d.querySelector(".expandPill");
-  pill.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    d.open = !d.open;
-  });
-
-  return d;
-}
-
-function setMeta(text){
-  const el = document.getElementById("meta");
-  if(el) el.textContent = text || "";
-}
-
-async function loadAllItems(){
-  const res = await fetch(DATA_FILE, { cache: "no-store" });
-  if(!res.ok) throw new Error(`Could not load ${DATA_FILE} (${res.status})`);
-  const txt = await res.text();
-  return parseDriveFileText(txt);
-}
-
-function openFirstVisible(){
-  const first = document.querySelector("#container details");
-  if(first){
-    first.open = true;
-    first.scrollIntoView({ behavior:"smooth", block:"start" });
-  }
-}
-
-async function render(){
-  const container = document.getElementById("container");
-  if(!container) return;
-  container.innerHTML = "";
-
-  const q = (document.getElementById("q")?.value || "").trim();
-
-  try{
-    const all = await loadAllItems();
-    const filtered = filterItems(all, q);
-    const sorted = sortNumerically(filtered);
-
-    setMeta(`${sorted.length.toLocaleString()} result(s) • sorted by extracted chapter number`);
-
-    if(!sorted.length){
-      const empty = document.createElement("div");
-      empty.className = "ad-slot";
-      empty.textContent = "No matches. Try fewer words or just a number (e.g. 12, 203).";
-      container.appendChild(empty);
-      return;
+      const ins = document.createElement("ins");
+      ins.className = "eas6a97888e2";
+      ins.setAttribute("data-zoneid", slot.dataset.zone);
+      slot.appendChild(ins);
     }
 
-    sorted.forEach((item, i) => {
-      container.appendChild(makeCard(item, i));
+    // Serve after ins tags exist.
+    (window.AdProvider = window.AdProvider || []).push({ serve: {} });
+  }
 
-      if(AD_EVERY && i < sorted.length - 1 && (i + 1) % AD_EVERY === 0){
-        container.appendChild(makeBetweenAd());
+  function buildBetweenAd(){
+    const wrap = document.createElement("div");
+    wrap.className = "between-ad";
+    const slot = document.createElement("div");
+    slot.className = "exo-slot";
+    slot.dataset.zone = BETWEEN_ZONE;
+    wrap.appendChild(slot);
+    return wrap;
+  }
+
+  function makeDetails(item, idx){
+    const d = document.createElement("details");
+    d.className = "card";
+    d.dataset.idx = String(idx);
+
+    const title = escapeHtml(item.title || `Item ${idx+1}`);
+    const id = item.id ? escapeHtml(item.id) : "";
+
+    // We do NOT inject an iframe immediately.
+    // We store data-src and only create iframe when opened.
+    d.innerHTML = `
+      <summary>
+        <div class="leftstack">
+          <div class="doc">${title}</div>
+          ${id ? `<div class="id">${id}</div>` : ``}
+        </div>
+        <div class="actions">
+          <a class="pill ghost" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open</a>
+          <span class="pill primary expbtn" role="button" tabindex="0">Expand <span class="chev"></span></span>
+        </div>
+      </summary>
+      <div class="content" data-src="${escapeHtml(item.url)}"></div>
+    `;
+    return d;
+  }
+
+  function render(){
+    const container = $("#container");
+    if(!container) return;
+
+    container.innerHTML = "";
+
+    // Insert items + between ads
+    ITEMS.forEach((item, i) => {
+      const d = makeDetails(item, i);
+      container.appendChild(d);
+
+      // Place between ad after every N items, but not at the end
+      const isInsertPoint = (i+1) % BETWEEN_EVERY === 0 && (i+1) < ITEMS.length;
+      if(isInsertPoint){
+        container.appendChild(buildBetweenAd());
       }
     });
 
-    openFirstVisible();
+    // After DOM exists, init ads (top/left/right + between)
+    initMagsrvAds(document);
 
-  }catch(err){
-    setMeta("");
-    const box = document.createElement("div");
-    box.className = "ad-slot";
-    box.textContent = "Failed to load: " + (err?.message || String(err));
-    container.appendChild(box);
+    // Open first/mid/last for “progression”
+    if(OPEN_PROGRESSIVE && ITEMS.length > 0){
+      const cards = $$("details.card", container);
+      const mid = Math.floor((cards.length - 1) / 2);
 
-    const hint = document.createElement("div");
-    hint.className = "ad-slot";
-    hint.style.marginTop = "12px";
-    hint.textContent = `Make sure ${DATA_FILE} is next to index.html and has lines like: FILE_ID | Title`;
-    container.appendChild(hint);
-  }
-}
+      // close all first
+      cards.forEach(c => c.open = false);
 
-function wireUI(){
-  const input = document.getElementById("q");
-  const clear = document.getElementById("clear");
-  const openFirst = document.getElementById("openFirst");
-
-  if(input){
-    input.addEventListener("keydown", (e) => {
-      if(e.key === "Enter") render();
-    });
-
-    input.addEventListener("input", () => {
-      clearTimeout(window.__t);
-      window.__t = setTimeout(render, 120);
-    });
+      if(cards[0]) cards[0].open = true;
+      if(cards[mid]) cards[mid].open = true;
+      if(cards[cards.length-1]) cards[cards.length-1].open = true;
+    }
   }
 
-  if(clear){
-    clear.addEventListener("click", () => {
-      if(input) input.value = "";
+  // Make "Expand" pill toggle details reliably
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".expbtn");
+    if(!btn) return;
+    const d = btn.closest("details");
+    if(!d) return;
+    d.open = !d.open;
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  // Lazy load iframe only when opened, and only keep ONE iframe alive at a time
+  document.addEventListener("toggle", (e) => {
+    const d = e.target;
+    if(!(d instanceof HTMLDetailsElement)) return;
+
+    const content = d.querySelector(".content[data-src]");
+    if(!content) return;
+
+    if(d.open){
+      // close other details to keep memory low
+      $$("details[open]").forEach(x => { if(x !== d) x.open = false; });
+
+      if(content.querySelector("iframe")) return;
+
+      const src = content.dataset.src;
+
+      // On narrow screens, avoid embedding heavy viewer; show a button instead
+      const isMobile = window.matchMedia("(max-width: 900px)").matches;
+
+      if(isMobile){
+        content.innerHTML = `
+          <div class="viewer">
+            <a href="${escapeHtml(src)}" target="_blank" rel="noopener">Open viewer</a>
+          </div>
+        `;
+      } else {
+        const iframe = document.createElement("iframe");
+        iframe.loading = "lazy";
+        iframe.referrerPolicy = "no-referrer";
+        iframe.src = src;
+        content.appendChild(iframe);
+      }
+    } else {
+      // free memory
+      content.innerHTML = "";
+    }
+  }, true);
+
+  // Search: local filter (no heavy ajax). Shows quick nav links.
+  let SEARCH_INDEX = null;
+  function buildSearchIndex(){
+    if(SEARCH_INDEX) return SEARCH_INDEX;
+    SEARCH_INDEX = ITEMS.map((it, i) => ({
+      i,
+      t: (it.title || "").toLowerCase(),
+      title: it.title || `Item ${i+1}`,
+      url: it.url
+    }));
+    return SEARCH_INDEX;
+  }
+
+  function runSearch(q){
+    q = (q || "").trim().toLowerCase();
+    if(!q) return [];
+    const toks = q.split(/\s+/).filter(Boolean);
+    const idx = buildSearchIndex();
+    const out = [];
+    for(const it of idx){
+      let ok = true;
+      for(const tok of toks){
+        if(!it.t.includes(tok)) { ok = false; break; }
+      }
+      if(ok) out.push(it);
+      if(out.length >= 30) break;
+    }
+    return out;
+  }
+
+  function wireUI(){
+    const input = $("#q");
+    const meta  = $("#meta");
+    const nav   = $("#nav");
+    const clear = $("#clear");
+    const openFirst = $("#openFirst");
+
+    if(clear){
+      clear.addEventListener("click", () => {
+        if(input) input.value = "";
+        if(nav) nav.style.display = "none";
+        if(meta) meta.textContent = "";
+      });
+    }
+
+    if(openFirst){
+      openFirst.addEventListener("click", () => {
+        const first = $("details.card");
+        if(first) first.open = true;
+        first?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+
+    if(input){
+      let tmr = null;
+      input.addEventListener("input", () => {
+        clearTimeout(tmr);
+        tmr = setTimeout(() => {
+          const q = input.value;
+          if(!q.trim()){
+            if(nav) nav.style.display = "none";
+            if(meta) meta.textContent = "";
+            return;
+          }
+          const hits = runSearch(q);
+          if(meta) meta.textContent = hits.length ? `Matches: ${hits.length}` : "No matches.";
+          if(nav){
+            nav.innerHTML = hits.map(h => `<a href="${escapeHtml(h.url)}" target="_blank" rel="noopener">${escapeHtml(h.title)}</a>`).join("");
+            nav.style.display = hits.length ? "flex" : "none";
+          }
+        }, 180);
+      });
+
+      input.addEventListener("keydown", (e) => {
+        if(e.key !== "Enter") return;
+        const hits = runSearch(input.value);
+        if(hits[0]) window.open(hits[0].url, "_blank", "noopener");
+      });
+    }
+  }
+
+  // Boot
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", () => {
       render();
+      wireUI();
+      // Ensure magsrv gets a serve call even if it loads late
+      setTimeout(() => initMagsrvAds(document), 800);
     });
+  } else {
+    render();
+    wireUI();
+    setTimeout(() => initMagsrvAds(document), 800);
   }
-
-  if(openFirst){
-    openFirst.addEventListener("click", () => openFirstVisible());
-  }
-}
-
-function init(){
-  mountFixedAds();   // mounts top/left/right ad zones
-  wireUI();          // wires search UI
-  render();          // renders list + between ads
-}
-
-document.addEventListener("DOMContentLoaded", init);
-
-/*
-POPUNDER NOTE:
-Popunder isn’t an <ins> slot; it’s that huge script ExoClick gave you.
-Keep it as a normal <script> paste near the end of <body> in index.html
-(or I can show you how to inject it from JS if you want).
-*/
+})();
