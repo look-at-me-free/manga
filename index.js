@@ -1,15 +1,37 @@
 // index.js
 (() => {
   // ====== EDIT THIS LIST ======
-  const ITEMS = [
-    { title: "Volume 1 Chapter 1", id: "V1-C001", url: "https://drive.google.com/file/d/1OovhU8PaSu4ZK4CsJMp4EilJ7zXM96S1/view?usp=sharing" },
-    { title: "Volume 1 Chapter 2", id: "V1-C002", url: "https://drive.google.com/file/d/1aVwsgv8L23LU_7fFZoEWO7Rj-_6aeCHl/view?usp=sharing" },
-    { title: "Volume 1 Chapter 3", id: "V1-C003", url: "https://drive.google.com/file/d/1pBiTpyyRv5FxI9015aH__6Wj7mGMhu_w/view?usp=sharing" },
-    { title: "Volume 1 Chapter 4", id: "V1-C004", url: "https://drive.google.com/file/d/1ETkV_XiipV_aAIfJQ_DApnfbSGkWa6Ap/view?usp=sharing" },
-    { title: "Volume 1 Chapter 5", id: "V1-C005", url: "https://drive.google.com/file/d/1B6Ok2wbJ1qVHWcbvkl2NqpdLd2W_Mhtd/view?usp=sharing" },
-    { title: "Volume 1 Chapter 6", id: "V1-C006", url: "https://drive.google.com/file/d/1z63JfaOeV_x6N692_Sb8_VKtT50_Eqgl/view?usp=sharing" },
-    { title: "Volume 1 Chapter 7", id: "V1-C007", url: "https://drive.google.com/file/d/1GP6yKJwHqAVc8Sn-V5hy3luG62pt0FeB/view?usp=sharing" },
-  ];
+const ITEMS = [
+  { title: "Volume 1 Chapter 1", id: "V1-C001", url: "https://drive.google.com/file/d/1OovhU8PaSu4ZK4CsJMp4EilJ7zXM96S1/view?usp=sharing" },
+  { title: "Volume 1 Chapter 2", id: "V1-C002", url: "https://drive.google.com/file/d/1aVwsgv8L23LU_7fFZoEWO7Rj-_6aeCHl/view?usp=sharing" },
+  { title: "Volume 1 Chapter 3", id: "V1-C003", url: "https://drive.google.com/file/d/1pBiTpyyRv5FxI9015aH__6Wj7mGMhu_w/view?usp=sharing" },
+  { title: "Volume 1 Chapter 4", id: "V1-C004", url: "https://drive.google.com/file/d/1ETkV_XiipV_aAIfJQ_DApnfbSGkWa6Ap/view?usp=sharing" },
+  { title: "Volume 1 Chapter 5", id: "V1-C005", url: "https://drive.google.com/file/d/1B6Ok2wbJ1qVHWcbvkl2NqpdLd2W_Mhtd/view?usp=sharing" },
+  { title: "Volume 1 Chapter 6", id: "V1-C006", url: "https://drive.google.com/file/d/1z63JfaOeV_x6N692_Sb8_VKtT50_Eqgl/view?usp=sharing" },
+  { title: "Volume 1 Chapter 7", id: "V1-C007", url: "https://drive.google.com/file/d/1GP6yKJwHqAVc8Sn-V5hy3luG62pt0FeB/view?usp=sharing" },
+
+  { title: "Volume 1 Chapter 8",  id: "V1-C008", url: "https://drive.google.com/file/d/1ZOkEahRiIUXyFj-F_NmfXJjSecEG8b8E/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 9",  id: "V1-C009", url: "https://drive.google.com/file/d/1BnqVYkWh70SmZUKuo_XiEETqAfKRBkRz/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 10", id: "V1-C010", url: "https://drive.google.com/file/d/1ThSV1CAFgZwXWYEZx8i1oTL2L-iKVMmZ/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 11", id: "V1-C011", url: "https://drive.google.com/file/d/19kRXReOH6B0n-mQ4l_8sbMO1gciD__zh/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 12", id: "V1-C012", url: "https://drive.google.com/file/d/1V4lKM9N0W9XShS7i_x5Boq6Yqp8-HVp7/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 13", id: "V1-C013", url: "https://drive.google.com/file/d/1eHwqod3QwfI4jYwOOEKYCd--tFgtg3nk/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 14", id: "V1-C014", url: "https://drive.google.com/file/d/1JK6caXUfx62YanePMV38P6bWMgQGVIxw/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 15", id: "V1-C015", url: "https://drive.google.com/file/d/1jDw5a3Z41ZCkt3KkHJOJPOgRI_S5BRaT/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 16", id: "V1-C016", url: "https://drive.google.com/file/d/1MI9NS9xSw-Gu5o2kP8-jsMm9GoR2AgwN/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 17", id: "V1-C017", url: "https://drive.google.com/file/d/1ZC-wSYPVIXzoAka-0YD-l03yspGelMwD/view?usp=drive_link" },
+
+  { title: "Volume 1 Chapter 18", id: "V1-C018", url: "https://drive.google.com/file/d/1I_GYxwC62ObDl0mvNXArLe6OtOBOG63t/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 19", id: "V1-C019", url: "https://drive.google.com/file/d/1jmL32DFLrwXSZr7IUXdhS3cQyAppUOtO/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 20", id: "V1-C020", url: "https://drive.google.com/file/d/1sHytQ5m_bswGMv9colR5taIatIchb_gR/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 21", id: "V1-C021", url: "https://drive.google.com/file/d/1prQGCeJcwI7b9SvXZAd064n275CQpXfr/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 22", id: "V1-C022", url: "https://drive.google.com/file/d/1VPJcAkYXPz_oU-s78DrIi3w3vddxTh9E/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 23", id: "V1-C023", url: "https://drive.google.com/file/d/1MP79r9Z4McWxkl5kjjya6XtxjBIaB7aB/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 24", id: "V1-C024", url: "https://drive.google.com/file/d/1W61esEMyP5TmbkfpqqTuLguFocs3TyNo/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 25", id: "V1-C025", url: "https://drive.google.com/file/d/1CcRdCmImoZpj-zBOD6SxsFc_QlSpJlTx/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 26", id: "V1-C026", url: "https://drive.google.com/file/d/1NcxRhXHgEcd0_Y127cIuJjSWp3YduEB3/view?usp=drive_link" },
+  { title: "Volume 1 Chapter 27", id: "V1-C027", url: "https://drive.google.com/file/d/1KMrs_5P9D7nVPeBS0U1C6UxbGaNcheWV/view?usp=drive_link" },
+];
 
   // ====== AD ZONES ======
   const BETWEEN_ZONE = "5865236"; // money zone (300x250)
