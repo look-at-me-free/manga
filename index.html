@@ -9,7 +9,7 @@
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double+Ink:wght@100..900&family=Pangolin&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double+Ink:wght@100..900&family=Pangolin&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
 <!-- Exo/Magsrv loader (ONLY ONCE) -->
 <script async type="application/javascript" src="https://a.magsrv.com/ad-provider.js"></script>
@@ -228,7 +228,7 @@ details[open] .chev{ transform:rotate(45deg); margin-top:-2px; }
 .content{ background:#000; border-top:1px solid rgba(255,255,255,.10); }
 iframe{ width:100%; height:85vh; border:0; }
 
-/* Between ad block (the JS will decide how many slots go in here) */
+/* Between ad block */
 .between-ad{
   margin:14px 0;
   padding:14px;
@@ -253,7 +253,7 @@ iframe{ width:100%; height:85vh; border:0; }
   background:rgba(255,255,255,.03);
 }
 
-/* Footer mega ad block (JS will insert 12 slots here) */
+/* Footer mega ad block */
 .end-ads{
   margin:18px 0 40px;
   padding:16px;
@@ -318,7 +318,7 @@ iframe{ width:100%; height:85vh; border:0; }
 
   <div class="toolbar">
     <div class="search">
-      <input id="q" type="search" placeholder="Search titles… e.g. DBZ 284, dbz 285…" autocomplete="off" />
+      <input id="q" type="search" placeholder="Search titles… e.g. Volume 1 Chapter 3" autocomplete="off" />
       <span class="kbd">Enter</span>
     </div>
     <button class="smallbtn" id="clear">Clear</button>
@@ -339,14 +339,12 @@ iframe{ width:100%; height:85vh; border:0; }
   <!-- LEFT STACK -->
   <aside class="rail">
     <div class="rail-stack" id="leftRail">
-      <!-- JS can clone multiple slots if you want -->
       <div class="exo-slot" data-zone="5865238" data-fallback="left"></div>
     </div>
   </aside>
 
   <main class="center">
     <div id="container"></div>
-    <!-- JS will optionally append the end-ads block here -->
   </main>
 
   <!-- RIGHT STACK -->
