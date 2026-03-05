@@ -17,7 +17,7 @@
   const END_ADS      = 12;
 
   // Between pattern (3 slots per between block, every 6 items)
-  const BETWEEN_EVERY = 6;
+  const BETWEEN_EVERY = 1;
   const BETWEEN_SLOTS = 3;
 
   const $  = (s, r=document) => r.querySelector(s);
