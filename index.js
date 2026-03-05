@@ -7,76 +7,105 @@
   ];
 
   // Zones
-  const BETWEEN_ZONE = "5865236"; // between chapters
-  const END_ZONE = "5865344";     // bottom 300x250
-  const END_ADS = 12;
+  const BETWEEN_ZONE = "5865236"; // your proven money zone (300x250)
+  const END_ZONE     = "5865236"; // IMPORTANT: use the same money zone at the footer for now
+  const END_ADS      = 12;
 
-  const $ = (s, r = document) => r.querySelector(s);
-  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  // Between pattern
+  const BETWEEN_ADS_PER_GAP = 6;
 
-  function escapeHtml(s) {
+  const $  = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+  function escapeHtml(s){
     return String(s)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#39;");
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
   }
 
   // --- Drive URL helpers ---
-  function driveFileIdFromUrl(url) {
-    // supports:
-    // https://drive.google.com/file/d/<ID>/view
-    // https://drive.google.com/open?id=<ID>
-    // https://drive.google.com/uc?id=<ID>&...
-    try {
+  function driveFileIdFromUrl(url){
+    try{
       const u = new URL(url);
       const m = u.pathname.match(/\/file\/d\/([^/]+)/);
-      if (m && m[1]) return m[1];
+      if(m && m[1]) return m[1];
       const id = u.searchParams.get("id");
-      if (id) return id;
-      return null;
+      return id || null;
     } catch {
       const m = String(url).match(/\/file\/d\/([^/]+)/);
       return m?.[1] || null;
     }
   }
 
-  function toDrivePreview(url) {
-    // If it's a Drive file link, convert to /preview for iframe embedding
+  function toDrivePreview(url){
     const id = driveFileIdFromUrl(url);
-    if (!id) return url;
+    if(!id) return url;
     return `https://drive.google.com/file/d/${id}/preview`;
   }
 
-  // Convert .exo-slot placeholders into <ins> and request ads
-  function initMagsrvAds(root = document) {
-    const slots = $$(".exo-slot[data-zone]", root);
-    for (const slot of slots) {
-      if (slot.dataset.inited) continue;
-      slot.dataset.inited = "1";
+  // ---- Ad init (TURN .exo-slot into <ins> + serve) ----
+  function ensureIns(slot){
+    if(slot.dataset.inited) return;
+    slot.dataset.inited = "1";
 
-      const ins = document.createElement("ins");
-      ins.className = "eas6a97888e2";
-      ins.setAttribute("data-zoneid", slot.dataset.zone);
-      slot.appendChild(ins);
-    }
+    const ins = document.createElement("ins");
+    ins.className = "eas6a97888e2";
+    ins.setAttribute("data-zoneid", slot.dataset.zone);
+    slot.appendChild(ins);
+  }
+
+  function serveAds(){
     (window.AdProvider = window.AdProvider || []).push({ serve: {} });
   }
 
-  // We agreed: 6 ads between every PDF
-  function betweenAdCount() {
-    return 6;
+  // LAZY ad loading: only init when near viewport
+  let adObserver = null;
+  function initLazyAds(){
+    if(adObserver) return;
+
+    adObserver = new IntersectionObserver((entries) => {
+      let didInit = false;
+
+      for(const entry of entries){
+        if(!entry.isIntersecting) continue;
+        const slot = entry.target;
+        ensureIns(slot);
+        adObserver.unobserve(slot);
+        didInit = true;
+      }
+
+      // only call serve if we actually initialized something new
+      if(didInit) {
+        // tiny delay lets DOM settle
+        setTimeout(serveAds, 30);
+      }
+    }, {
+      root: null,
+      rootMargin: "900px 0px", // start loading before user reaches it
+      threshold: 0.01
+    });
+
+    // observe all slots currently on page
+    $$(`.exo-slot[data-zone]`).forEach(slot => adObserver.observe(slot));
   }
 
-  function buildBetweenAd(count) {
+  function observeNewSlots(root){
+    if(!adObserver) return;
+    $$(`.exo-slot[data-zone]`, root).forEach(slot => adObserver.observe(slot));
+  }
+
+  // ---- Ad block builders ----
+  function buildBetweenAd(count){
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
 
     const grid = document.createElement("div");
     grid.className = "between-grid";
 
-    for (let i = 0; i < count; i++) {
+    for(let i=0;i<count;i++){
       const slot = document.createElement("div");
       slot.className = "exo-slot";
       slot.dataset.zone = BETWEEN_ZONE;
@@ -87,35 +116,60 @@
     return wrap;
   }
 
-  function buildEndAds() {
-    const wrap = document.createElement("div");
-    wrap.className = "between-ad";
+  function buildEndAds(){
+    // keep your footer styling from CSS, but your HTML expects .end-ads grid
+    const wrap = document.createElement("section");
+    wrap.className = "end-ads";
+
+    const title = document.createElement("p");
+    title.className = "end-ads-title pangolin";
+    title.textContent = "More panels";
 
     const grid = document.createElement("div");
-    grid.className = "between-grid";
+    grid.className = "end-ads-grid";
 
-    for (let i = 0; i < END_ADS; i++) {
+    for(let i=0;i<END_ADS;i++){
       const slot = document.createElement("div");
       slot.className = "exo-slot";
       slot.dataset.zone = END_ZONE;
       grid.appendChild(slot);
     }
 
+    wrap.appendChild(title);
     wrap.appendChild(grid);
     return wrap;
   }
 
-  function makeDetails(item, idx) {
+  function makeFeaturedMoneySlot(){
+    // A guaranteed above-fold 5865236 slot (this is where the money happens)
+    const wrap = document.createElement("div");
+    wrap.className = "between-ad";
+    wrap.style.maxWidth = "1100px";
+    wrap.style.margin = "16px auto 0";
+
+    const grid = document.createElement("div");
+    grid.className = "between-grid";
+
+    const slot = document.createElement("div");
+    slot.className = "exo-slot";
+    slot.dataset.zone = BETWEEN_ZONE; // 5865236
+    grid.appendChild(slot);
+
+    wrap.appendChild(grid);
+    return wrap;
+  }
+
+  function makeDetails(item, idx){
     const d = document.createElement("details");
     d.className = "card";
     d.dataset.idx = String(idx);
     d.id = `item-${idx}`;
 
-    const title = escapeHtml(item.title || `Item ${idx + 1}`);
+    const title = escapeHtml(item.title || `Item ${idx+1}`);
     const id = item.id ? escapeHtml(item.id) : "";
 
-    const openUrl = item.url;                 // normal link
-    const embedUrl = toDrivePreview(item.url); // iframe-friendly
+    const openUrl  = item.url;
+    const embedUrl = toDrivePreview(item.url);
 
     d.innerHTML = `
       <summary>
@@ -133,163 +187,153 @@
     return d;
   }
 
-  function render() {
+  function render(){
     const container = $("#container");
-    if (!container) return;
-
+    if(!container) return;
     container.innerHTML = "";
+
+    // 1) Featured money slot ABOVE first chapter (high viewability)
+    container.appendChild(makeFeaturedMoneySlot());
 
     ITEMS.forEach((item, i) => {
       const d = makeDetails(item, i);
       container.appendChild(d);
 
-      if ((i + 1) < ITEMS.length) {
-        container.appendChild(buildBetweenAd(betweenAdCount(i)));
+      if((i + 1) < ITEMS.length){
+        container.appendChild(buildBetweenAd(BETWEEN_ADS_PER_GAP));
       }
     });
 
-    // bottom: 12x 300x250
+    // Footer: 12 slots (same money zone for now)
     container.appendChild(buildEndAds());
 
-    initMagsrvAds(document);
+    // Observe any slots we just created
+    observeNewSlots(container);
 
-    // progression vibe: open first/mid/last
-    if (ITEMS.length > 0) {
-      const cards = $$("details.card", container);
-      const mid = Math.floor((cards.length - 1) / 2);
-
-      cards.forEach(c => (c.open = false));
-      if (cards[0]) cards[0].open = true;
-      if (cards[mid]) cards[mid].open = true;
-      if (cards[cards.length - 1]) cards[cards.length - 1].open = true;
-    }
+    // Open behavior: only 2 items => open both
+    const cards = $$("details.card", container);
+    cards.forEach(c => c.open = true);
   }
 
-  // Expand button behavior
+  // Expand button
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".expbtn");
-    if (!btn) return;
+    if(!btn) return;
     const d = btn.closest("details");
-    if (!d) return;
+    if(!d) return;
     d.open = !d.open;
     e.preventDefault();
     e.stopPropagation();
   });
 
-  // Lazy iframe: only keep ONE iframe alive at a time
-  document.addEventListener(
-    "toggle",
-    (e) => {
-      const d = e.target;
-      if (!(d instanceof HTMLDetailsElement)) return;
+  // Embed: keep one iframe alive at a time (desktop); on mobile show a button
+  document.addEventListener("toggle", (e) => {
+    const d = e.target;
+    if(!(d instanceof HTMLDetailsElement)) return;
 
-      const content = d.querySelector(".content[data-src]");
-      if (!content) return;
+    const content = d.querySelector(".content[data-src]");
+    if(!content) return;
 
-      if (d.open) {
-        // close others
-        $$("details[open]").forEach((x) => {
-          if (x !== d) x.open = false;
-        });
-
-        if (content.querySelector("iframe")) return;
-
-        const embedSrc = content.dataset.src;
-        const openSrc = content.dataset.open || embedSrc;
-
-        const isMobile = window.matchMedia("(max-width: 900px)").matches;
-        if (isMobile) {
-          content.innerHTML = `
-            <div style="padding:16px;text-align:center">
-              <a class="pill primary" href="${escapeHtml(openSrc)}" target="_blank" rel="noopener">Open viewer</a>
-            </div>
-          `;
-        } else {
-          const iframe = document.createElement("iframe");
-          iframe.loading = "lazy";
-          iframe.referrerPolicy = "no-referrer";
-          iframe.src = embedSrc;
-          iframe.allow = "fullscreen";
-          content.appendChild(iframe);
-        }
-      } else {
-        content.innerHTML = "";
+    if(d.open){
+      // close others ONLY if you want. Since you asked for both open with 2 items,
+      // we keep them both open when ITEMS.length <= 2.
+      if(ITEMS.length > 2){
+        $$("details[open]").forEach(x => { if(x !== d) x.open = false; });
       }
-    },
-    true
-  );
 
-  // Lightweight search
+      if(content.querySelector("iframe")) return;
+
+      const embedSrc = content.dataset.src;
+      const openSrc  = content.dataset.open || embedSrc;
+
+      const isMobile = window.matchMedia("(max-width: 900px)").matches;
+      if(isMobile){
+        content.innerHTML = `
+          <div style="padding:16px;text-align:center">
+            <a class="pill primary" href="${escapeHtml(openSrc)}" target="_blank" rel="noopener">Open viewer</a>
+          </div>
+        `;
+      } else {
+        const iframe = document.createElement("iframe");
+        iframe.loading = "lazy";
+        iframe.referrerPolicy = "no-referrer";
+        iframe.src = embedSrc;
+        iframe.allow = "fullscreen";
+        content.appendChild(iframe);
+      }
+    } else {
+      content.innerHTML = "";
+    }
+  }, true);
+
+  // Search
   let SEARCH_INDEX = null;
-  function buildSearchIndex() {
-    if (SEARCH_INDEX) return SEARCH_INDEX;
+  function buildSearchIndex(){
+    if(SEARCH_INDEX) return SEARCH_INDEX;
     SEARCH_INDEX = ITEMS.map((it, i) => ({
       i,
       t: (it.title || "").toLowerCase(),
-      title: it.title || `Item ${i + 1}`,
-      url: it.url,
+      title: it.title || `Item ${i+1}`,
+      url: it.url
     }));
     return SEARCH_INDEX;
   }
 
-  function runSearch(q) {
+  function runSearch(q){
     q = (q || "").trim().toLowerCase();
-    if (!q) return [];
+    if(!q) return [];
     const toks = q.split(/\s+/).filter(Boolean);
-
     const idx = buildSearchIndex();
+
     const out = [];
-    for (const it of idx) {
+    for(const it of idx){
       let ok = true;
-      for (const tok of toks) {
-        if (!it.t.includes(tok)) {
-          ok = false;
-          break;
-        }
+      for(const tok of toks){
+        if(!it.t.includes(tok)) { ok = false; break; }
       }
-      if (ok) out.push(it);
-      if (out.length >= 30) break;
+      if(ok) out.push(it);
+      if(out.length >= 30) break;
     }
     return out;
   }
 
-  function wireUI() {
+  function wireUI(){
     const input = $("#q");
-    const meta = $("#meta");
-    const nav = $("#nav");
+    const meta  = $("#meta");
+    const nav   = $("#nav");
     const clear = $("#clear");
     const openFirst = $("#openFirst");
 
-    if (clear) {
+    if(clear){
       clear.addEventListener("click", () => {
-        if (input) input.value = "";
-        if (nav) nav.style.display = "none";
-        if (meta) meta.textContent = "";
+        if(input) input.value = "";
+        if(nav) nav.style.display = "none";
+        if(meta) meta.textContent = "";
       });
     }
 
-    if (openFirst) {
+    if(openFirst){
       openFirst.addEventListener("click", () => {
         const first = $("details.card");
-        if (first) first.open = true;
+        if(first) first.open = true;
         first?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
 
-    if (input) {
+    if(input){
       let tmr = null;
       input.addEventListener("input", () => {
         clearTimeout(tmr);
         tmr = setTimeout(() => {
           const q = input.value;
-          if (!q.trim()) {
-            if (nav) nav.style.display = "none";
-            if (meta) meta.textContent = "";
+          if(!q.trim()){
+            if(nav) nav.style.display = "none";
+            if(meta) meta.textContent = "";
             return;
           }
           const hits = runSearch(q);
-          if (meta) meta.textContent = hits.length ? `Matches: ${hits.length}` : "No matches.";
-          if (nav) {
+          if(meta) meta.textContent = hits.length ? `Matches: ${hits.length}` : "No matches.";
+          if(nav){
             nav.innerHTML = hits.map(h => `<a href="#item-${h.i}">${escapeHtml(h.title)}</a>`).join("");
             nav.style.display = hits.length ? "flex" : "none";
           }
@@ -297,43 +341,25 @@
       });
 
       input.addEventListener("keydown", (e) => {
-        if (e.key !== "Enter") return;
+        if(e.key !== "Enter") return;
         const hits = runSearch(input.value);
-        if (hits[0]) window.open(hits[0].url, "_blank", "noopener");
+        if(hits[0]) window.open(hits[0].url, "_blank", "noopener");
       });
     }
   }
 
-  // Side fallback hooks (optional)
-  function injectFallback(_side, _slotEl) {}
-  function slotLooksFilled(slotEl) {
-    if (slotEl.querySelector("iframe")) return true;
-    if (slotEl.children.length >= 2) return true;
-    const ins = slotEl.querySelector("ins");
-    if (ins) {
-      const r = ins.getBoundingClientRect();
-      if (r.height >= 40) return true;
-    }
-    return false;
-  }
-  function runSideFallbacks() {
-    const sideSlots = $$(".exo-slot[data-fallback]");
-    setTimeout(() => {
-      for (const slot of sideSlots) {
-        if (slotLooksFilled(slot)) continue;
-        injectFallback(slot.dataset.fallback, slot);
-      }
-    }, 1600);
-  }
-
-  function boot() {
+  function boot(){
     render();
     wireUI();
-    setTimeout(() => initMagsrvAds(document), 700);
-    runSideFallbacks();
+
+    // Start lazy ad system AFTER DOM exists
+    initLazyAds();
+
+    // Kick an extra serve a moment later (helps on some loads)
+    setTimeout(serveAds, 900);
   }
 
-  if (document.readyState === "loading") {
+  if(document.readyState === "loading"){
     document.addEventListener("DOMContentLoaded", boot);
   } else {
     boot();
