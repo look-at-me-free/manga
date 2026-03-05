@@ -12,14 +12,13 @@
   ];
 
   // Zones
-  const BETWEEN_ZONE = "5865236"; // your proven money zone (300x250)
-  const END_ZONE     = "5865236"; // same money zone at footer
+  const BETWEEN_ZONE = "5865236"; // proven money zone (300x250)
+  const END_ZONE     = "5865236"; // same money zone at footer for now
   const END_ADS      = 12;
 
-  // Between pattern (FIXED):
-  // Insert a between-ad block AFTER every N items, not after every item.
+  // Between pattern (3 slots per between block, every 6 items)
   const BETWEEN_EVERY = 6;
-  const BETWEEN_SLOTS = 1; // how many 300x250s inside each between block
+  const BETWEEN_SLOTS = 3;
 
   const $  = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
@@ -144,7 +143,7 @@
   }
 
   function makeFeaturedMoneySlot(){
-    // guaranteed above-fold 5865236 slot
+    // single above-fold 5865236 slot (clean + high viewability)
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
     wrap.style.maxWidth = "1100px";
@@ -191,12 +190,11 @@
   }
 
   function openSmart(cards){
-    // FIX: don’t open every iframe by default (kills performance + can tank ad viewability).
+    // keep the site feeling clean: don’t open everything by default
     if(cards.length <= 2){
       cards.forEach(c => c.open = true);
       return;
     }
-    // open first, middle, last
     const first = 0;
     const mid   = Math.floor(cards.length/2);
     const last  = cards.length - 1;
@@ -208,29 +206,27 @@
     if(!container) return;
     container.innerHTML = "";
 
-    // 1) Featured money slot ABOVE first chapter
+    // featured slot
     container.appendChild(makeFeaturedMoneySlot());
 
     ITEMS.forEach((item, i) => {
       container.appendChild(makeDetails(item, i));
 
-      // FIX: between ads only every BETWEEN_EVERY items (not after every item)
+      // between block every N items
       const isGapPoint = ((i + 1) % BETWEEN_EVERY === 0) && (i + 1) < ITEMS.length;
       if(isGapPoint){
         container.appendChild(buildBetweenAd(BETWEEN_SLOTS));
       }
     });
 
-    // Footer ads
     container.appendChild(buildEndAds());
-
     observeNewSlots(container);
 
     const cards = $$("details.card", container);
     openSmart(cards);
   }
 
-  // Expand button (kept)
+  // Expand button
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".expbtn");
     if(!btn) return;
@@ -241,7 +237,7 @@
     e.stopPropagation();
   });
 
-  // Embed: keep one iframe alive at a time (desktop); on mobile show a button
+  // Embed
   document.addEventListener("toggle", (e) => {
     const d = e.target;
     if(!(d instanceof HTMLDetailsElement)) return;
@@ -250,7 +246,6 @@
     if(!content) return;
 
     if(d.open){
-      // close others if you want (for many items)
       if(ITEMS.length > 2){
         $$("details[open]").forEach(x => { if(x !== d) x.open = false; });
       }
@@ -369,8 +364,6 @@
     wireUI();
 
     initLazyAds();
-
-    // extra serve a moment later (helps on some loads)
     setTimeout(serveAds, 900);
   }
 
