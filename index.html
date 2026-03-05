@@ -29,7 +29,6 @@
 
 *{ box-sizing:border-box; }
 
-html{ scroll-behavior:smooth; }
 body{
   margin:0;
   background:
@@ -58,7 +57,8 @@ body{
 .kbd,
 .smallbtn,
 .search input,
-.search-title{
+.search-title,
+.search-label{
   font-family:"Pangolin", cursive;
   font-weight:400;
 }
@@ -101,25 +101,6 @@ body{
   font-size:12px;
   text-align:center;
   margin:10px 0 0;
-}
-
-/* Pixel SEARCH button */
-.search-jump{
-  font-family:"Press Start 2P", system-ui, sans-serif;
-  font-size:14px;
-  letter-spacing:1px;
-  padding:14px 18px;
-  border-radius:14px;
-  border:2px solid rgba(255,255,255,.18);
-  background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
-  color:var(--ink);
-  cursor:pointer;
-  box-shadow:0 14px 50px rgba(0,0,0,.5);
-  transition:transform .12s ease, background .12s ease;
-}
-.search-jump:hover{
-  transform:translateY(-1px);
-  background:linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.08));
 }
 
 /* Top banner */
@@ -183,7 +164,7 @@ summary{
   cursor:pointer;
   padding:16px 14px;
   display:grid;
-  grid-template-columns: 1fr auto 210px;
+  grid-template-columns: 1fr auto 210px; /* left | center | right */
   gap:14px;
   align-items:center;
 }
@@ -272,7 +253,7 @@ details[open] .chev{ transform:rotate(45deg); margin-top:-2px; }
 .content{ background:#000; border-top:1px solid rgba(255,255,255,.10); }
 iframe{ width:100%; height:85vh; border:0; }
 
-/* ===== Between ad block ===== */
+/* ===== Between ad block (full-width packing) ===== */
 .between-ad{
   margin:14px 0;
   padding:14px;
@@ -298,8 +279,9 @@ iframe{ width:100%; height:85vh; border:0; }
   justify-content:center;
   align-items:center;
 }
+.between-grid.featured{ grid-template-columns: 1fr; }
 
-/* Footer mega ad block */
+/* Footer mega ad block (24) */
 .end-ads{
   margin:18px 0 18px;
   padding:16px;
@@ -333,6 +315,126 @@ iframe{ width:100%; height:85vh; border:0; }
   align-items:center;
 }
 
+/* ✅ Endcap long rectangle under final chapter */
+.endcap-ad{
+  max-width:1100px;
+  margin:18px auto 70px;
+  padding:14px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.35));
+  box-shadow:0 18px 60px rgba(0,0,0,.45);
+}
+.endcap-ad .exo-slot{
+  width:100%;
+  min-height:90px;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.03);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Make injected ads center reliably */
+.exo-slot ins{
+  display:block !important;
+  margin:0 auto !important;
+}
+
+/* ====== TOP SEARCH AREA (impressive, obvious) ====== */
+.search-zone{
+  max-width:1100px;
+  margin:18px auto 0;
+  padding:0 16px 10px;
+}
+
+.search-explain{
+  max-width:1100px;
+  margin:14px auto 0;
+  padding:0 16px;
+  color:rgba(255,255,255,.78);
+  font-size:13px;
+}
+
+.search-explain span{
+  color:rgba(255,255,255,.92);
+}
+
+.search-label{
+  text-align:center;
+  margin:18px 0 10px;
+  font-family:"Press Start 2P", system-ui, sans-serif;
+  font-size:18px;
+  letter-spacing:1.6px;
+  color:rgba(255,255,255,.92);
+  text-transform:uppercase;
+}
+
+.search{
+  width:100%;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:14px 16px;
+  border-radius:18px;
+  border:2px solid rgba(255,255,255,.18);
+  background:#ffffff;
+  box-shadow:0 18px 60px rgba(0,0,0,.55);
+}
+
+.search input{
+  width:100%;
+  background:transparent;
+  border:0;
+  outline:0;
+  color:#111;
+  font-size:16px;
+  caret-color:#000;
+}
+
+/* Make the cursor feel “stylized” (thicker caret) */
+.search input{
+  caret-shape: block; /* ignored by most browsers, harmless */
+}
+@supports not (caret-color: #000) {}
+
+/* subtle “this is the search” glow */
+.search:focus-within{
+  box-shadow:0 22px 70px rgba(0,0,0,.62);
+  transform:translateY(-1px);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+
+.kbd{
+  font-size:12px;
+  color:#333;
+  border:1px solid rgba(0,0,0,.18);
+  padding:4px 8px;
+  border-radius:999px;
+  background:rgba(0,0,0,.04);
+}
+
+/* Nav chips for search results */
+.nav{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:12px 0 0;
+  justify-content:center;
+}
+.nav a{
+  text-decoration:none;
+  padding:6px 12px;
+  background:rgba(255,255,255,.07);
+  border-radius:999px;
+  color:white;
+  font-size:13px;
+  font-family:"Pangolin", cursive;
+  border:1px solid rgba(255,255,255,.12);
+}
+
 /* Responsive packing */
 @media (max-width: 1100px){
   .layout{ grid-template-columns:1fr; }
@@ -356,69 +458,12 @@ iframe{ width:100%; height:85vh; border:0; }
   .open-note{ text-align:center; }
   .between-grid{ grid-template-columns: 1fr; }
   .end-ads-grid{ grid-template-columns: 1fr; }
-}
 
-/* Make injected ads center reliably */
-.exo-slot ins{
-  display:block !important;
-  margin:0 auto !important;
-}
-
-/* ===== Bottom search section ===== */
-.search-zone{
-  max-width:1100px;
-  margin:0 auto 60px;
-  padding:18px 16px 0;
-}
-.search-zone{ scroll-margin-top:40px; }
-.search-title{
-  text-align:center;
-  color:var(--muted);
-  margin:0 0 10px;
-  font-size:13px;
-}
-.search{
-  width:100%;
-  display:flex;
-  gap:10px;
-  align-items:center;
-  padding:12px 14px;
-  border-radius:999px;
-  border:1px solid var(--stroke);
-  background:rgba(255,255,255,.05);
-}
-.search input{
-  width:100%;
-  background:transparent;
-  border:0;
-  outline:0;
-  color:var(--ink);
-  font-size:14px;
-}
-.kbd{
-  font-size:12px;
-  color:var(--muted);
-  border:1px solid rgba(255,255,255,.18);
-  padding:3px 8px;
-  border-radius:999px;
-}
-
-/* Nav chips */
-.nav{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  padding:12px 0 0;
-  justify-content:center;
-}
-.nav a{
-  text-decoration:none;
-  padding:6px 12px;
-  background:rgba(255,255,255,.07);
-  border-radius:999px;
-  color:white;
-  font-size:13px;
-  font-family:"Pangolin", cursive;
+  .search{
+    flex-wrap:wrap;
+    border-radius:18px;
+  }
+  .kbd{ display:none; }
 }
 </style>
 </head>
@@ -430,16 +475,34 @@ iframe{ width:100%; height:85vh; border:0; }
   <p class="hero-sub">Expand • Read • Scroll</p>
 
   <div class="toolbar">
-    <button class="search-jump" id="jumpSearch" type="button">SEARCH</button>
+    <!-- Top buttons -->
     <button class="smallbtn" id="openFirstTop" type="button">First Chapter</button>
+    <button class="smallbtn" id="openLatestTop" type="button">Latest Chapter</button>
   </div>
 
   <div class="meta" id="meta"></div>
 
-  <!-- TOP BANNER ZONE -->
+  <!-- TOP BANNER ZONE (5865232) -->
   <div class="top-ad">
     <div class="exo-slot" data-zone="5865232"></div>
   </div>
+
+  <!-- Friendly explanation + SEARCH at top (no scary glide) -->
+  <p class="search-explain">
+    <span>Why is Search up here?</span> Because nobody deserves a surprise rollercoaster scroll — so the Search lives right where your eyes already are 😄
+  </p>
+
+  <section class="search-zone" id="searchSection">
+    <div class="search-label">SEARCH BAR</div>
+
+    <nav class="nav" id="nav" style="display:none;"></nav>
+
+    <div class="search">
+      <input id="q" type="search" placeholder="Type… e.g. Volume 1 Chapter 12" autocomplete="off" />
+      <span class="kbd">Enter</span>
+      <button class="smallbtn" id="clear" type="button">Clear</button>
+    </div>
+  </section>
 </header>
 
 <div class="layout">
@@ -451,22 +514,8 @@ iframe{ width:100%; height:85vh; border:0; }
   </aside>
 
   <main class="center">
-    <!-- Chapters render here (NO ad above chapters anymore) -->
     <div id="container"></div>
-
-    <!-- Bottom search -->
-    <section class="search-zone" id="searchSection">
-      <p class="search-title">Search anything (titles/chapters) ↓</p>
-
-      <nav class="nav" id="nav" style="display:none;"></nav>
-
-      <div class="search">
-        <input id="q" type="search" placeholder="Type… e.g. Volume 1 Chapter 12" autocomplete="off" />
-        <span class="kbd">Enter</span>
-        <button class="smallbtn" id="clear" type="button">Clear</button>
-        <button class="smallbtn" id="openFirstBottom" type="button">First Chapter</button>
-      </div>
-    </section>
+    <!-- NOTE: index.js injects: chapters -> 24-ad block -> final chapter -> endcap long ad -->
   </main>
 
   <!-- RIGHT STACK -->
@@ -477,7 +526,7 @@ iframe{ width:100%; height:85vh; border:0; }
   </aside>
 </div>
 
-<!-- ExoClick Popunder — 1 per 12 hours -->
+<!-- ExoClick Popunder (Zone 5865422) — 1 per 12 hours -->
 <script type="application/javascript">
 (function(){
   var adConfig = {
