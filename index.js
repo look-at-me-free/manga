@@ -32,18 +32,23 @@
   ];
 
   // ====== AD ZONES ======
-  const BETWEEN_ZONE = "5865236"; // money zone (300x250)
-  const END_ZONE     = "5865236"; // footer same zone
-  const END_ADS      = 24;        // ✅ footer 24 ads
+  const BETWEEN_ZONE = "5865236";
+  const END_ZONE     = "5865236";
+  const END_ADS      = 24;
 
   // ====== AD DENSITY ======
-  const BETWEEN_EVERY = 2;  // place between ads after every N chapters
-  const BETWEEN_SLOTS = 3;  // ✅ 3 end-to-end
+  const BETWEEN_EVERY = 2;
+  const BETWEEN_SLOTS = 3;
 
   // ====== BEHAVIOR ======
   const OPEN_SMART = true;
   const CLOSE_OTHERS_ON_OPEN = true;
   const LAZY_ADS = true;
+
+  // ====== SEARCH BUTTON BEHAVIOR ======
+  // First click = teleport. After = smooth scroll (fast, max 1.5s).
+  const SEARCH_FIRST_TELEPORT_KEY = "archive_search_first_done_v1";
+  const SCROLL_MAX_MS = 1500; // ✅ max 1.5s
 
   const $  = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
@@ -137,6 +142,7 @@
   function buildEndAds(){
     const wrap = document.createElement("section");
     wrap.className = "end-ads";
+    wrap.id = "endAds"; // optional anchor if you want
 
     const title = document.createElement("p");
     title.className = "end-ads-title";
@@ -157,7 +163,6 @@
     return wrap;
   }
 
-  // ✅ FIX: Featured block should be FULL WIDTH (no left bias)
   function makeFeaturedMoneySlot(){
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
@@ -227,6 +232,64 @@
     [first, mid, last].forEach(i => { if(cards[i]) cards[i].open = true; });
   }
 
+  // ====== Cinematic scroll (fast, max 1.5s) ======
+  function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+  function smoothScrollToY(targetY, maxMs = SCROLL_MAX_MS){
+    const startY = window.scrollY || window.pageYOffset || 0;
+    const distance = targetY - startY;
+    if(Math.abs(distance) < 2){
+      window.scrollTo(0, targetY);
+      return;
+    }
+
+    // Duration scales with distance but is capped
+    // (fast for short, still capped for huge scroll)
+    const base = 650; // quick baseline
+    const extra = Math.min(850, Math.abs(distance) * 0.25); // scale but cap
+    const duration = Math.min(maxMs, base + extra);
+
+    const start = performance.now();
+    function step(now){
+      const t = Math.min(1, (now - start) / duration);
+      const e = easeOutCubic(t);
+      window.scrollTo(0, Math.round(startY + distance * e));
+      if(t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function scrollToSearch({ teleportFirstTime } = { teleportFirstTime: true }){
+    const section = $("#searchSection");
+    if(!section) return;
+
+    const rect = section.getBoundingClientRect();
+    const targetY = Math.max(0, rect.top + (window.scrollY || 0) - 10);
+
+    const alreadyDidFirst = localStorage.getItem(SEARCH_FIRST_TELEPORT_KEY) === "1";
+
+    if(teleportFirstTime && !alreadyDidFirst){
+      // First click: instant "teleport"
+      window.scrollTo(0, targetY);
+      localStorage.setItem(SEARCH_FIRST_TELEPORT_KEY, "1");
+      setTimeout(() => $("#q")?.focus(), 50);
+      return;
+    }
+
+    // After first time: smooth + fast
+    smoothScrollToY(targetY, SCROLL_MAX_MS);
+    setTimeout(() => $("#q")?.focus(), 250);
+  }
+
+  function openFirstChapter(){
+    const first = $("details.card");
+    if(first){
+      first.open = true;
+      // Bring it into view smoothly without being dramatic
+      first.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
   // ====== Render ======
   function render(){
     const container = $("#container");
@@ -234,17 +297,14 @@
 
     container.replaceChildren();
 
-    // Featured money slot (now centered / full width)
     container.appendChild(makeFeaturedMoneySlot());
 
     ITEMS.forEach((item, i) => {
       container.appendChild(makeDetails(item, i));
-
       const isGap = ((i + 1) % BETWEEN_EVERY === 0) && (i + 1) < ITEMS.length;
       if(isGap) container.appendChild(buildBetweenAd(BETWEEN_SLOTS));
     });
 
-    // Footer 24 ads
     container.appendChild(buildEndAds());
 
     observeNewSlots(container);
@@ -267,12 +327,26 @@
       return;
     }
 
-    // Top SEARCH button scrolls to bottom search section
+    // SEARCH button (top) -> bottom search
     const jump = e.target.closest("#jumpSearch");
     if(jump){
-      const section = $("#searchSection");
-      section?.scrollIntoView({ behavior:"smooth", block:"start" });
-      setTimeout(() => $("#q")?.focus(), 250);
+      e.preventDefault();
+      e.stopPropagation();
+      scrollToSearch({ teleportFirstTime: true });
+      return;
+    }
+
+    // Open First buttons (top or bottom)
+    // Supports: #openFirst OR #openFirstTop/#openFirstBottom
+    const of =
+      e.target.closest("#openFirst") ||
+      e.target.closest("#openFirstTop") ||
+      e.target.closest("#openFirstBottom");
+
+    if(of){
+      e.preventDefault();
+      e.stopPropagation();
+      openFirstChapter();
       return;
     }
   });
@@ -307,7 +381,7 @@
     }
   }, true);
 
-  // ====== SEARCH ======
+  // ====== SEARCH (bottom input) ======
   let SEARCH_INDEX = null;
   function buildSearchIndex(){
     if(SEARCH_INDEX) return SEARCH_INDEX;
@@ -338,57 +412,59 @@
     return out;
   }
 
-  function wireUI(){
+  function wireSearchUI(){
     const input = $("#q");
     const meta  = $("#meta");
     const nav   = $("#nav");
-    const clear = $("#clear");
-    const openFirst = $("#openFirst");
+
+    // optional clear buttons (top or bottom)
+    const clearButtons = [
+      $("#clear"),
+      $("#clearBottom"),
+      $("#clearTop"),
+    ].filter(Boolean);
 
     if(meta) meta.textContent = `Items: ${ITEMS.length}`;
 
-    if(clear){
-      clear.addEventListener("click", () => {
+    clearButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
         if(input) input.value = "";
         if(nav) nav.style.display = "none";
         if(meta) meta.textContent = `Items: ${ITEMS.length}`;
       });
-    }
+    });
 
-    if(openFirst){
-      openFirst.addEventListener("click", () => {
-        const first = $("details.card");
-        if(first) first.open = true;
-        first?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
+    if(!input) return;
 
-    if(input){
-      let tmr = null;
-      input.addEventListener("input", () => {
-        clearTimeout(tmr);
-        tmr = setTimeout(() => {
-          const q = input.value;
-          if(!q.trim()){
-            if(nav) nav.style.display = "none";
-            if(meta) meta.textContent = `Items: ${ITEMS.length}`;
-            return;
-          }
-          const hits = runSearch(q);
-          if(meta) meta.textContent = hits.length ? `Matches: ${hits.length}` : "No matches.";
-          if(nav){
-            nav.innerHTML = hits.map(h => `<a href="#item-${h.i}">${escapeHtml(h.title)}</a>`).join("");
-            nav.style.display = hits.length ? "flex" : "none";
-          }
-        }, 140);
-      });
+    let tmr = null;
+    input.addEventListener("input", () => {
+      clearTimeout(tmr);
+      tmr = setTimeout(() => {
+        const q = input.value;
+        if(!q.trim()){
+          if(nav) nav.style.display = "none";
+          if(meta) meta.textContent = `Items: ${ITEMS.length}`;
+          return;
+        }
+        const hits = runSearch(q);
+        if(meta) meta.textContent = hits.length ? `Matches: ${hits.length}` : "No matches.";
 
-      input.addEventListener("keydown", (e) => {
-        if(e.key !== "Enter") return;
-        const hits = runSearch(input.value);
-        if(hits[0]) location.hash = `#item-${hits[0].i}`;
-      });
-    }
+        // If you want NO nav pills at all, just keep #nav hidden in HTML.
+        if(nav){
+          nav.innerHTML = hits.map(h => `<a href="#item-${h.i}">${escapeHtml(h.title)}</a>`).join("");
+          nav.style.display = hits.length ? "flex" : "none";
+        }
+      }, 140);
+    });
+
+    // Enter goes to the first match (no new tab)
+    input.addEventListener("keydown", (e) => {
+      if(e.key !== "Enter") return;
+      const hits = runSearch(input.value);
+      if(hits[0]){
+        location.hash = `#item-${hits[0].i}`;
+      }
+    });
   }
 
   function boot(){
@@ -396,7 +472,7 @@
     window.__ARCHIVE_BOOTED__ = true;
 
     render();
-    wireUI();
+    wireSearchUI();
 
     if(LAZY_ADS){
       initLazyAds();
