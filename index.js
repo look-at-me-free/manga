@@ -11,15 +11,24 @@
     { title: "Volume 1 Chapter 7", id: "V1-C007", url: "https://drive.google.com/file/d/1GP6yKJwHqAVc8Sn-V5hy3luG62pt0FeB/view?usp=sharing" },
   ];
 
-  // Zones
-  const BETWEEN_ZONE = "5865236"; // proven money zone (300x250)
-  const END_ZONE     = "5865236"; // same money zone at footer for now
-  const END_ADS      = 12;
+  // ====== AD ZONES ======
+  const TOP_ZONE     = "5865232";
+  const LEFT_ZONE    = "5865238";
+  const RIGHT_ZONE   = "5865240";
 
-  // Between pattern
-  // If you want "every 2", set BETWEEN_EVERY = 2
-  const BETWEEN_EVERY = 1; // <--- change to 2 if you want every 2 chapters
-  const BETWEEN_SLOTS = 4;
+  const BETWEEN_ZONE = "5865236"; // money zone (300x250)
+  const END_ZONE     = "5865236"; // same zone at footer for now
+
+  // ====== AD DENSITY ======
+  // You said: "every 2"
+  const BETWEEN_EVERY = 2;  // place between ads after every N chapters
+  const BETWEEN_SLOTS = 3;  // how many 300x250 in each between block
+  const END_ADS       = 9;  // footer grid count (keeps it less chaotic than 12)
+
+  // ====== BEHAVIOR ======
+  const OPEN_SMART = true;        // opens 3 cards (first/mid/last) on load
+  const CLOSE_OTHERS_ON_OPEN = true; // keep it clean: one iframe at a time (desktop)
+  const LAZY_ADS = true;          // loads ads near viewport (better feel)
 
   const $  = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
@@ -49,15 +58,13 @@
 
   function toDrivePreview(url){
     const id = driveFileIdFromUrl(url);
-    if(!id) return url;
-    return `https://drive.google.com/file/d/${id}/preview`;
+    return id ? `https://drive.google.com/file/d/${id}/preview` : url;
   }
 
-  // ---- Ad init (TURN .exo-slot into <ins> + serve) ----
+  // ====== ADS: turn .exo-slot[data-zone] into <ins> and serve ======
   function ensureIns(slot){
     if(slot.dataset.inited) return;
     slot.dataset.inited = "1";
-
     const ins = document.createElement("ins");
     ins.className = "eas6a97888e2";
     ins.setAttribute("data-zoneid", slot.dataset.zone);
@@ -68,14 +75,13 @@
     (window.AdProvider = window.AdProvider || []).push({ serve: {} });
   }
 
-  // LAZY ad loading: only init when near viewport
+  // Lazy ad loading keeps the site feeling less spammy
   let adObserver = null;
   function initLazyAds(){
-    if(adObserver) return;
+    if(adObserver || !LAZY_ADS) return;
 
     adObserver = new IntersectionObserver((entries) => {
       let didInit = false;
-
       for(const entry of entries){
         if(!entry.isIntersecting) continue;
         const slot = entry.target;
@@ -83,17 +89,15 @@
         adObserver.unobserve(slot);
         didInit = true;
       }
-
-      if(didInit){
-        setTimeout(serveAds, 30);
-      }
-    }, {
-      root: null,
-      rootMargin: "900px 0px",
-      threshold: 0.01
-    });
+      if(didInit) setTimeout(serveAds, 30);
+    }, { root:null, rootMargin:"900px 0px", threshold:0.01 });
 
     $$(`.exo-slot[data-zone]`).forEach(slot => adObserver.observe(slot));
+  }
+
+  function initAllAdsNow(){
+    $$(`.exo-slot[data-zone]`).forEach(ensureIns);
+    serveAds();
   }
 
   function observeNewSlots(root){
@@ -101,11 +105,10 @@
     $$(`.exo-slot[data-zone]`, root).forEach(slot => adObserver.observe(slot));
   }
 
-  // ---- Ad block builders ----
+  // ====== Ad block builders ======
   function buildBetweenAd(count){
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
-
     const grid = document.createElement("div");
     grid.className = "between-grid";
 
@@ -125,7 +128,7 @@
     wrap.className = "end-ads";
 
     const title = document.createElement("p");
-    title.className = "end-ads-title pangolin";
+    title.className = "end-ads-title";
     title.textContent = "More panels";
 
     const grid = document.createElement("div");
@@ -143,8 +146,8 @@
     return wrap;
   }
 
+  // One clean above-fold money block
   function makeFeaturedMoneySlot(){
-    // single above-fold slot (clean + high viewability)
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
     wrap.style.maxWidth = "1100px";
@@ -162,7 +165,7 @@
     return wrap;
   }
 
-  // UPDATED: matches the new index.html action layout/classes
+  // ====== Cards ======
   function makeDetails(item, idx){
     const d = document.createElement("details");
     d.className = "card";
@@ -170,7 +173,7 @@
     d.id = `item-${idx}`;
 
     const title = escapeHtml(item.title || `Item ${idx+1}`);
-    const id = item.id ? escapeHtml(item.id) : "";
+    const id    = item.id ? escapeHtml(item.id) : "";
 
     const openUrl  = item.url;
     const embedUrl = toDrivePreview(item.url);
@@ -182,18 +185,20 @@
           ${id ? `<div class="id">${id}</div>` : ``}
         </div>
 
+        <!-- CENTER COLUMN -->
         <div class="actions">
           <div class="action-expand">
-            <button class="pill ghost expbtn expand-btn" type="button">
+            <button class="pill expbtn expand-btn" type="button">
               EXPAND <span class="chev"></span>
             </button>
             <div class="expand-hint">(click to EXPAND THE CHAPTER)</div>
           </div>
+        </div>
 
-          <div class="action-open">
-            <a class="pill primary open-btn" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">OPEN</a>
-            <div class="open-note">(this opens a new tab for the chapter!)</div>
-          </div>
+        <!-- RIGHT COLUMN -->
+        <div class="action-open">
+          <a class="pill primary open-btn" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">OPEN</a>
+          <div class="open-note">(this opens a new tab for the chapter!)</div>
         </div>
       </summary>
 
@@ -203,7 +208,7 @@
   }
 
   function openSmart(cards){
-    // keep the site feeling clean: don’t open everything by default
+    if(!OPEN_SMART) return;
     if(cards.length <= 2){
       cards.forEach(c => c.open = true);
       return;
@@ -214,32 +219,36 @@
     [first, mid, last].forEach(i => { if(cards[i]) cards[i].open = true; });
   }
 
+  // ====== Render ======
   function render(){
     const container = $("#container");
     if(!container) return;
     container.innerHTML = "";
 
-    // featured slot
+    // Above-fold money slot
     container.appendChild(makeFeaturedMoneySlot());
 
     ITEMS.forEach((item, i) => {
       container.appendChild(makeDetails(item, i));
 
-      // between block every N items
-      const isGapPoint = ((i + 1) % BETWEEN_EVERY === 0) && (i + 1) < ITEMS.length;
-      if(isGapPoint){
-        container.appendChild(buildBetweenAd(BETWEEN_SLOTS));
-      }
+      // between ads every N items
+      const isGap = ((i + 1) % BETWEEN_EVERY === 0) && (i + 1) < ITEMS.length;
+      if(isGap) container.appendChild(buildBetweenAd(BETWEEN_SLOTS));
     });
 
     container.appendChild(buildEndAds());
+
+    // Hook new slots for lazy loading
     observeNewSlots(container);
 
+    // Open a few sections to show users how it works
     const cards = $$("details.card", container);
     openSmart(cards);
   }
 
-  // Expand button
+  // ====== UI EVENTS ======
+  // Expand button should not fight the <summary> click:
+  // It toggles the details without "jumpy" behavior.
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".expbtn");
     if(!btn) return;
@@ -250,7 +259,7 @@
     e.stopPropagation();
   });
 
-  // Embed
+  // Embed when details opens; keep it clean by closing other iframes (desktop)
   document.addEventListener("toggle", (e) => {
     const d = e.target;
     if(!(d instanceof HTMLDetailsElement)) return;
@@ -259,9 +268,11 @@
     if(!content) return;
 
     if(d.open){
-      // close others (keeps it clean) when there are many chapters
-      if(ITEMS.length > 2){
-        $$("details[open]").forEach(x => { if(x !== d) x.open = false; });
+      const isMobile = window.matchMedia("(max-width: 900px)").matches;
+
+      // On desktop, keep one open at a time to avoid heavy memory + chaos
+      if(!isMobile && CLOSE_OTHERS_ON_OPEN){
+        $$("details.card[open]").forEach(x => { if(x !== d) x.open = false; });
       }
 
       if(content.querySelector("iframe")) return;
@@ -269,7 +280,6 @@
       const embedSrc = content.dataset.src;
       const openSrc  = content.dataset.open || embedSrc;
 
-      const isMobile = window.matchMedia("(max-width: 900px)").matches;
       if(isMobile){
         content.innerHTML = `
           <div style="padding:16px;text-align:center">
@@ -290,7 +300,7 @@
     }
   }, true);
 
-  // Search
+  // ====== SEARCH ======
   let SEARCH_INDEX = null;
   function buildSearchIndex(){
     if(SEARCH_INDEX) return SEARCH_INDEX;
@@ -316,7 +326,7 @@
         if(!it.t.includes(tok)) { ok = false; break; }
       }
       if(ok) out.push(it);
-      if(out.length >= 30) break;
+      if(out.length >= 40) break;
     }
     return out;
   }
@@ -363,7 +373,7 @@
             nav.innerHTML = hits.map(h => `<a href="#item-${h.i}">${escapeHtml(h.title)}</a>`).join("");
             nav.style.display = hits.length ? "flex" : "none";
           }
-        }, 180);
+        }, 160);
       });
 
       input.addEventListener("keydown", (e) => {
@@ -378,8 +388,14 @@
     render();
     wireUI();
 
-    initLazyAds();
-    setTimeout(serveAds, 900);
+    // Ads
+    if(LAZY_ADS) {
+      initLazyAds();
+      // extra nudge
+      setTimeout(serveAds, 900);
+    } else {
+      initAllAdsNow();
+    }
   }
 
   if(document.readyState === "loading"){
