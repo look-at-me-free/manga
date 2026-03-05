@@ -56,7 +56,8 @@ body{
 .id,
 .kbd,
 .smallbtn,
-.search input{
+.search input,
+.search-title{
   font-family:"Pangolin", cursive;
   font-weight:400;
 }
@@ -70,7 +71,7 @@ body{
 
 .hero-sub{ margin-top:10px; color:var(--muted); }
 
-/* Toolbar */
+/* Top action button row */
 .toolbar{
   max-width:1100px;
   margin:16px auto 0;
@@ -80,34 +81,6 @@ body{
   flex-wrap:wrap;
   align-items:center;
   justify-content:center;
-}
-
-.search{
-  width:min(760px, 100%);
-  display:flex;
-  gap:10px;
-  align-items:center;
-  padding:10px 12px;
-  border-radius:999px;
-  border:1px solid var(--stroke);
-  background:rgba(255,255,255,.05);
-}
-
-.search input{
-  width:100%;
-  background:transparent;
-  border:0;
-  outline:0;
-  color:var(--ink);
-  font-size:14px;
-}
-
-.kbd{
-  font-size:12px;
-  color:var(--muted);
-  border:1px solid rgba(255,255,255,.18);
-  padding:3px 8px;
-  border-radius:999px;
 }
 
 .smallbtn{
@@ -129,6 +102,25 @@ body{
   margin:10px 0 0;
 }
 
+/* Pixel SEARCH button (replaces search bar up top) */
+.search-jump{
+  font-family:"Press Start 2P", system-ui, sans-serif;
+  font-size:14px;
+  letter-spacing:1px;
+  padding:14px 18px;
+  border-radius:14px;
+  border:2px solid rgba(255,255,255,.18);
+  background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
+  color:var(--ink);
+  cursor:pointer;
+  box-shadow:0 14px 50px rgba(0,0,0,.5);
+  transition:transform .12s ease, background .12s ease;
+}
+.search-jump:hover{
+  transform:translateY(-1px);
+  background:linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.08));
+}
+
 /* Top banner */
 .top-ad{
   max-width:1100px;
@@ -145,6 +137,7 @@ body{
   justify-content:center;
   align-items:center;
   min-height:90px;
+  width:100%;
 }
 
 /* Layout */
@@ -278,7 +271,7 @@ details[open] .chev{ transform:rotate(45deg); margin-top:-2px; }
 .content{ background:#000; border-top:1px solid rgba(255,255,255,.10); }
 iframe{ width:100%; height:85vh; border:0; }
 
-/* ===== Between ad block (FIXED: fills width cleanly, no dead space) ===== */
+/* ===== Between ad block (full-width packing) ===== */
 .between-ad{
   margin:14px 0;
   padding:14px;
@@ -287,14 +280,12 @@ iframe{ width:100%; height:85vh; border:0; }
   background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.35));
   box-shadow:0 18px 60px rgba(0,0,0,.45);
 }
-
 .between-grid{
   display:grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap:14px;
   align-items:stretch;
 }
-
 .between-grid .exo-slot{
   width:100%;
   min-height:250px;
@@ -306,27 +297,118 @@ iframe{ width:100%; height:85vh; border:0; }
   justify-content:center;
   align-items:center;
 }
+/* featured: single slot spans full width */
+.between-grid.featured{ grid-template-columns: 1fr; }
 
-/* force-injected ins to center too (some ad scripts inject weird inline blocks) */
+/* Footer mega ad block */
+.end-ads{
+  margin:18px 0 18px;
+  padding:16px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.35));
+  box-shadow:0 18px 60px rgba(0,0,0,.45);
+}
+.end-ads-title{
+  text-align:center;
+  color:var(--muted);
+  margin:0 0 12px;
+  font-size:13px;
+  font-family:"Pangolin", cursive;
+}
+.end-ads-grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* PACKS LEFT->RIGHT, NO CENTER GAPS */
+  gap:14px;
+  align-items:stretch;
+}
+.end-ads-grid .exo-slot{
+  width:100%;
+  min-height:250px;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.03);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Responsive packing */
+@media (max-width: 1100px){
+  .layout{ grid-template-columns:1fr; }
+  .rail{ position:relative; top:auto; height:auto; overflow:visible; padding-right:0; }
+  .end-ads-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 860px){
+  .between-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .end-ads-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px){
+  summary{
+    grid-template-columns: 1fr;
+    gap:10px;
+    align-items:start;
+  }
+  .action-open{
+    align-items:center;
+    text-align:center;
+  }
+  .open-note{ text-align:center; }
+  .between-grid{ grid-template-columns: 1fr; }
+  .end-ads-grid{ grid-template-columns: 1fr; }
+}
+
+/* Make injected ads center reliably */
 .exo-slot ins{
   display:block !important;
   margin:0 auto !important;
 }
 
-@media (max-width: 980px){
-  .between-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* ===== Bottom search section ===== */
+.search-zone{
+  max-width:1100px;
+  margin:0 auto 60px;
+  padding:18px 16px 0;
 }
-@media (max-width: 620px){
-  .between-grid{ grid-template-columns: 1fr; }
+.search-title{
+  text-align:center;
+  color:var(--muted);
+  margin:0 0 10px;
+  font-size:13px;
+}
+.search{
+  width:100%;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:12px 14px;
+  border-radius:999px;
+  border:1px solid var(--stroke);
+  background:rgba(255,255,255,.05);
+}
+.search input{
+  width:100%;
+  background:transparent;
+  border:0;
+  outline:0;
+  color:var(--ink);
+  font-size:14px;
+}
+.kbd{
+  font-size:12px;
+  color:var(--muted);
+  border:1px solid rgba(255,255,255,.18);
+  padding:3px 8px;
+  border-radius:999px;
 }
 
-/* Nav */
+/* Nav chips for search results (placed near bottom now) */
 .nav{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
-  padding:12px;
-  border-bottom:1px solid var(--stroke);
+  padding:12px 0 0;
   justify-content:center;
 }
 .nav a{
@@ -338,24 +420,6 @@ iframe{ width:100%; height:85vh; border:0; }
   font-size:13px;
   font-family:"Pangolin", cursive;
 }
-
-@media(max-width:1100px){
-  .layout{ grid-template-columns:1fr; }
-  .rail{ position:relative; top:auto; height:auto; overflow:visible; padding-right:0; }
-}
-
-@media(max-width:600px){
-  summary{
-    grid-template-columns: 1fr;
-    gap:10px;
-    align-items:start;
-  }
-  .action-open{
-    align-items:center;
-    text-align:center;
-  }
-  .open-note{ text-align:center; }
-}
 </style>
 </head>
 
@@ -363,14 +427,10 @@ iframe{ width:100%; height:85vh; border:0; }
 
 <header class="hero">
   <h1 class="hero-title">Full Manga Series</h1>
-  <p class="hero-sub">Search • Expand • Read</p>
+  <p class="hero-sub">Expand • Read • Scroll</p>
 
   <div class="toolbar">
-    <div class="search">
-      <input id="q" type="search" placeholder="Search titles… e.g. Volume 1 Chapter 3" autocomplete="off" />
-      <span class="kbd">Enter</span>
-    </div>
-    <button class="smallbtn" id="clear" type="button">Clear</button>
+    <button class="search-jump" id="jumpSearch" type="button">SEARCH</button>
     <button class="smallbtn" id="openFirst" type="button">Open First</button>
   </div>
 
@@ -382,30 +442,41 @@ iframe{ width:100%; height:85vh; border:0; }
   </div>
 </header>
 
-<!-- Search results bar (index.js fills this) -->
-<nav class="nav" id="nav" style="display:none;"></nav>
-
 <div class="layout">
   <!-- LEFT STACK -->
   <aside class="rail">
     <div class="rail-stack" id="leftRail">
-      <div class="exo-slot" data-zone="5865238" data-fallback="left"></div>
+      <div class="exo-slot" data-zone="5865238"></div>
     </div>
   </aside>
 
   <main class="center">
     <div id="container"></div>
+
+    <!-- Bottom search lives AFTER the 24-ad footer (index.js renders footer above this) -->
+    <section class="search-zone" id="searchSection">
+      <p class="search-title">Search anything (titles/chapters) ↓</p>
+
+      <nav class="nav" id="nav" style="display:none;"></nav>
+
+      <div class="search">
+        <input id="q" type="search" placeholder="Type… e.g. Volume 1 Chapter 12" autocomplete="off" />
+        <span class="kbd">Enter</span>
+        <button class="smallbtn" id="clear" type="button">Clear</button>
+      </div>
+    </section>
+
   </main>
 
   <!-- RIGHT STACK -->
   <aside class="rail">
     <div class="rail-stack" id="rightRail">
-      <div class="exo-slot" data-zone="5865240" data-fallback="right"></div>
+      <div class="exo-slot" data-zone="5865240"></div>
     </div>
   </aside>
 </div>
 
-<!-- ExoClick Popunder (Zone 5865422) — retention-friendly: 1 per 12 hours -->
+<!-- ExoClick Popunder (Zone 5865422) — 1 per 12 hours -->
 <script type="application/javascript">
 (function(){
   var adConfig = {
@@ -416,9 +487,9 @@ iframe{ width:100%; height:85vh; border:0; }
     popup_force: false,
     chrome_enabled: true,
     new_tab: false,
-    frequency_period: 720,  // minutes = 12 hours
-    frequency_count: 1,     // 1 per period
-    trigger_method: 3,      // clicking on links (default)
+    frequency_period: 720,
+    frequency_count: 1,
+    trigger_method: 3,
     trigger_class: "",
     trigger_delay: 0,
     capping_enabled: true,
@@ -437,7 +508,6 @@ iframe{ width:100%; height:85vh; border:0; }
     if(k === "ads_host" || k === "syndication_host") continue;
     s.setAttribute("data-exo-" + k, adConfig[k]);
   }
-
   document.body.appendChild(s);
 })();
 </script>
