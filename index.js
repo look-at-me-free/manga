@@ -12,23 +12,19 @@
   ];
 
   // ====== AD ZONES ======
-  const TOP_ZONE     = "5865232";
-  const LEFT_ZONE    = "5865238";
-  const RIGHT_ZONE   = "5865240";
-
   const BETWEEN_ZONE = "5865236"; // money zone (300x250)
   const END_ZONE     = "5865236"; // same zone at footer for now
+  const END_ADS      = 9;         // footer grid count
 
   // ====== AD DENSITY ======
-  // You said: "every 2"
+  // you said "every 2"
   const BETWEEN_EVERY = 2;  // place between ads after every N chapters
   const BETWEEN_SLOTS = 3;  // how many 300x250 in each between block
-  const END_ADS       = 9;  // footer grid count (keeps it less chaotic than 12)
 
   // ====== BEHAVIOR ======
-  const OPEN_SMART = true;        // opens 3 cards (first/mid/last) on load
-  const CLOSE_OTHERS_ON_OPEN = true; // keep it clean: one iframe at a time (desktop)
-  const LAZY_ADS = true;          // loads ads near viewport (better feel)
+  const OPEN_SMART = true;             // open 3 cards (first/mid/last) on load
+  const CLOSE_OTHERS_ON_OPEN = true;   // keep it clean: 1 iframe at a time (desktop)
+  const LAZY_ADS = true;               // loads ads near viewport (less janky)
 
   const $  = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
@@ -75,7 +71,7 @@
     (window.AdProvider = window.AdProvider || []).push({ serve: {} });
   }
 
-  // Lazy ad loading keeps the site feeling less spammy
+  // Lazy ad loading
   let adObserver = null;
   function initLazyAds(){
     if(adObserver || !LAZY_ADS) return;
@@ -95,20 +91,21 @@
     $$(`.exo-slot[data-zone]`).forEach(slot => adObserver.observe(slot));
   }
 
-  function initAllAdsNow(){
-    $$(`.exo-slot[data-zone]`).forEach(ensureIns);
-    serveAds();
-  }
-
   function observeNewSlots(root){
     if(!adObserver) return;
     $$(`.exo-slot[data-zone]`, root).forEach(slot => adObserver.observe(slot));
+  }
+
+  function initAllAdsNow(){
+    $$(`.exo-slot[data-zone]`).forEach(ensureIns);
+    serveAds();
   }
 
   // ====== Ad block builders ======
   function buildBetweenAd(count){
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
+
     const grid = document.createElement("div");
     grid.className = "between-grid";
 
@@ -146,7 +143,6 @@
     return wrap;
   }
 
-  // One clean above-fold money block
   function makeFeaturedMoneySlot(){
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
@@ -185,7 +181,6 @@
           ${id ? `<div class="id">${id}</div>` : ``}
         </div>
 
-        <!-- CENTER COLUMN -->
         <div class="actions">
           <div class="action-expand">
             <button class="pill expbtn expand-btn" type="button">
@@ -195,7 +190,6 @@
           </div>
         </div>
 
-        <!-- RIGHT COLUMN -->
         <div class="action-open">
           <a class="pill primary open-btn" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">OPEN</a>
           <div class="open-note">(this opens a new tab for the chapter!)</div>
@@ -225,30 +219,25 @@
     if(!container) return;
     container.innerHTML = "";
 
-    // Above-fold money slot
     container.appendChild(makeFeaturedMoneySlot());
 
     ITEMS.forEach((item, i) => {
       container.appendChild(makeDetails(item, i));
 
-      // between ads every N items
       const isGap = ((i + 1) % BETWEEN_EVERY === 0) && (i + 1) < ITEMS.length;
       if(isGap) container.appendChild(buildBetweenAd(BETWEEN_SLOTS));
     });
 
     container.appendChild(buildEndAds());
 
-    // Hook new slots for lazy loading
     observeNewSlots(container);
 
-    // Open a few sections to show users how it works
     const cards = $$("details.card", container);
     openSmart(cards);
   }
 
   // ====== UI EVENTS ======
-  // Expand button should not fight the <summary> click:
-  // It toggles the details without "jumpy" behavior.
+  // Expand button toggles the details cleanly
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".expbtn");
     if(!btn) return;
@@ -259,7 +248,7 @@
     e.stopPropagation();
   });
 
-  // Embed when details opens; keep it clean by closing other iframes (desktop)
+  // Embed: ALWAYS embed (including iPhone). No more "mobile open-only" behavior.
   document.addEventListener("toggle", (e) => {
     const d = e.target;
     if(!(d instanceof HTMLDetailsElement)) return;
@@ -270,7 +259,7 @@
     if(d.open){
       const isMobile = window.matchMedia("(max-width: 900px)").matches;
 
-      // On desktop, keep one open at a time to avoid heavy memory + chaos
+      // Desktop: keep it clean (close others)
       if(!isMobile && CLOSE_OTHERS_ON_OPEN){
         $$("details.card[open]").forEach(x => { if(x !== d) x.open = false; });
       }
@@ -280,21 +269,24 @@
       const embedSrc = content.dataset.src;
       const openSrc  = content.dataset.open || embedSrc;
 
-      if(isMobile){
-        content.innerHTML = `
-          <div style="padding:16px;text-align:center">
-            <a class="pill primary open-btn" href="${escapeHtml(openSrc)}" target="_blank" rel="noopener">OPEN</a>
-            <div class="open-note" style="text-align:center">(this opens a new tab for the chapter!)</div>
-          </div>
-        `;
-      } else {
-        const iframe = document.createElement("iframe");
-        iframe.loading = "lazy";
-        iframe.referrerPolicy = "no-referrer";
-        iframe.src = embedSrc;
-        iframe.allow = "fullscreen";
-        content.appendChild(iframe);
-      }
+      // Header (Open + note) + iframe viewer under it
+      content.innerHTML = `
+        <div style="padding:12px;text-align:center;border-bottom:1px solid rgba(255,255,255,.10);">
+          <a class="pill primary open-btn" href="${escapeHtml(openSrc)}" target="_blank" rel="noopener">OPEN</a>
+          <div class="open-note" style="margin-top:6px;">(this opens a new tab for the chapter!)</div>
+        </div>
+      `;
+
+      const iframe = document.createElement("iframe");
+      iframe.loading = "lazy";
+      iframe.referrerPolicy = "no-referrer";
+      iframe.src = embedSrc;
+      iframe.allow = "fullscreen";
+      iframe.style.width = "100%";
+      iframe.style.height = "78vh";
+      iframe.style.border = "0";
+      content.appendChild(iframe);
+
     } else {
       content.innerHTML = "";
     }
@@ -388,10 +380,8 @@
     render();
     wireUI();
 
-    // Ads
-    if(LAZY_ADS) {
+    if(LAZY_ADS){
       initLazyAds();
-      // extra nudge
       setTimeout(serveAds, 900);
     } else {
       initAllAdsNow();
