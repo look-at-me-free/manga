@@ -1,263 +1,325 @@
-(() => {
-  // ====== EDIT THIS LIST ======
-  // title: what the user sees
-  // url: direct PDF view link (or whatever you embed)
-  // id: optional small tag shown under title (volume/chapter label)
-  const ITEMS = [
-    // EXAMPLE:
-    // { title: "Tracksuit Dragon Ball Full Color — Volume 1", id: "DBFC-001", url: "https://drive.google.com/file/d/XXXX/view?usp=sharing" },
-  ];
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manga Archive</title>
 
-  // Between-ad zone
-  const BETWEEN_ZONE = "5865236";
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reggae+One&family=Rock+Salt&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
-  // How often to place between-ads (every N entries)
-  const BETWEEN_EVERY = 6;
+<style>
+:root{
+  --bg:#07070a;
+  --ink:rgba(255,255,255,.9);
+  --muted:rgba(255,255,255,.55);
+  --panel:rgba(255,255,255,.06);
+  --stroke:rgba(255,255,255,.14);
+  --radius:18px;
+  --shadow:0 20px 60px rgba(0,0,0,.7);
 
-  // Open 3 on load: first, middle, last
-  const OPEN_PROGRESSIVE = true;
+  --railW:min(240px,22vw);
+  --gap:18px;
+}
 
-  const $ = (s, r=document) => r.querySelector(s);
-  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+*{ box-sizing:border-box; }
 
-  function escapeHtml(s){
-    return String(s)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#39;");
-  }
+body{
+  margin:0;
+  background:
+    radial-gradient(900px 500px at 15% 0%, rgba(255,255,255,.06), transparent 60%),
+    radial-gradient(800px 550px at 85% 15%, rgba(255,255,255,.05), transparent 55%),
+    var(--bg);
+  color:var(--ink);
+  font-family:Inter,system-ui;
+}
 
-  // Convert .exo-slot placeholders into <ins data-zoneid="..."> and serve ads.
-  function initMagsrvAds(root=document){
-    const slots = $$(".exo-slot[data-zone]", root);
-    for(const slot of slots){
-      if(slot.dataset.inited) continue;
-      slot.dataset.inited = "1";
+.hero{
+  text-align:center;
+  padding:44px 16px 18px;
+  border-bottom:1px solid var(--stroke);
+  background: linear-gradient(to bottom, rgba(255,255,255,.05), transparent 75%);
+}
 
-      const ins = document.createElement("ins");
-      ins.className = "eas6a97888e2";
-      ins.setAttribute("data-zoneid", slot.dataset.zone);
-      slot.appendChild(ins);
-    }
+.hero-title{
+  font-family:"Reggae One";
+  font-size:clamp(2.2rem,7vw,5rem);
+  margin:0;
+  letter-spacing:.5px;
+}
 
-    // Serve after ins tags exist.
-    (window.AdProvider = window.AdProvider || []).push({ serve: {} });
-  }
+.hero-sub{
+  margin-top:8px;
+  color:var(--muted);
+}
 
-  function buildBetweenAd(){
-    const wrap = document.createElement("div");
-    wrap.className = "between-ad";
-    const slot = document.createElement("div");
-    slot.className = "exo-slot";
-    slot.dataset.zone = BETWEEN_ZONE;
-    wrap.appendChild(slot);
-    return wrap;
-  }
+.top-ad{ max-width:1100px; margin:18px auto 0; }
 
-  function makeDetails(item, idx){
-    const d = document.createElement("details");
-    d.className = "card";
-    d.dataset.idx = String(idx);
+.layout{
+  display:grid;
+  grid-template-columns:var(--railW) 1fr var(--railW);
+  gap:var(--gap);
+  max-width:1500px;
+  margin:auto;
+  padding:18px;
+}
 
-    const title = escapeHtml(item.title || `Item ${idx+1}`);
-    const id = item.id ? escapeHtml(item.id) : "";
+.center{ max-width:1100px; margin:auto; width:100%; }
 
-    // We do NOT inject an iframe immediately.
-    // We store data-src and only create iframe when opened.
-    d.innerHTML = `
-      <summary>
-        <div class="leftstack">
-          <div class="doc">${title}</div>
-          ${id ? `<div class="id">${id}</div>` : ``}
-        </div>
-        <div class="actions">
-          <a class="pill ghost" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open</a>
-          <span class="pill primary expbtn" role="button" tabindex="0">Expand <span class="chev"></span></span>
-        </div>
-      </summary>
-      <div class="content" data-src="${escapeHtml(item.url)}"></div>
-    `;
-    return d;
-  }
+.rail{
+  position:sticky;
+  top:80px;
+}
 
-  function render(){
-    const container = $("#container");
-    if(!container) return;
+details{
+  margin:16px 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  border:2px solid var(--stroke);
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  box-shadow:var(--shadow);
+  backdrop-filter: blur(8px);
+  content-visibility:auto;
+  contain-intrinsic-size: 84px 420px;
+}
 
-    container.innerHTML = "";
+summary{
+  cursor:pointer;
+  padding:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+summary::-webkit-details-marker{ display:none; }
 
-    // Insert items + between ads
-    ITEMS.forEach((item, i) => {
-      const d = makeDetails(item, i);
-      container.appendChild(d);
+.leftstack{ text-align:left; }
+.doc{ font-weight:800; letter-spacing:.3px; line-height:1.15; }
+.id{ font-size:12px; color:var(--muted); font-family:monospace; margin-top:6px; }
 
-      // Place between ad after every N items, but not at the end
-      const isInsertPoint = (i+1) % BETWEEN_EVERY === 0 && (i+1) < ITEMS.length;
-      if(isInsertPoint){
-        container.appendChild(buildBetweenAd());
-      }
-    });
+.actions{ display:flex; gap:8px; align-items:center; }
 
-    // After DOM exists, init ads (top/left/right + between)
-    initMagsrvAds(document);
+.pill{
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.12);
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:12px;
+  text-decoration:none;
+  color:white;
+  white-space:nowrap;
+  transition:transform .12s ease, background .12s ease;
+}
+.pill:hover{ background:rgba(255,255,255,.16); transform:translateY(-1px); }
+.pill.primary{ background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.18); }
+.pill.ghost{ background:transparent; }
 
-    // Open first/mid/last for “progression”
-    if(OPEN_PROGRESSIVE && ITEMS.length > 0){
-      const cards = $$("details.card", container);
-      const mid = Math.floor((cards.length - 1) / 2);
+.chev{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-right:2px solid rgba(255,255,255,.7);
+  border-bottom:2px solid rgba(255,255,255,.7);
+  transform:rotate(-45deg);
+  margin-left:8px;
+  opacity:.85;
+}
+details[open] .chev{ transform:rotate(45deg); margin-top:-2px; }
 
-      // close all first
-      cards.forEach(c => c.open = false);
+.content{
+  background:#000;
+  border-top:1px solid rgba(255,255,255,.10);
+  min-height: 70px;
+}
 
-      if(cards[0]) cards[0].open = true;
-      if(cards[mid]) cards[mid].open = true;
-      if(cards[cards.length-1]) cards[cards.length-1].open = true;
-    }
-  }
+.viewer{
+  padding:10px;
+  display:flex;
+  justify-content:center;
+}
+.viewer a{
+  color:#fff;
+  text-decoration:none;
+  border:1px solid rgba(255,255,255,.18);
+  padding:10px 14px;
+  border-radius:12px;
+  background:rgba(255,255,255,.08);
+}
+.viewer a:hover{ background:rgba(255,255,255,.12); }
 
-  // Make "Expand" pill toggle details reliably
-  document.addEventListener("click", (e) => {
-    const btn = e.target.closest(".expbtn");
-    if(!btn) return;
-    const d = btn.closest("details");
-    if(!d) return;
-    d.open = !d.open;
-    e.preventDefault();
-    e.stopPropagation();
-  });
+iframe{
+  width:100%;
+  height:85vh;
+  border:0;
+}
 
-  // Lazy load iframe only when opened, and only keep ONE iframe alive at a time
-  document.addEventListener("toggle", (e) => {
-    const d = e.target;
-    if(!(d instanceof HTMLDetailsElement)) return;
+.between-ad{ margin:14px 0; }
 
-    const content = d.querySelector(".content[data-src]");
-    if(!content) return;
+.nav{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:12px;
+  border-bottom:1px solid var(--stroke);
+  justify-content:center;
+}
+.nav a{
+  text-decoration:none;
+  padding:6px 12px;
+  background:rgba(255,255,255,.07);
+  border-radius:999px;
+  color:white;
+  font-size:13px;
+}
 
-    if(d.open){
-      // close other details to keep memory low
-      $$("details[open]").forEach(x => { if(x !== d) x.open = false; });
+.toolbar{
+  max-width:1100px;
+  margin:16px auto 0;
+  padding:0 16px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+}
+.search{
+  width:min(760px, 100%);
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:10px 12px;
+  border-radius:999px;
+  border:1px solid var(--stroke);
+  background:rgba(255,255,255,.05);
+}
+.search input{
+  width:100%;
+  background:transparent;
+  border:0;
+  outline:0;
+  color:var(--ink);
+  font-size:14px;
+}
+.kbd{
+  font-size:12px;
+  color:var(--muted);
+  border:1px solid rgba(255,255,255,.18);
+  padding:3px 8px;
+  border-radius:999px;
+}
+.smallbtn{
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.06);
+  color:var(--ink);
+  padding:8px 12px;
+  border-radius:999px;
+  cursor:pointer;
+  font-size:13px;
+  transition:transform .12s ease, background .12s ease;
+}
+.smallbtn:hover{ background:rgba(255,255,255,.1); transform:translateY(-1px); }
 
-      if(content.querySelector("iframe")) return;
+.meta{
+  color:var(--muted);
+  font-size:12px;
+  text-align:center;
+  margin:10px 0 0;
+}
 
-      const src = content.dataset.src;
+/* ad placeholder stability */
+.exo-slot{
+  border:1px dashed rgba(255,255,255,.18);
+  border-radius:14px;
+  min-height: 90px;
+  background:rgba(255,255,255,.03);
+  overflow:hidden;
+}
+.exo-slot ins{
+  display:block;
+  min-height:90px;
+}
 
-      // On narrow screens, avoid embedding heavy viewer; show a button instead
-      const isMobile = window.matchMedia("(max-width: 900px)").matches;
+@media(max-width:1100px){
+  .layout{ grid-template-columns:1fr; }
+  .rail{ position:relative; top:auto; }
+}
+</style>
 
-      if(isMobile){
-        content.innerHTML = `
-          <div class="viewer">
-            <a href="${escapeHtml(src)}" target="_blank" rel="noopener">Open viewer</a>
-          </div>
-        `;
-      } else {
-        const iframe = document.createElement("iframe");
-        iframe.loading = "lazy";
-        iframe.referrerPolicy = "no-referrer";
-        iframe.src = src;
-        content.appendChild(iframe);
-      }
-    } else {
-      // free memory
-      content.innerHTML = "";
-    }
-  }, true);
+<!-- LOAD MAGSRV ONCE -->
+<script async type="application/javascript" src="https://a.magsrv.com/ad-provider.js"></script>
 
-  // Search: local filter (no heavy ajax). Shows quick nav links.
-  let SEARCH_INDEX = null;
-  function buildSearchIndex(){
-    if(SEARCH_INDEX) return SEARCH_INDEX;
-    SEARCH_INDEX = ITEMS.map((it, i) => ({
-      i,
-      t: (it.title || "").toLowerCase(),
-      title: it.title || `Item ${i+1}`,
-      url: it.url
-    }));
-    return SEARCH_INDEX;
-  }
+</head>
 
-  function runSearch(q){
-    q = (q || "").trim().toLowerCase();
-    if(!q) return [];
-    const toks = q.split(/\s+/).filter(Boolean);
-    const idx = buildSearchIndex();
-    const out = [];
-    for(const it of idx){
-      let ok = true;
-      for(const tok of toks){
-        if(!it.t.includes(tok)) { ok = false; break; }
-      }
-      if(ok) out.push(it);
-      if(out.length >= 30) break;
-    }
-    return out;
-  }
+<body>
 
-  function wireUI(){
-    const input = $("#q");
-    const meta  = $("#meta");
-    const nav   = $("#nav");
-    const clear = $("#clear");
-    const openFirst = $("#openFirst");
+<header class="hero">
+  <h1 class="hero-title">Full Manga Series</h1>
+  <p class="hero-sub">Search • Expand • Read</p>
 
-    if(clear){
-      clear.addEventListener("click", () => {
-        if(input) input.value = "";
-        if(nav) nav.style.display = "none";
-        if(meta) meta.textContent = "";
-      });
-    }
+  <div class="toolbar">
+    <div class="search">
+      <input id="q" type="search" placeholder="Search titles… e.g. dragon ball 12, naruto 44, pokemon 3…" autocomplete="off" />
+      <span class="kbd">Enter</span>
+    </div>
+    <button class="smallbtn" id="clear" type="button">Clear</button>
+    <button class="smallbtn" id="openFirst" type="button">Open First</button>
+  </div>
 
-    if(openFirst){
-      openFirst.addEventListener("click", () => {
-        const first = $("details.card");
-        if(first) first.open = true;
-        first?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
+  <div class="meta" id="meta"></div>
 
-    if(input){
-      let tmr = null;
-      input.addEventListener("input", () => {
-        clearTimeout(tmr);
-        tmr = setTimeout(() => {
-          const q = input.value;
-          if(!q.trim()){
-            if(nav) nav.style.display = "none";
-            if(meta) meta.textContent = "";
-            return;
-          }
-          const hits = runSearch(q);
-          if(meta) meta.textContent = hits.length ? `Matches: ${hits.length}` : "No matches.";
-          if(nav){
-            nav.innerHTML = hits.map(h => `<a href="${escapeHtml(h.url)}" target="_blank" rel="noopener">${escapeHtml(h.title)}</a>`).join("");
-            nav.style.display = hits.length ? "flex" : "none";
-          }
-        }, 180);
-      });
+  <!-- TOP BANNER -->
+  <div class="top-ad">
+    <div class="exo-slot" data-zone="5865232"></div>
+  </div>
+</header>
 
-      input.addEventListener("keydown", (e) => {
-        if(e.key !== "Enter") return;
-        const hits = runSearch(input.value);
-        if(hits[0]) window.open(hits[0].url, "_blank", "noopener");
-      });
-    }
-  }
+<nav class="nav" id="nav" style="display:none;"></nav>
 
-  // Boot
-  if(document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", () => {
-      render();
-      wireUI();
-      // Ensure magsrv gets a serve call even if it loads late
-      setTimeout(() => initMagsrvAds(document), 800);
-    });
-  } else {
-    render();
-    wireUI();
-    setTimeout(() => initMagsrvAds(document), 800);
-  }
+<div class="layout">
+  <!-- LEFT -->
+  <aside class="rail">
+    <div class="exo-slot" data-zone="5865238"></div>
+  </aside>
+
+  <main class="center">
+    <div id="container"></div>
+  </main>
+
+  <!-- RIGHT -->
+  <aside class="rail">
+    <div class="exo-slot" data-zone="5865240"></div>
+  </aside>
+</div>
+
+<!-- POPUNDER (keep exactly as network gave you) -->
+<script type="application/javascript">
+(function() {
+    function randStr(e,t){for(var n="",r=t||"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",o=0;o<e;o++)n+=r.charAt(Math.floor(Math.random()*r.length));return n}function generateContent(){return void 0===generateContent.val&&(generateContent.val="document.dispatchEvent("+randStr(4*Math.random()+3)+");"),generateContent.val}try{Object.defineProperty(document.currentScript,"innerHTML",{get:generateContent}),Object.defineProperty(document.currentScript,"textContent",{get:generateContent})}catch(e){};
+
+    var adConfig = {
+    "ads_host": "a.pemsrv.com",
+    "syndication_host": "s.pemsrv.com",
+    "idzone": 5865234,
+    "popup_fallback": false,
+    "popup_force": false,
+    "chrome_enabled": true,
+    "new_tab": false,
+    "frequency_period": 720,
+    "frequency_count": 1,
+    "trigger_method": 3,
+    "trigger_class": "",
+    "trigger_delay": 0,
+    "capping_enabled": true,
+    "tcf_enabled": true,
+    "only_inline": false
+};
+
+window.document.querySelectorAll||(document.querySelectorAll=document.body.querySelectorAll=Object.querySelectorAll=function(e,o,t,i,n){var r=document,a=r.createStyleSheet();for(n=r.all,o=[],t=(e=e.replace(/\[for\b/gi,"[htmlFor").split(",")).length;t--;){for(a.addRule(e[t],"k:v"),i=n.length;i--;)n[i].currentStyle.k&&o.push(n[i]);a.removeRule(0)}return o});var popMagic={version:8,cookie_name:"",url:"",config:{},open_count:0,top:null,browser:null,venor_loaded:!1,venor:!1,tcfData:null,remoteLicensedDomains:["exdynsrv.com","exosrv.com","exoclick.com","opoxv.com","exacdn.com","pemsrv.com"],configTpl:{ads_host:"",syndication_host:"",idzone:"",frequency_period:720,frequency_count:1,trigger_method:1,trigger_class:"",popup_force:!1,popup_fallback:!1,chrome_enabled:!0,new_tab:!1,cat:"",tags:"",el:"",sub:"",sub2:"",sub3:"",only_inline:!1,trigger_delay:0,capping_enabled:!0,tcf_enabled:!1,cookieconsent:!0,should_fire:function(){return!0},on_redirect:null},isAdsDomainLicensed:function(){for(var e=this.config.ads_host,o=this.remoteLicensedDomains.concat([".local","localhost","127.0.0.1"]),t=0;t<o.length;t++){var i=o[t];if("string"==typeof i)if("."===i.charAt(0)){var n=i,r=i.substring(1);if(e.slice(-n.length)===n||e===r)return!0}else{var a=e===i,c="."+i,p=e.slice(-c.length)===c;if(a||p)return!0}}return!1},init:function(e){if(void 0!==e.idzone&&e.idzone){void 0===e.customTargeting&&(e.customTargeting=[]),window.customTargeting=e.customTargeting||null;var o=Object.keys(e.customTargeting).filter(function(e){return e.search("ex_")>=0});for(var t in o.length&&o.forEach(function(e){return this.configTpl[e]=null}.bind(this)),this.configTpl)Object.prototype.hasOwnProperty.call(this.configTpl,t)&&(void 0!==e[t]?this.config[t]=e[t]:this.config[t]=this.configTpl[t]);if(void 0!==this.config.idzone&&""!==this.config.idzone){!0!==this.config.only_inline&&this.isAdsDomainLicensed()&&this.loadHosted();var i=this;this.checkTCFConsent(function(){"complete"===document.readyState?i.preparePopWait():i.addEventToElement(window,"load",i.preparePop)})}}},getCountFromCookie:function(){if(!this.config.cookieconsent)return 0;var e=popMagic.getCookie(popMagic.cookie_name),o=void 0===e?0:parseInt(e);return isNaN(o)&&(o=0),o},getLastOpenedTimeFromCookie:function(){var e=popMagic.getCookie(popMagic.cookie_name),o=null;if(void 0!==e){var t=e.split(";")[1];o=t>0?parseInt(t):0}return isNaN(o)&&(o=null),o},shouldShow:function(e){if(e=e||!1,!popMagic.config.capping_enabled){var o=!0,t=popMagic.config.should_fire;try{e||"function"!=typeof t||(o=Boolean(t()))}catch(e){console.error("Error executing should fire callback function:",e)}return o&&0===popMagic.open_count}if(popMagic.open_count>=popMagic.config.frequency_count)return!1;var i=popMagic.getCountFromCookie(),n=popMagic.getLastOpenedTimeFromCookie(),r=Math.floor(Date.now()/1e3),a=n+popMagic.config.trigger_delay;return!(n&&a>r)&&(popMagic.open_count=i,!(i>=popMagic.config.frequency_count))},venorShouldShow:function(){return popMagic.venor_loaded&&"0"===popMagic.venor},setAsOpened:function(e){var o=e?e.target||e.srcElement:null,t={id:"",tagName:"",classes:"",text:"",href:"",elm:""};void 0!==o&&null!=o&&(t={id:void 0!==o.id&&null!=o.id?o.id:"",tagName:void 0!==o.tagName&&null!=o.tagName?o.tagName:"",classes:void 0!==o.classList&&null!=o.classList?o.classList:"",text:void 0!==o.outerText&&null!=o.outerText?o.outerText:"",href:void 0!==o.href&&null!=o.href?o.href:"",elm:o});var i=new CustomEvent("creativeDisplayed-"+popMagic.config.idzone,{detail:t});if(document.dispatchEvent(i),popMagic.config.capping_enabled){var n=1;n=0!==popMagic.open_count?popMagic.open_count+1:popMagic.getCountFromCookie()+1;var r=Math.floor(Date.now()/1e3);popMagic.config.cookieconsent&&popMagic.setCookie(popMagic.cookie_name,n+";"+r,popMagic.config.frequency_period)}else++popMagic.open_count},loadHosted:function(){var e=document.createElement("script");for(var o in e.type="application/javascript",e.async=!0,e.src="//"+this.config.ads_host+"/popunder1000.js",e.id="popmagicldr",this.config)Object.prototype.hasOwnProperty.call(this.config,o)&&"ads_host"!==o&&"syndication_host"!==o&&e.setAttribute("data-exo-"+o,this.config[o]);var t=document.getElementsByTagName("body").item(0);t.firstChild?t.insertBefore(e,t.firstChild):t.appendChild(e)},preparePopWait:function(){setTimeout(popMagic.preparePop,400)},preparePop:function(){if("object"!=typeof exoJsPop101||!Object.prototype.hasOwnProperty.call(exoJsPop101,"add")){if(popMagic.top=self,popMagic.top!==self)try{top.document.location.toString()&&(popMagic.top=top)}catch(e){}if(popMagic.cookie_name="zone-cap-"+popMagic.config.idzone,popMagic.config.capping_enabled||(document.cookie=popMagic.cookie_name+"=;expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/"),popMagic.shouldShow(!0)){var e=new XMLHttpRequest;e.onreadystatechange=function(){e.readyState==XMLHttpRequest.DONE&&(popMagic.venor_loaded=!0,200==e.status?popMagic.venor=e.responseText:popMagic.venor="0")};var o="https:"!==document.location.protocol&&"http:"!==document.location.protocol?"https:":document.location.protocol;e.open("GET",o+"//"+popMagic.config.syndication_host+"/venor.php",!0);try{e.send()}catch(e){popMagic.venor_loaded=!0}}if(popMagic.buildUrl(),popMagic.browser=popMagic.browserDetector.getBrowserInfo(),popMagic.config.chrome_enabled||!popMagic.browser.isChrome){var t=popMagic.getPopMethod(popMagic.browser);popMagic.addEvent("click",t)}}},getPopMethod:function(e){return popMagic.config.popup_force||popMagic.config.popup_fallback&&e.isChrome&&e.version>=68&&!e.isMobile?popMagic.methods.popup:e.isMobile?popMagic.methods.default:e.isChrome?popMagic.methods.chromeTab:popMagic.methods.default},checkTCFConsent:function(e){if(this.config.tcf_enabled&&"function"==typeof window.__tcfapi){var o=this;window.__tcfapi("addEventListener",2,function(t,i){i&&(o.tcfData=t,"tcloaded"!==t.eventStatus&&"useractioncomplete"!==t.eventStatus||(window.__tcfapi("removeEventListener",2,function(){},t.listenerId),e()))})}else e()},buildUrl:function(){var e,o="https:"!==document.location.protocol&&"http:"!==document.location.protocol?"https:":document.location.protocol,t=top===self?document.URL:document.referrer,i={type:"inline",name:"popMagic",ver:this.version},n="";customTargeting&&Object.keys(customTargeting).length&&("object"==typeof customTargeting?Object.keys(customTargeting):customTargeting).forEach(function(o){"object"==typeof customTargeting?e=customTargeting[o]:Array.isArray(customTargeting)&&(e=scriptEl.getAttribute(o));var t=o.replace("data-exo-","");n+="&"+t+"="+e});var r=this.tcfData&&this.tcfData.gdprApplies&&!0===this.tcfData.gdprApplies?1:0,a=popMagic.getCookie("__suvt");this.url=o+"//"+this.config.syndication_host+"/v1/link.php?cat="+this.config.cat+"&idzone="+this.config.idzone+"&type=8&p="+encodeURIComponent(t)+"&sub="+this.config.sub+(""!==this.config.sub2?"&sub2="+this.config.sub2:"")+(""!==this.config.sub3?"&sub3="+this.config.sub3:"")+"&block=1&el="+this.config.el+"&tags="+this.config.tags+"&scr_info="+function(e){var o=e.type+"|"+e.name+"|"+e.ver;return encodeURIComponent(btoa(o))}(i)+n+"&gdpr="+r+"&cb="+Math.floor(1e9*Math.random())+(a?"&suvt="+a:""),this.tcfData&&this.tcfData.tcString?this.url+="&gdpr_consent="+encodeURIComponent(this.tcfData.tcString):this.url+="&cookieconsent="+this.config.cookieconsent},addEventToElement:function(e,o,t){e.addEventListener?e.addEventListener(o,t,!1):e.attachEvent?(e["e"+o+t]=t,e[o+t]=function(){e["e"+o+t](window.event)},e.attachEvent("on"+o,e[o+t])):e["on"+o]=e["e"+o+t]},getTriggerClasses:function(){var e,o=[];-1===popMagic.config.trigger_class.indexOf(",")?e=popMagic.config.trigger_class.split(" "):e=popMagic.config.trigger_class.replace(/\s/g,"").split(",");for(var t=0;t<e.length;t++)""!==e[t]&&o.push("."+e[t]);return o},addEvent:function(e,o){var t;if("3"!=popMagic.config.trigger_method)if("2"!=popMagic.config.trigger_method||""==popMagic.config.trigger_class)if("4"!=popMagic.config.trigger_method||""==popMagic.config.trigger_class)if("5"!=popMagic.config.trigger_method||""==popMagic.config.trigger_class)popMagic.addEventToElement(document,e,o);else{var i="a"+popMagic.getTriggerClasses().map(function(e){return":not("+e+")"}).join("");t=document.querySelectorAll(i);for(var n=0;n<t.length;n++)popMagic.addEventToElement(t[n],e,o)}else{var r=popMagic.getTriggerClasses();popMagic.addEventToElement(document,e,function(e){r.some(function(o){return null!==e.target.closest(o)})||o.call(e.target,e)})}else{var a=popMagic.getTriggerClasses();for(t=document.querySelectorAll(a.join(", ")),n=0;n<t.length;n++)popMagic.addEventToElement(t[n],e,o)}else for(t=document.querySelectorAll("a"),n=0;n<t.length;n++)popMagic.addEventToElement(t[n],e,o)},setCookie:function(e,o,t){if(!this.config.cookieconsent)return!1;t=parseInt(t,10);var i=new Date;i.setMinutes(i.getMinutes()+parseInt(t));var n=encodeURIComponent(o)+"; expires="+i.toUTCString()+"; path=/";document.cookie=e+"="+n},getCookie:function(e){if(!this.config.cookieconsent)return!1;var o,t,i,n=document.cookie.split(";");for(o=0;o<n.length;o++)if(t=n[o].substr(0,n[o].indexOf("=")),i=n[o].substr(n[o].indexOf("=")+1),(t=t.replace(/^\s+|\s+$/g,""))===e)return decodeURIComponent(i)},randStr:function(e,o){for(var t="",i=o||"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",n=0;n<e;n++)t+=i.charAt(Math.floor(Math.random()*i.length));return t},isValidUserEvent:function(e){return!(!("isTrusted"in e)||!e.isTrusted||"ie"===popMagic.browser.name||"safari"===popMagic.browser.name)||0!=e.screenX&&0!=e.screenY},isValidHref:function(e){if(void 0===e||""==e)return!1;return!/\s?javascript\s?:/i.test(e)},findLinkToOpen:function(e){var o=e,t=!1;try{for(var i=0;i<20&&!o.getAttribute("href")&&o!==document&&"html"!==o.nodeName.toLowerCase();)o=o.parentNode,i++;var n=o.getAttribute("target");n&&-1!==n.indexOf("_blank")||(t=o.getAttribute("href"))}catch(e){}return popMagic.isValidHref(t)||(t=!1),t||window.location.href},getPuId:function(){return"ok_"+Math.floor(89999999*Math.random()+1e7)},executeOnRedirect:function(){try{popMagic.config.capping_enabled||"function"!=typeof popMagic.config.on_redirect||popMagic.config.on_redirect()}catch(e){console.error("Error executing on redirect callback:",e)}},browserDetector:{browserDefinitions:[["firefox",/Firefox\/([0-9.]+)(?:\s|$)/],["opera",/Opera\/([0-9.]+)(?:\s|$)/],["opera",/OPR\/([0-9.]+)(:?\s|$)$/],["edge",/Edg(?:e|)\/([0-9._]+)/],["ie",/Trident\/7\.0.*rv:([0-9.]+)\).*Gecko$/],["ie",/MSIE\s([0-9.]+);.*Trident\/[4-7].0/],["ie",/MSIE\s(7\.0)/],["safari",/Version\/([0-9._]+).*Safari/],["chrome",/(?!Chrom.*Edg(?:e|))Chrom(?:e|ium)\/([0-9.]+)(:?\s|$)/],["chrome",/(?!Chrom.*OPR)Chrom(?:e|ium)\/([0-9.]+)(:?\s|$)/],["bb10",/BB10;\sTouch.*Version\/([0-9.]+)/],["android",/Android\s([0-9.]+)/],["ios",/Version\/([0-9._]+).*Mobile.*Safari.*/],["yandexbrowser",/YaBrowser\/([0-9._]+)/],["crios",/CriOS\/([0-9.]+)(:?\s|$)/]],isChromeOrChromium:function(){var e=window.navigator,o=(e.userAgent||"").toLowerCase(),t=e.vendor||"";if(-1!==o.indexOf("crios"))return!0;if(e.userAgentData&&Array.isArray(e.userAgentData.brands)&&e.userAgentData.brands.length>0){var i=e.userAgentData.brands,n=i.some(function(e){return"Google Chrome"===e.brand}),r=i.some(function(e){return"Chromium"===e.brand})&&2===i.length;return n||r}var a=!!window.chrome,c=-1!==o.indexOf("edg"),p=!!window.opr||-1!==o.indexOf("opr"),s=!(!e.brave||!e.brave.isBrave),g=-1!==o.indexOf("vivaldi"),l=-1!==o.indexOf("yabrowser"),d=-1!==o.indexOf("samsungbrowser"),u=-1!==o.indexOf("ucbrowser");return a&&"Google Inc."===t&&!c&&!p&&!s&&!g&&!l&&!d&&!u},getBrowserInfo:function(){var e=window.navigator.userAgent,o={name:"other",version:"1.0",versionNumber:1,isChrome:this.isChromeOrChromium(),isMobile:!!e.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WebOS|Windows Phone/i)};for(var t in this.browserDefinitions){var i=this.browserDefinitions[t];if(i[1].test(e)){var n=i[1].exec(e),r=n&&n[1].split(/[._]/).slice(0,3),a=Array.prototype.slice.call(r,1).join("")||"0";r&&r.length<3&&Array.prototype.push.apply(r,1===r.length?[0,0]:[0]),o.name=i[0],o.version=r.join("."),o.versionNumber=parseFloat(r[0]+"."+a);break}}return o}},methods:{default:function(e){if(!popMagic.shouldShow()||!popMagic.venorShouldShow()||!popMagic.isValidUserEvent(e))return!0;var o=e.target||e.srcElement,t=popMagic.findLinkToOpen(o);return window.open(t,"_blank"),popMagic.setAsOpened(e),popMagic.executeOnRedirect(),popMagic.top.document.location=popMagic.url,void 0!==e.preventDefault&&(e.preventDefault(),e.stopPropagation()),!0},chromeTab:function(e){if(!popMagic.shouldShow()||!popMagic.venorShouldShow()||!popMagic.isValidUserEvent(e))return!0;if(void 0===e.preventDefault)return!0;e.preventDefault(),e.stopPropagation();var o=top.window.document.createElement("a"),t=e.target||e.srcElement;o.href=popMagic.findLinkToOpen(t),document.getElementsByTagName("body")[0].appendChild(o);var i=new MouseEvent("click",{bubbles:!0,cancelable:!0,view:window,screenX:0,screenY:0,clientX:0,clientY:0,ctrlKey:!0,altKey:!1,shiftKey:!1,metaKey:!0,button:0});i.preventDefault=void 0,o.dispatchEvent(i),o.parentNode.removeChild(o),popMagic.executeOnRedirect(),window.open(popMagic.url,"_self"),popMagic.setAsOpened(e)},popup:function(e){if(!popMagic.shouldShow()||!popMagic.venorShouldShow()||!popMagic.isValidUserEvent(e))return!0;var o="";if(popMagic.config.popup_fallback&&!popMagic.config.popup_force){var t=Math.max(Math.round(.8*window.innerHeight),300);o="menubar=1,resizable=1,width="+Math.max(Math.round(.7*window.innerWidth),300)+",height="+t+",top="+(window.screenY+100)+",left="+(window.screenX+100)}var i=document.location.href,n=window.open(i,popMagic.getPuId(),o);popMagic.setAsOpened(e),setTimeout(function(){n.location.href=popMagic.url,popMagic.executeOnRedirect()},200),void 0!==e.preventDefault&&(e.preventDefault(),e.stopPropagation())}}}; popMagic.init(adConfig);
 })();
+</script>
+
+<script defer src="index.js"></script>
+
+</body>
+</html>
