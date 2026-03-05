@@ -76,6 +76,10 @@
   const END_ZONE     = "5865236";
   const END_ADS      = 24;
 
+  // ✅ Long “endcap” ad under the FINAL chapter (wide rectangle)
+  // Recommended to use your banner zone (same as top banner) if you want it to look clean.
+  const ENDCAP_ZONE  = "5865232";
+
   // ====== AD DENSITY ======
   const BETWEEN_EVERY = 2;
   const BETWEEN_SLOTS = 3;
@@ -85,11 +89,10 @@
   const CLOSE_OTHERS_ON_OPEN = true;
   const LAZY_ADS = true;
 
-  // ✅ FEATURED AD ABOVE CHAPTERS (TURN OFF TO LOOK LEGIT)
+  // ✅ FEATURED AD ABOVE CHAPTERS (OFF = looks legit)
   const SHOW_FEATURED_AD_ABOVE_CHAPTERS = false;
 
-  // ====== SEARCH BUTTON BEHAVIOR ======
-  const SEARCH_FIRST_TELEPORT_KEY = "archive_search_first_done_v1";
+  // ====== SCROLL ======
   const SCROLL_MAX_MS = 1500;
 
   const $  = (s, r=document) => r.querySelector(s);
@@ -104,6 +107,7 @@
       .replaceAll("'","&#39;");
   }
 
+  // --- Drive URL helpers ---
   function driveFileIdFromUrl(url){
     try{
       const u = new URL(url);
@@ -161,6 +165,7 @@
     serveAds();
   }
 
+  // ====== Ad blocks ======
   function buildBetweenAd(count){
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
@@ -203,7 +208,21 @@
     return wrap;
   }
 
-  // (kept for optional use, but now gated by SHOW_FEATURED_AD_ABOVE_CHAPTERS)
+  // ✅ Endcap ad: one long rectangle under the FINAL chapter
+  function buildEndcapAd(){
+    const wrap = document.createElement("section");
+    wrap.className = "endcap-ad";
+    wrap.id = "endcapAd";
+
+    const slot = document.createElement("div");
+    slot.className = "exo-slot";
+    slot.dataset.zone = ENDCAP_ZONE;
+
+    wrap.appendChild(slot);
+    return wrap;
+  }
+
+  // Optional featured above chapters (kept, but gated)
   function makeFeaturedMoneySlot(){
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
@@ -273,8 +292,8 @@
     [first, mid, last].forEach(i => { if(cards[i]) cards[i].open = true; });
   }
 
+  // ====== Smooth scroll helper ======
   function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
-
   function smoothScrollToY(targetY, maxMs = SCROLL_MAX_MS){
     const startY = window.scrollY || window.pageYOffset || 0;
     const distance = targetY - startY;
@@ -296,26 +315,7 @@
     requestAnimationFrame(step);
   }
 
-  function scrollToSearch({ teleportFirstTime } = { teleportFirstTime: true }){
-    const section = $("#searchSection");
-    if(!section) return;
-
-    const rect = section.getBoundingClientRect();
-    const targetY = Math.max(0, rect.top + (window.scrollY || 0) - 10);
-
-    const alreadyDidFirst = localStorage.getItem(SEARCH_FIRST_TELEPORT_KEY) === "1";
-
-    if(teleportFirstTime && !alreadyDidFirst){
-      window.scrollTo(0, targetY);
-      localStorage.setItem(SEARCH_FIRST_TELEPORT_KEY, "1");
-      setTimeout(() => $("#q")?.focus(), 50);
-      return;
-    }
-
-    smoothScrollToY(targetY, SCROLL_MAX_MS);
-    setTimeout(() => $("#q")?.focus(), 250);
-  }
-
+  // ====== Nav helpers ======
   function openFirstChapter(){
     const first = $("details.card");
     if(first){
@@ -324,25 +324,62 @@
     }
   }
 
-  // ====== Render ======
+  function openLatestChapter(){
+    const lastIdx = ITEMS.length - 1;
+    const latest = $(`#item-${lastIdx}`);
+    if(latest){
+      latest.open = true;
+      latest.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  // ====== Render (requested layout) ======
+  // Layout near bottom becomes:
+  // ... chapters ... -> penultimate -> [24 ad block] -> final -> [long endcap ad]
   function render(){
     const container = $("#container");
     if(!container) return;
 
     container.replaceChildren();
 
-    // ✅ This is the “spammy” first-viewport slot. It is now OFF by default.
+    // ✅ No “spammy” ad above the chapters (unless you toggle it on)
     if(SHOW_FEATURED_AD_ABOVE_CHAPTERS){
       container.appendChild(makeFeaturedMoneySlot());
     }
 
-    ITEMS.forEach((item, i) => {
-      container.appendChild(makeDetails(item, i));
-      const isGap = ((i + 1) % BETWEEN_EVERY === 0) && (i + 1) < ITEMS.length;
-      if(isGap) container.appendChild(buildBetweenAd(BETWEEN_SLOTS));
-    });
+    if(ITEMS.length === 0){
+      return;
+    }
 
+    if(ITEMS.length === 1){
+      // Single chapter: show it, then endcap
+      container.appendChild(makeDetails(ITEMS[0], 0));
+      container.appendChild(buildEndcapAd());
+      observeNewSlots(container);
+      openSmart($$("details.card", container));
+      return;
+    }
+
+    const lastIdx = ITEMS.length - 1;
+
+    // Render all chapters EXCEPT the last one
+    for(let i = 0; i < lastIdx; i++){
+      container.appendChild(makeDetails(ITEMS[i], i));
+
+      // Between-ads should NOT appear after penultimate chapter.
+      // So only allow gaps while (i+1) < lastIdx.
+      const isGap = ((i + 1) % BETWEEN_EVERY === 0) && (i + 1) < lastIdx;
+      if(isGap) container.appendChild(buildBetweenAd(BETWEEN_SLOTS));
+    }
+
+    // ✅ 24-ad block comes BEFORE final chapter
     container.appendChild(buildEndAds());
+
+    // ✅ Final chapter (latest) comes AFTER the 24-ad block
+    container.appendChild(makeDetails(ITEMS[lastIdx], lastIdx));
+
+    // ✅ Long endcap ad under the final chapter
+    container.appendChild(buildEndcapAd());
 
     observeNewSlots(container);
 
@@ -352,6 +389,7 @@
 
   // ====== UI EVENTS ======
   document.addEventListener("click", (e) => {
+    // Expand/Hide button
     const btn = e.target.closest(".expbtn");
     if(btn){
       const d = btn.closest("details");
@@ -363,23 +401,36 @@
       return;
     }
 
-    const jump = e.target.closest("#jumpSearch");
-    if(jump){
-      e.preventDefault();
-      e.stopPropagation();
-      scrollToSearch({ teleportFirstTime: true });
-      return;
-    }
-
+    // First chapter buttons
     const of =
       e.target.closest("#openFirst") ||
       e.target.closest("#openFirstTop") ||
       e.target.closest("#openFirstBottom");
-
     if(of){
       e.preventDefault();
       e.stopPropagation();
       openFirstChapter();
+      return;
+    }
+
+    // Latest chapter buttons (add these IDs in HTML when you want)
+    const ol =
+      e.target.closest("#openLatest") ||
+      e.target.closest("#openLatestTop") ||
+      e.target.closest("#openLatestBottom");
+    if(ol){
+      e.preventDefault();
+      e.stopPropagation();
+      openLatestChapter();
+      return;
+    }
+
+    // If you still have a SEARCH button somewhere, make it just focus the input (no scary glide)
+    const jump = e.target.closest("#jumpSearch");
+    if(jump){
+      e.preventDefault();
+      e.stopPropagation();
+      $("#q")?.focus();
       return;
     }
   });
@@ -422,7 +473,7 @@
     }
   }, true);
 
-  // ====== SEARCH (bottom input) ======
+  // ====== SEARCH (works wherever #q is; top/bottom doesn’t matter) ======
   let SEARCH_INDEX = null;
   function buildSearchIndex(){
     if(SEARCH_INDEX) return SEARCH_INDEX;
