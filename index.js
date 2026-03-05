@@ -1,16 +1,15 @@
 // index.js
 (() => {
   // ====== EDIT THIS LIST ======
-  // Put your manga PDFs here.
   const ITEMS = [
     { title: "DBZ 284", id: "DBZ-284", url: "https://drive.google.com/file/d/1h6PGUPSCLtiKP800GfZBvu8rHaVfECLo/view?usp=drive_link" },
     { title: "DBZ 285", id: "DBZ-285", url: "https://drive.google.com/file/d/14MZ1Gfo_kVJSVzaSClPnAnrZ-g-NJ8AE/view?usp=drive_link" },
   ];
 
   // Zones
-  const BETWEEN_ZONE = "5865236"; // between chapters (your money rectangles)
-  const END_ZONE = "5865344";     // bottom grid ads (300x250)
-  const END_ADS = 12;             // number of bottom ads
+  const BETWEEN_ZONE = "5865236"; // between chapters
+  const END_ZONE = "5865344";     // bottom 300x250
+  const END_ADS = 12;
 
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -22,6 +21,32 @@
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#39;");
+  }
+
+  // --- Drive URL helpers ---
+  function driveFileIdFromUrl(url) {
+    // supports:
+    // https://drive.google.com/file/d/<ID>/view
+    // https://drive.google.com/open?id=<ID>
+    // https://drive.google.com/uc?id=<ID>&...
+    try {
+      const u = new URL(url);
+      const m = u.pathname.match(/\/file\/d\/([^/]+)/);
+      if (m && m[1]) return m[1];
+      const id = u.searchParams.get("id");
+      if (id) return id;
+      return null;
+    } catch {
+      const m = String(url).match(/\/file\/d\/([^/]+)/);
+      return m?.[1] || null;
+    }
+  }
+
+  function toDrivePreview(url) {
+    // If it's a Drive file link, convert to /preview for iframe embedding
+    const id = driveFileIdFromUrl(url);
+    if (!id) return url;
+    return `https://drive.google.com/file/d/${id}/preview`;
   }
 
   // Convert .exo-slot placeholders into <ins> and request ads
@@ -39,8 +64,8 @@
     (window.AdProvider = window.AdProvider || []).push({ serve: {} });
   }
 
-  // We agreed: 6 ads between every PDF (because chapters are long now)
-  function betweenAdCount(_afterIndex0Based) {
+  // We agreed: 6 ads between every PDF
+  function betweenAdCount() {
     return 6;
   }
 
@@ -89,7 +114,9 @@
     const title = escapeHtml(item.title || `Item ${idx + 1}`);
     const id = item.id ? escapeHtml(item.id) : "";
 
-    // Lazy-load on open: store url in data-src
+    const openUrl = item.url;                 // normal link
+    const embedUrl = toDrivePreview(item.url); // iframe-friendly
+
     d.innerHTML = `
       <summary>
         <div class="leftstack">
@@ -97,11 +124,11 @@
           ${id ? `<div class="id">${id}</div>` : ``}
         </div>
         <div class="actions">
-          <a class="pill primary" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open</a>
+          <a class="pill primary" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">Open</a>
           <button class="pill ghost expbtn" type="button">Expand <span class="chev"></span></button>
         </div>
       </summary>
-      <div class="content" data-src="${escapeHtml(item.url)}"></div>
+      <div class="content" data-src="${escapeHtml(embedUrl)}" data-open="${escapeHtml(openUrl)}"></div>
     `;
     return d;
   }
@@ -116,20 +143,17 @@
       const d = makeDetails(item, i);
       container.appendChild(d);
 
-      // insert between ads after each item except the last one
       if ((i + 1) < ITEMS.length) {
-        const k = betweenAdCount(i);
-        container.appendChild(buildBetweenAd(k));
+        container.appendChild(buildBetweenAd(betweenAdCount(i)));
       }
     });
 
-    // bottom: 12x 300x250 grid
+    // bottom: 12x 300x250
     container.appendChild(buildEndAds());
 
-    // init ads after DOM exists
     initMagsrvAds(document);
 
-    // Open first/middle/last for “progression vibe”
+    // progression vibe: open first/mid/last
     if (ITEMS.length > 0) {
       const cards = $$("details.card", container);
       const mid = Math.floor((cards.length - 1) / 2);
@@ -170,20 +194,22 @@
 
         if (content.querySelector("iframe")) return;
 
-        const src = content.dataset.src;
+        const embedSrc = content.dataset.src;
+        const openSrc = content.dataset.open || embedSrc;
 
         const isMobile = window.matchMedia("(max-width: 900px)").matches;
         if (isMobile) {
           content.innerHTML = `
             <div style="padding:16px;text-align:center">
-              <a class="pill primary" href="${escapeHtml(src)}" target="_blank" rel="noopener">Open viewer</a>
+              <a class="pill primary" href="${escapeHtml(openSrc)}" target="_blank" rel="noopener">Open viewer</a>
             </div>
           `;
         } else {
           const iframe = document.createElement("iframe");
           iframe.loading = "lazy";
           iframe.referrerPolicy = "no-referrer";
-          iframe.src = src;
+          iframe.src = embedSrc;
+          iframe.allow = "fullscreen";
           content.appendChild(iframe);
         }
       } else {
@@ -193,7 +219,7 @@
     true
   );
 
-  // Lightweight search (no ajax)
+  // Lightweight search
   let SEARCH_INDEX = null;
   function buildSearchIndex() {
     if (SEARCH_INDEX) return SEARCH_INDEX;
@@ -262,12 +288,9 @@
             return;
           }
           const hits = runSearch(q);
-          if (meta)
-            meta.textContent = hits.length ? `Matches: ${hits.length}` : "No matches.";
+          if (meta) meta.textContent = hits.length ? `Matches: ${hits.length}` : "No matches.";
           if (nav) {
-            nav.innerHTML = hits
-              .map((h) => `<a href="#item-${h.i}">${escapeHtml(h.title)}</a>`)
-              .join("");
+            nav.innerHTML = hits.map(h => `<a href="#item-${h.i}">${escapeHtml(h.title)}</a>`).join("");
             nav.style.display = hits.length ? "flex" : "none";
           }
         }, 180);
@@ -281,12 +304,8 @@
     }
   }
 
-  // ----- Side fallback: Exo first, then other networks if empty -----
-  // You paste your OTHER network code inside these functions.
-  function injectFallback(_side /* "left" | "right" */, _slotEl) {
-    // slotEl.innerHTML = `...other network code...`;
-  }
-
+  // Side fallback hooks (optional)
+  function injectFallback(_side, _slotEl) {}
   function slotLooksFilled(slotEl) {
     if (slotEl.querySelector("iframe")) return true;
     if (slotEl.children.length >= 2) return true;
@@ -297,7 +316,6 @@
     }
     return false;
   }
-
   function runSideFallbacks() {
     const sideSlots = $$(".exo-slot[data-fallback]");
     setTimeout(() => {
@@ -311,11 +329,7 @@
   function boot() {
     render();
     wireUI();
-
-    // Serve again once magsrv script is surely loaded
     setTimeout(() => initMagsrvAds(document), 700);
-
-    // Side fallbacks after Exo has had a chance
     runSideFallbacks();
   }
 
