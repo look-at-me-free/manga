@@ -17,14 +17,13 @@
   const END_ADS      = 9;         // footer grid count
 
   // ====== AD DENSITY ======
-  // you said "every 2"
   const BETWEEN_EVERY = 2;  // place between ads after every N chapters
   const BETWEEN_SLOTS = 3;  // how many 300x250 in each between block
 
   // ====== BEHAVIOR ======
-  const OPEN_SMART = true;             // open 3 cards (first/mid/last) on load
-  const CLOSE_OTHERS_ON_OPEN = true;   // keep it clean: 1 iframe at a time (desktop)
-  const LAZY_ADS = true;               // loads ads near viewport (less janky)
+  const OPEN_SMART = true;           // open 3 cards (first/mid/last) on load
+  const CLOSE_OTHERS_ON_OPEN = true; // 1 iframe at a time (desktop)
+  const LAZY_ADS = true;             // loads ads near viewport
 
   const $  = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
@@ -51,13 +50,12 @@
       return m?.[1] || null;
     }
   }
-
   function toDrivePreview(url){
     const id = driveFileIdFromUrl(url);
     return id ? `https://drive.google.com/file/d/${id}/preview` : url;
   }
 
-  // ====== ADS: turn .exo-slot[data-zone] into <ins> and serve ======
+  // ====== ADS ======
   function ensureIns(slot){
     if(slot.dataset.inited) return;
     slot.dataset.inited = "1";
@@ -66,12 +64,10 @@
     ins.setAttribute("data-zoneid", slot.dataset.zone);
     slot.appendChild(ins);
   }
-
   function serveAds(){
     (window.AdProvider = window.AdProvider || []).push({ serve: {} });
   }
 
-  // Lazy ad loading
   let adObserver = null;
   function initLazyAds(){
     if(adObserver || !LAZY_ADS) return;
@@ -90,32 +86,27 @@
 
     $$(`.exo-slot[data-zone]`).forEach(slot => adObserver.observe(slot));
   }
-
   function observeNewSlots(root){
     if(!adObserver) return;
     $$(`.exo-slot[data-zone]`, root).forEach(slot => adObserver.observe(slot));
   }
-
   function initAllAdsNow(){
     $$(`.exo-slot[data-zone]`).forEach(ensureIns);
     serveAds();
   }
 
-  // ====== Ad block builders ======
+  // ====== Ad blocks ======
   function buildBetweenAd(count){
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
-
     const grid = document.createElement("div");
     grid.className = "between-grid";
-
     for(let i=0;i<count;i++){
       const slot = document.createElement("div");
       slot.className = "exo-slot";
       slot.dataset.zone = BETWEEN_ZONE;
       grid.appendChild(slot);
     }
-
     wrap.appendChild(grid);
     return wrap;
   }
@@ -174,6 +165,8 @@
     const openUrl  = item.url;
     const embedUrl = toDrivePreview(item.url);
 
+    // IMPORTANT: we render ONLY ONE "OPEN" in the header, and NEVER render another "OPEN" inside content.
+    // This prevents the "double open button" spam/glitch forever.
     d.innerHTML = `
       <summary>
         <div class="leftstack">
@@ -181,16 +174,16 @@
           ${id ? `<div class="id">${id}</div>` : ``}
         </div>
 
-        <div class="actions">
-          <div class="action-expand">
-            <button class="pill expbtn expand-btn" type="button">
-              EXPAND <span class="chev"></span>
-            </button>
-            <div class="expand-hint">(click to EXPAND THE CHAPTER)</div>
-          </div>
+        <!-- CENTER: EXPAND (perfectly centered) -->
+        <div class="midstack">
+          <button class="pill expbtn expand-btn" type="button" aria-label="Expand chapter">
+            EXPAND <span class="chev"></span>
+          </button>
+          <div class="expand-hint">(click to EXPAND THE CHAPTER)</div>
         </div>
 
-        <div class="action-open">
+        <!-- RIGHT: OPEN -->
+        <div class="rightstack">
           <a class="pill primary open-btn" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">OPEN</a>
           <div class="open-note">(this opens a new tab for the chapter!)</div>
         </div>
@@ -198,6 +191,43 @@
 
       <div class="content" data-src="${escapeHtml(embedUrl)}" data-open="${escapeHtml(openUrl)}"></div>
     `;
+
+    // Force-center the 3 columns even if your CSS isn't perfect yet:
+    const summary = d.querySelector("summary");
+    if(summary){
+      summary.style.display = "grid";
+      summary.style.gridTemplateColumns = "1fr auto 1fr";
+      summary.style.alignItems = "center";
+      summary.style.gap = "12px";
+    }
+
+    const mid = d.querySelector(".midstack");
+    if(mid){
+      mid.style.display = "flex";
+      mid.style.flexDirection = "column";
+      mid.style.alignItems = "center";
+      mid.style.justifyContent = "center";
+      mid.style.textAlign = "center";
+      mid.style.minWidth = "220px";
+    }
+
+    const right = d.querySelector(".rightstack");
+    if(right){
+      right.style.display = "flex";
+      right.style.flexDirection = "column";
+      right.style.alignItems = "flex-end";
+      right.style.justifyContent = "center";
+      right.style.textAlign = "right";
+    }
+
+    const left = d.querySelector(".leftstack");
+    if(left){
+      left.style.display = "flex";
+      left.style.flexDirection = "column";
+      left.style.alignItems = "flex-start";
+      left.style.justifyContent = "center";
+    }
+
     return d;
   }
 
@@ -217,7 +247,9 @@
   function render(){
     const container = $("#container");
     if(!container) return;
-    container.innerHTML = "";
+
+    // HARD RESET so nothing ever stacks
+    container.replaceChildren();
 
     container.appendChild(makeFeaturedMoneySlot());
 
@@ -237,7 +269,7 @@
   }
 
   // ====== UI EVENTS ======
-  // Expand button toggles the details cleanly
+  // Expand button toggles details cleanly
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".expbtn");
     if(!btn) return;
@@ -248,7 +280,7 @@
     e.stopPropagation();
   });
 
-  // Embed: ALWAYS embed (including iPhone). No more "mobile open-only" behavior.
+  // Embed viewer on open (desktop + iPhone)
   document.addEventListener("toggle", (e) => {
     const d = e.target;
     if(!(d instanceof HTMLDetailsElement)) return;
@@ -259,23 +291,18 @@
     if(d.open){
       const isMobile = window.matchMedia("(max-width: 900px)").matches;
 
-      // Desktop: keep it clean (close others)
+      // Desktop: keep clean
       if(!isMobile && CLOSE_OTHERS_ON_OPEN){
         $$("details.card[open]").forEach(x => { if(x !== d) x.open = false; });
       }
 
+      // Don’t rebuild if already embedded
       if(content.querySelector("iframe")) return;
 
       const embedSrc = content.dataset.src;
-      const openSrc  = content.dataset.open || embedSrc;
 
-      // Header (Open + note) + iframe viewer under it
-      content.innerHTML = `
-        <div style="padding:12px;text-align:center;border-bottom:1px solid rgba(255,255,255,.10);">
-          <a class="pill primary open-btn" href="${escapeHtml(openSrc)}" target="_blank" rel="noopener">OPEN</a>
-          <div class="open-note" style="margin-top:6px;">(this opens a new tab for the chapter!)</div>
-        </div>
-      `;
+      // IMPORTANT: NO buttons inside content (prevents double-open glitch)
+      content.replaceChildren();
 
       const iframe = document.createElement("iframe");
       iframe.loading = "lazy";
@@ -288,7 +315,7 @@
       content.appendChild(iframe);
 
     } else {
-      content.innerHTML = "";
+      content.replaceChildren();
     }
   }, true);
 
@@ -377,6 +404,10 @@
   }
 
   function boot(){
+    // guard against accidental double-boot
+    if(window.__ARCHIVE_BOOTED__) return;
+    window.__ARCHIVE_BOOTED__ = true;
+
     render();
     wireUI();
 
@@ -389,7 +420,7 @@
   }
 
   if(document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", boot);
+    document.addEventListener("DOMContentLoaded", boot, { once:true });
   } else {
     boot();
   }
