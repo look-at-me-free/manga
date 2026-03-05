@@ -49,13 +49,6 @@ body{
   color:var(--ink);
 }
 
-.pangolin{
-  font-family:"Pangolin", cursive;
-  font-weight:400;
-  font-style:normal;
-  color:var(--ink);
-}
-
 .hero-sub,
 .meta,
 .nav a,
@@ -203,25 +196,6 @@ summary::-webkit-details-marker{ display:none; }
 .doc{ font-size:16px; letter-spacing:.2px; line-height:1.15; }
 .id{ font-size:12px; color:var(--muted); margin-top:6px; }
 
-/* Center column = Expand */
-.actions{ display:block; }
-.action-expand{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-}
-
-/* Right column = Open */
-.action-open{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-  justify-content:center;
-  text-align:right;
-}
-
 /* Buttons */
 .pill{
   background:rgba(255,255,255,.10);
@@ -285,63 +259,6 @@ details[open] .chev{ transform:rotate(45deg); margin-top:-2px; }
 .content{ background:#000; border-top:1px solid rgba(255,255,255,.10); }
 iframe{ width:100%; height:85vh; border:0; }
 
-/* Between ad block */
-.between-ad{
-  margin:14px 0;
-  padding:14px;
-  border-radius:18px;
-  border:1px solid rgba(255,255,255,.14);
-  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.35));
-  box-shadow:0 18px 60px rgba(0,0,0,.45);
-}
-.between-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
-  gap:14px;
-  justify-items:center;
-  align-items:center;
-}
-.between-grid .exo-slot{
-  width:300px;
-  min-height:250px;
-  border-radius:14px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.03);
-}
-
-/* Footer mega ad block */
-.end-ads{
-  margin:18px 0 40px;
-  padding:16px;
-  border-radius:18px;
-  border:1px solid rgba(255,255,255,.14);
-  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.35));
-  box-shadow:0 18px 60px rgba(0,0,0,.45);
-}
-.end-ads-title{
-  text-align:center;
-  color:var(--muted);
-  margin:0 0 12px;
-  font-size:13px;
-  font-family:"Pangolin", cursive;
-}
-.end-ads-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
-  gap:14px;
-  justify-content:center;
-  justify-items:center;
-}
-.end-ads-grid .exo-slot{
-  width:320px;
-  min-height:200px;
-  border-radius:14px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.03);
-}
-
 /* Nav */
 .nav{
   display:flex;
@@ -364,20 +281,13 @@ iframe{ width:100%; height:85vh; border:0; }
 @media(max-width:1100px){
   .layout{ grid-template-columns:1fr; }
   .rail{ position:relative; top:auto; height:auto; overflow:visible; padding-right:0; }
-  .between-grid .exo-slot{ width:min(300px, 92vw); }
-  .end-ads-grid .exo-slot{ width:min(320px, 92vw); }
 }
 
-/* Mobile: stack summary cleanly */
 @media(max-width:600px){
   summary{
     grid-template-columns: 1fr;
     gap:10px;
     align-items:start;
-  }
-  .action-open{
-    align-items:center;
-    text-align:center;
   }
   .open-note{ text-align:center; }
 }
@@ -395,8 +305,8 @@ iframe{ width:100%; height:85vh; border:0; }
       <input id="q" type="search" placeholder="Search titles… e.g. Volume 1 Chapter 3" autocomplete="off" />
       <span class="kbd">Enter</span>
     </div>
-    <button class="smallbtn" id="clear">Clear</button>
-    <button class="smallbtn" id="openFirst">Open First</button>
+    <button class="smallbtn" id="clear" type="button">Clear</button>
+    <button class="smallbtn" id="openFirst" type="button">Open First</button>
   </div>
 
   <div class="meta" id="meta"></div>
@@ -407,6 +317,7 @@ iframe{ width:100%; height:85vh; border:0; }
   </div>
 </header>
 
+<!-- Search results bar (index.js fills this) -->
 <nav class="nav" id="nav" style="display:none;"></nav>
 
 <div class="layout">
@@ -429,9 +340,42 @@ iframe{ width:100%; height:85vh; border:0; }
   </aside>
 </div>
 
-<!-- Your popunder (5865234) - paste EXACT Exo script here -->
+<!-- ExoClick Popunder (Zone 5865422) — retention-friendly: 1 per 12 hours -->
 <script type="application/javascript">
-/* paste your popunder block here exactly as Exo gave it */
+(function(){
+  var adConfig = {
+    ads_host: "a.pemsrv.com",
+    syndication_host: "s.pemsrv.com",
+    idzone: 5865422,
+    popup_fallback: false,
+    popup_force: false,
+    chrome_enabled: true,
+    new_tab: false,
+    frequency_period: 720,  // minutes = 12 hours
+    frequency_count: 1,     // 1 per period
+    trigger_method: 3,      // clicking on links (default)
+    trigger_class: "",
+    trigger_delay: 0,
+    capping_enabled: true,
+    tcf_enabled: true,
+    only_inline: false
+  };
+
+  var s = document.createElement("script");
+  s.type = "application/javascript";
+  s.async = true;
+  s.src = "//" + adConfig.ads_host + "/popunder1000.js";
+  s.id = "popmagicldr";
+
+  for (var k in adConfig){
+    if(!Object.prototype.hasOwnProperty.call(adConfig, k)) continue;
+    if(k === "ads_host" || k === "syndication_host") continue;
+    s.setAttribute("data-exo-" + k, adConfig[k]);
+  }
+
+  var b = document.getElementsByTagName("body")[0];
+  b.appendChild(s);
+})();
 </script>
 
 <!-- Main app logic -->
