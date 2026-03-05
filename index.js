@@ -2,22 +2,23 @@
 (() => {
   // ====== EDIT THIS LIST ======
   const ITEMS = [
-  { title: "Volume 1 Chapter 1", id: "V1-C001", url: "https://drive.google.com/file/d/1OovhU8PaSu4ZK4CsJMp4EilJ7zXM96S1/view?usp=sharing" },
-  { title: "Volume 1 Chapter 2", id: "V1-C002", url: "https://drive.google.com/file/d/1aVwsgv8L23LU_7fFZoEWO7Rj-_6aeCHl/view?usp=sharing" },
-  { title: "Volume 1 Chapter 3", id: "V1-C003", url: "https://drive.google.com/file/d/1pBiTpyyRv5FxI9015aH__6Wj7mGMhu_w/view?usp=sharing" },
-  { title: "Volume 1 Chapter 4", id: "V1-C004", url: "https://drive.google.com/file/d/1ETkV_XiipV_aAIfJQ_DApnfbSGkWa6Ap/view?usp=sharing" },
-  { title: "Volume 1 Chapter 5", id: "V1-C005", url: "https://drive.google.com/file/d/1B6Ok2wbJ1qVHWcbvkl2NqpdLd2W_Mhtd/view?usp=sharing" },
-  { title: "Volume 1 Chapter 6", id: "V1-C006", url: "https://drive.google.com/file/d/1z63JfaOeV_x6N692_Sb8_VKtT50_Eqgl/view?usp=sharing" },
-  { title: "Volume 1 Chapter 7", id: "V1-C007", url: "https://drive.google.com/file/d/1GP6yKJwHqAVc8Sn-V5hy3luG62pt0FeB/view?usp=sharing" },
-];
+    { title: "Volume 1 Chapter 1", id: "V1-C001", url: "https://drive.google.com/file/d/1OovhU8PaSu4ZK4CsJMp4EilJ7zXM96S1/view?usp=sharing" },
+    { title: "Volume 1 Chapter 2", id: "V1-C002", url: "https://drive.google.com/file/d/1aVwsgv8L23LU_7fFZoEWO7Rj-_6aeCHl/view?usp=sharing" },
+    { title: "Volume 1 Chapter 3", id: "V1-C003", url: "https://drive.google.com/file/d/1pBiTpyyRv5FxI9015aH__6Wj7mGMhu_w/view?usp=sharing" },
+    { title: "Volume 1 Chapter 4", id: "V1-C004", url: "https://drive.google.com/file/d/1ETkV_XiipV_aAIfJQ_DApnfbSGkWa6Ap/view?usp=sharing" },
+    { title: "Volume 1 Chapter 5", id: "V1-C005", url: "https://drive.google.com/file/d/1B6Ok2wbJ1qVHWcbvkl2NqpdLd2W_Mhtd/view?usp=sharing" },
+    { title: "Volume 1 Chapter 6", id: "V1-C006", url: "https://drive.google.com/file/d/1z63JfaOeV_x6N692_Sb8_VKtT50_Eqgl/view?usp=sharing" },
+    { title: "Volume 1 Chapter 7", id: "V1-C007", url: "https://drive.google.com/file/d/1GP6yKJwHqAVc8Sn-V5hy3luG62pt0FeB/view?usp=sharing" },
+  ];
 
   // Zones
   const BETWEEN_ZONE = "5865236"; // proven money zone (300x250)
   const END_ZONE     = "5865236"; // same money zone at footer for now
   const END_ADS      = 12;
 
-  // Between pattern (3 slots per between block, every 6 items)
-  const BETWEEN_EVERY = 1;
+  // Between pattern
+  // If you want "every 2", set BETWEEN_EVERY = 2
+  const BETWEEN_EVERY = 1; // <--- change to 2 if you want every 2 chapters
   const BETWEEN_SLOTS = 4;
 
   const $  = (s, r=document) => r.querySelector(s);
@@ -143,7 +144,7 @@
   }
 
   function makeFeaturedMoneySlot(){
-    // single above-fold 5865236 slot (clean + high viewability)
+    // single above-fold slot (clean + high viewability)
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
     wrap.style.maxWidth = "1100px";
@@ -161,6 +162,7 @@
     return wrap;
   }
 
+  // UPDATED: matches the new index.html action layout/classes
   function makeDetails(item, idx){
     const d = document.createElement("details");
     d.className = "card";
@@ -179,11 +181,22 @@
           <div class="doc">${title}</div>
           ${id ? `<div class="id">${id}</div>` : ``}
         </div>
+
         <div class="actions">
-          <a class="pill primary" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">Open</a>
-          <button class="pill ghost expbtn" type="button">Expand <span class="chev"></span></button>
+          <div class="action-expand">
+            <button class="pill ghost expbtn expand-btn" type="button">
+              EXPAND <span class="chev"></span>
+            </button>
+            <div class="expand-hint">(click to EXPAND THE CHAPTER)</div>
+          </div>
+
+          <div class="action-open">
+            <a class="pill primary open-btn" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">OPEN</a>
+            <div class="open-note">(this opens a new tab for the chapter!)</div>
+          </div>
         </div>
       </summary>
+
       <div class="content" data-src="${escapeHtml(embedUrl)}" data-open="${escapeHtml(openUrl)}"></div>
     `;
     return d;
@@ -246,6 +259,7 @@
     if(!content) return;
 
     if(d.open){
+      // close others (keeps it clean) when there are many chapters
       if(ITEMS.length > 2){
         $$("details[open]").forEach(x => { if(x !== d) x.open = false; });
       }
@@ -259,7 +273,8 @@
       if(isMobile){
         content.innerHTML = `
           <div style="padding:16px;text-align:center">
-            <a class="pill primary" href="${escapeHtml(openSrc)}" target="_blank" rel="noopener">Open viewer</a>
+            <a class="pill primary open-btn" href="${escapeHtml(openSrc)}" target="_blank" rel="noopener">OPEN</a>
+            <div class="open-note" style="text-align:center">(this opens a new tab for the chapter!)</div>
           </div>
         `;
       } else {
