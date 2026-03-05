@@ -2,17 +2,24 @@
 (() => {
   // ====== EDIT THIS LIST ======
   const ITEMS = [
-    { title: "DBZ 284", id: "DBZ-284", url: "https://drive.google.com/file/d/1h6PGUPSCLtiKP800GfZBvu8rHaVfECLo/view?usp=drive_link" },
-    { title: "DBZ 285", id: "DBZ-285", url: "https://drive.google.com/file/d/14MZ1Gfo_kVJSVzaSClPnAnrZ-g-NJ8AE/view?usp=drive_link" },
+    { title: "Volume 1 Chapter 1", id: "V1-C001", url: "https://drive.google.com/file/d/1B6Ok2wbJ1qVHWcbvkl2NqpdLd2W_Mhtd/view?usp=sharing" },
+    { title: "Volume 1 Chapter 2", id: "V1-C002", url: "https://drive.google.com/file/d/1ETkV_XiipV_aAIfJQ_DApnfbSGkWa6Ap/view?usp=sharing" },
+    { title: "Volume 1 Chapter 3", id: "V1-C003", url: "https://drive.google.com/file/d/1GP6yKJwHqAVc8Sn-V5hy3luG62pt0FeB/view?usp=sharing" },
+    { title: "Volume 1 Chapter 4", id: "V1-C004", url: "https://drive.google.com/file/d/1OovhU8PaSu4ZK4CsJMp4EilJ7zXM96S1/view?usp=sharing" },
+    { title: "Volume 1 Chapter 5", id: "V1-C005", url: "https://drive.google.com/file/d/1aVwsgv8L23LU_7fFZoEWO7Rj-_6aeCHl/view?usp=sharing" },
+    { title: "Volume 1 Chapter 6", id: "V1-C006", url: "https://drive.google.com/file/d/1pBiTpyyRv5FxI9015aH__6Wj7mGMhu_w/view?usp=sharing" },
+    { title: "Volume 1 Chapter 7", id: "V1-C007", url: "https://drive.google.com/file/d/1z63JfaOeV_x6N692_Sb8_VKtT50_Eqgl/view?usp=sharing" },
   ];
 
   // Zones
   const BETWEEN_ZONE = "5865236"; // your proven money zone (300x250)
-  const END_ZONE     = "5865236"; // IMPORTANT: use the same money zone at the footer for now
+  const END_ZONE     = "5865236"; // same money zone at footer
   const END_ADS      = 12;
 
-  // Between pattern
-  const BETWEEN_ADS_PER_GAP = 6;
+  // Between pattern (FIXED):
+  // Insert a between-ad block AFTER every N items, not after every item.
+  const BETWEEN_EVERY = 6;
+  const BETWEEN_SLOTS = 1; // how many 300x250s inside each between block
 
   const $  = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
@@ -77,18 +84,15 @@
         didInit = true;
       }
 
-      // only call serve if we actually initialized something new
-      if(didInit) {
-        // tiny delay lets DOM settle
+      if(didInit){
         setTimeout(serveAds, 30);
       }
     }, {
       root: null,
-      rootMargin: "900px 0px", // start loading before user reaches it
+      rootMargin: "900px 0px",
       threshold: 0.01
     });
 
-    // observe all slots currently on page
     $$(`.exo-slot[data-zone]`).forEach(slot => adObserver.observe(slot));
   }
 
@@ -117,7 +121,6 @@
   }
 
   function buildEndAds(){
-    // keep your footer styling from CSS, but your HTML expects .end-ads grid
     const wrap = document.createElement("section");
     wrap.className = "end-ads";
 
@@ -141,7 +144,7 @@
   }
 
   function makeFeaturedMoneySlot(){
-    // A guaranteed above-fold 5865236 slot (this is where the money happens)
+    // guaranteed above-fold 5865236 slot
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
     wrap.style.maxWidth = "1100px";
@@ -152,7 +155,7 @@
 
     const slot = document.createElement("div");
     slot.className = "exo-slot";
-    slot.dataset.zone = BETWEEN_ZONE; // 5865236
+    slot.dataset.zone = BETWEEN_ZONE;
     grid.appendChild(slot);
 
     wrap.appendChild(grid);
@@ -187,35 +190,47 @@
     return d;
   }
 
+  function openSmart(cards){
+    // FIX: don’t open every iframe by default (kills performance + can tank ad viewability).
+    if(cards.length <= 2){
+      cards.forEach(c => c.open = true);
+      return;
+    }
+    // open first, middle, last
+    const first = 0;
+    const mid   = Math.floor(cards.length/2);
+    const last  = cards.length - 1;
+    [first, mid, last].forEach(i => { if(cards[i]) cards[i].open = true; });
+  }
+
   function render(){
     const container = $("#container");
     if(!container) return;
     container.innerHTML = "";
 
-    // 1) Featured money slot ABOVE first chapter (high viewability)
+    // 1) Featured money slot ABOVE first chapter
     container.appendChild(makeFeaturedMoneySlot());
 
     ITEMS.forEach((item, i) => {
-      const d = makeDetails(item, i);
-      container.appendChild(d);
+      container.appendChild(makeDetails(item, i));
 
-      if((i + 1) < ITEMS.length){
-        container.appendChild(buildBetweenAd(BETWEEN_ADS_PER_GAP));
+      // FIX: between ads only every BETWEEN_EVERY items (not after every item)
+      const isGapPoint = ((i + 1) % BETWEEN_EVERY === 0) && (i + 1) < ITEMS.length;
+      if(isGapPoint){
+        container.appendChild(buildBetweenAd(BETWEEN_SLOTS));
       }
     });
 
-    // Footer: 12 slots (same money zone for now)
+    // Footer ads
     container.appendChild(buildEndAds());
 
-    // Observe any slots we just created
     observeNewSlots(container);
 
-    // Open behavior: only 2 items => open both
     const cards = $$("details.card", container);
-    cards.forEach(c => c.open = true);
+    openSmart(cards);
   }
 
-  // Expand button
+  // Expand button (kept)
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".expbtn");
     if(!btn) return;
@@ -235,8 +250,7 @@
     if(!content) return;
 
     if(d.open){
-      // close others ONLY if you want. Since you asked for both open with 2 items,
-      // we keep them both open when ITEMS.length <= 2.
+      // close others if you want (for many items)
       if(ITEMS.length > 2){
         $$("details[open]").forEach(x => { if(x !== d) x.open = false; });
       }
@@ -304,11 +318,13 @@
     const clear = $("#clear");
     const openFirst = $("#openFirst");
 
+    if(meta) meta.textContent = `Items: ${ITEMS.length}`;
+
     if(clear){
       clear.addEventListener("click", () => {
         if(input) input.value = "";
         if(nav) nav.style.display = "none";
-        if(meta) meta.textContent = "";
+        if(meta) meta.textContent = `Items: ${ITEMS.length}`;
       });
     }
 
@@ -328,7 +344,7 @@
           const q = input.value;
           if(!q.trim()){
             if(nav) nav.style.display = "none";
-            if(meta) meta.textContent = "";
+            if(meta) meta.textContent = `Items: ${ITEMS.length}`;
             return;
           }
           const hits = runSearch(q);
@@ -352,10 +368,9 @@
     render();
     wireUI();
 
-    // Start lazy ad system AFTER DOM exists
     initLazyAds();
 
-    // Kick an extra serve a moment later (helps on some loads)
+    // extra serve a moment later (helps on some loads)
     setTimeout(serveAds, 900);
   }
 
