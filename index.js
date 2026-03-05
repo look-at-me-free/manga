@@ -1,21 +1,12 @@
+// index.js
 (() => {
   // ====== EDIT THIS LIST ======
-  // title: what the user sees
-  // url: direct PDF view link (or whatever you embed)
-  // id: optional small tag shown under title (volume/chapter label)
   const ITEMS = [
-    // EXAMPLE:
     // { title: "Tracksuit Dragon Ball Full Color — Volume 1", id: "DBFC-001", url: "https://drive.google.com/file/d/XXXX/view?usp=sharing" },
   ];
 
-  // Between-ad zone
-  const BETWEEN_ZONE = "5865236";
-
-  // How often to place between-ads (every N entries)
-  const BETWEEN_EVERY = 6;
-
-  // Open 3 on load: first, middle, last
-  const OPEN_PROGRESSIVE = true;
+  // Zones
+  const BETWEEN_ZONE = "5865236"; // your money rectangle zone
 
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
@@ -29,7 +20,7 @@
       .replaceAll("'","&#39;");
   }
 
-  // Convert .exo-slot placeholders into <ins data-zoneid="..."> and serve ads.
+  // Convert .exo-slot placeholders into <ins> and request ads
   function initMagsrvAds(root=document){
     const slots = $$(".exo-slot[data-zone]", root);
     for(const slot of slots){
@@ -41,18 +32,35 @@
       ins.setAttribute("data-zoneid", slot.dataset.zone);
       slot.appendChild(ins);
     }
-
-    // Serve after ins tags exist.
     (window.AdProvider = window.AdProvider || []).push({ serve: {} });
   }
 
-  function buildBetweenAd(){
+  // Your exact ad pattern:
+  // After item 1: 1 rectangle
+  // After items 2..9: 3 rectangles
+  // After item 10+: 6 rectangles
+  function betweenAdCount(afterIndex0Based){
+    const n = afterIndex0Based + 1; // chapter number
+    if(n === 1) return 1;
+    if(n >= 2 && n <= 9) return 3;
+    return 6; // 10+
+  }
+
+  function buildBetweenAd(count){
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
-    const slot = document.createElement("div");
-    slot.className = "exo-slot";
-    slot.dataset.zone = BETWEEN_ZONE;
-    wrap.appendChild(slot);
+
+    const grid = document.createElement("div");
+    grid.className = "between-grid";
+
+    for(let i=0;i<count;i++){
+      const slot = document.createElement("div");
+      slot.className = "exo-slot";
+      slot.dataset.zone = BETWEEN_ZONE;
+      grid.appendChild(slot);
+    }
+
+    wrap.appendChild(grid);
     return wrap;
   }
 
@@ -64,8 +72,7 @@
     const title = escapeHtml(item.title || `Item ${idx+1}`);
     const id = item.id ? escapeHtml(item.id) : "";
 
-    // We do NOT inject an iframe immediately.
-    // We store data-src and only create iframe when opened.
+    // no iframe injected yet; lazy-load on open
     d.innerHTML = `
       <summary>
         <div class="leftstack">
@@ -73,8 +80,8 @@
           ${id ? `<div class="id">${id}</div>` : ``}
         </div>
         <div class="actions">
-          <a class="pill ghost" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open</a>
-          <span class="pill primary expbtn" role="button" tabindex="0">Expand <span class="chev"></span></span>
+          <a class="pill primary" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open</a>
+          <button class="pill ghost expbtn" type="button">Expand <span class="chev"></span></button>
         </div>
       </summary>
       <div class="content" data-src="${escapeHtml(item.url)}"></div>
@@ -88,36 +95,33 @@
 
     container.innerHTML = "";
 
-    // Insert items + between ads
     ITEMS.forEach((item, i) => {
       const d = makeDetails(item, i);
       container.appendChild(d);
 
-      // Place between ad after every N items, but not at the end
-      const isInsertPoint = (i+1) % BETWEEN_EVERY === 0 && (i+1) < ITEMS.length;
-      if(isInsertPoint){
-        container.appendChild(buildBetweenAd());
+      // insert between ads after each item except the last one
+      if((i + 1) < ITEMS.length){
+        const k = betweenAdCount(i);
+        container.appendChild(buildBetweenAd(k));
       }
     });
 
-    // After DOM exists, init ads (top/left/right + between)
+    // init ads after DOM exists
     initMagsrvAds(document);
 
-    // Open first/mid/last for “progression”
-    if(OPEN_PROGRESSIVE && ITEMS.length > 0){
+    // Open first/middle/last for progression vibe
+    if(ITEMS.length > 0){
       const cards = $$("details.card", container);
       const mid = Math.floor((cards.length - 1) / 2);
 
-      // close all first
       cards.forEach(c => c.open = false);
-
       if(cards[0]) cards[0].open = true;
       if(cards[mid]) cards[mid].open = true;
       if(cards[cards.length-1]) cards[cards.length-1].open = true;
     }
   }
 
-  // Make "Expand" pill toggle details reliably
+  // Expand button behavior
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".expbtn");
     if(!btn) return;
@@ -128,7 +132,7 @@
     e.stopPropagation();
   });
 
-  // Lazy load iframe only when opened, and only keep ONE iframe alive at a time
+  // Lazy iframe: only keep ONE iframe alive at a time
   document.addEventListener("toggle", (e) => {
     const d = e.target;
     if(!(d instanceof HTMLDetailsElement)) return;
@@ -137,20 +141,18 @@
     if(!content) return;
 
     if(d.open){
-      // close other details to keep memory low
+      // close others
       $$("details[open]").forEach(x => { if(x !== d) x.open = false; });
 
       if(content.querySelector("iframe")) return;
 
       const src = content.dataset.src;
 
-      // On narrow screens, avoid embedding heavy viewer; show a button instead
       const isMobile = window.matchMedia("(max-width: 900px)").matches;
-
       if(isMobile){
         content.innerHTML = `
-          <div class="viewer">
-            <a href="${escapeHtml(src)}" target="_blank" rel="noopener">Open viewer</a>
+          <div style="padding:16px;text-align:center">
+            <a class="pill primary" href="${escapeHtml(src)}" target="_blank" rel="noopener">Open viewer</a>
           </div>
         `;
       } else {
@@ -161,12 +163,11 @@
         content.appendChild(iframe);
       }
     } else {
-      // free memory
       content.innerHTML = "";
     }
   }, true);
 
-  // Search: local filter (no heavy ajax). Shows quick nav links.
+  // Lightweight search (no ajax)
   let SEARCH_INDEX = null;
   function buildSearchIndex(){
     if(SEARCH_INDEX) return SEARCH_INDEX;
@@ -183,6 +184,7 @@
     q = (q || "").trim().toLowerCase();
     if(!q) return [];
     const toks = q.split(/\s+/).filter(Boolean);
+
     const idx = buildSearchIndex();
     const out = [];
     for(const it of idx){
@@ -198,8 +200,8 @@
 
   function wireUI(){
     const input = $("#q");
-    const meta  = $("#meta");
-    const nav   = $("#nav");
+    const meta = $("#meta");
+    const nav = $("#nav");
     const clear = $("#clear");
     const openFirst = $("#openFirst");
 
@@ -233,7 +235,7 @@
           const hits = runSearch(q);
           if(meta) meta.textContent = hits.length ? `Matches: ${hits.length}` : "No matches.";
           if(nav){
-            nav.innerHTML = hits.map(h => `<a href="${escapeHtml(h.url)}" target="_blank" rel="noopener">${escapeHtml(h.title)}</a>`).join("");
+            nav.innerHTML = hits.map(h => `<a href="#item-${h.i}">${escapeHtml(h.title)}</a>`).join("");
             nav.style.display = hits.length ? "flex" : "none";
           }
         }, 180);
@@ -247,17 +249,54 @@
     }
   }
 
+  // ----- Side fallback: Exo first, then other networks if empty -----
+  // You paste your OTHER network code inside these functions.
+  function injectFallback(side /* "left" | "right" */ , slotEl){
+    // EXAMPLE:
+    // slotEl.innerHTML = `<script src="https://other-network.example/tag.js"></script>`;
+    // or slotEl.innerHTML = `...their <ins> + serve call...`;
+  }
+
+  function slotLooksFilled(slotEl){
+    // simple heuristics: iframe/ins children, or height changes
+    if(slotEl.querySelector("iframe")) return true;
+    // sometimes the provider injects stuff without iframe; check for >1 child
+    if(slotEl.children.length >= 2) return true;
+    // or if <ins> got size
+    const ins = slotEl.querySelector("ins");
+    if(ins){
+      const r = ins.getBoundingClientRect();
+      if(r.height >= 40) return true;
+    }
+    return false;
+  }
+
+  function runSideFallbacks(){
+    const sideSlots = $$(".exo-slot[data-fallback]");
+    // Give Exo a moment to fill
+    setTimeout(() => {
+      for(const slot of sideSlots){
+        if(slotLooksFilled(slot)) continue;
+        injectFallback(slot.dataset.fallback, slot);
+      }
+    }, 1600);
+  }
+
   // Boot
-  if(document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", () => {
-      render();
-      wireUI();
-      // Ensure magsrv gets a serve call even if it loads late
-      setTimeout(() => initMagsrvAds(document), 800);
-    });
-  } else {
+  function boot(){
     render();
     wireUI();
-    setTimeout(() => initMagsrvAds(document), 800);
+
+    // Serve again once magsrv script is surely loaded
+    setTimeout(() => initMagsrvAds(document), 700);
+
+    // Side fallbacks after Exo has had a chance
+    runSideFallbacks();
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
   }
 })();
