@@ -1,0 +1,588 @@
+
+
+<!-- index.html -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Manga Archive</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double+Ink:wght@100..900&family=Jersey+25&family=Pangolin&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<script async type="application/javascript" src="https://a.magsrv.com/ad-provider.js"></script>
+
+<style>
+:root{
+  --bg:#07070a;
+  --ink:rgba(255,255,255,.92);
+  --muted:rgba(255,255,255,.60);
+  --stroke:rgba(255,255,255,.14);
+  --radius:18px;
+  --shadow:0 20px 60px rgba(0,0,0,.7);
+  --railW:min(260px,22vw);
+  --gap:18px;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  background:
+    radial-gradient(900px 500px at 15% 0%, rgba(255,255,255,.06), transparent 60%),
+    radial-gradient(800px 550px at 85% 15%, rgba(255,255,255,.05), transparent 55%),
+    var(--bg);
+  color:var(--ink);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+}
+
+/* Shared text styles */
+.hero-sub,
+.meta,
+.nav a,
+.doc,
+.kbd,
+.smallbtn,
+.search input{
+  font-family:"Pangolin", cursive;
+  font-weight:400;
+}
+
+/* Header */
+.hero{
+  text-align:center;
+  padding:20px 16px 8px;
+  border-bottom:1px solid var(--stroke);
+  background:linear-gradient(to bottom, rgba(255,255,255,.05), transparent 75%);
+}
+
+.hero-title{
+  font-family:"Bitcount Prop Double Ink", system-ui, sans-serif;
+  font-weight:700;
+  font-size:clamp(1.8rem,5.2vw,3.8rem);
+  margin:0;
+  letter-spacing:.5px;
+  color:var(--ink);
+}
+
+.hero-sub{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.toolbar{
+  max-width:1100px;
+  margin:10px auto 0;
+  padding:0 16px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+}
+
+.smallbtn{
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.06);
+  color:var(--ink);
+  padding:8px 12px;
+  border-radius:999px;
+  cursor:pointer;
+  font-size:13px;
+  transition:transform .12s ease, background .12s ease;
+}
+.smallbtn:hover{
+  background:rgba(255,255,255,.10);
+  transform:translateY(-1px);
+}
+
+.meta{
+  color:var(--muted);
+  font-size:12px;
+  text-align:center;
+  margin:8px 0 0;
+}
+
+/* Top search */
+.search-zone{
+  max-width:1100px;
+  margin:10px auto 0;
+  padding:0 16px 6px;
+}
+
+.search-label{
+  text-align:center;
+  margin:0 0 8px;
+  font-family:"Press Start 2P", system-ui, sans-serif;
+  font-size:16px;
+  letter-spacing:1.2px;
+  color:rgba(255,255,255,.92);
+  text-transform:uppercase;
+}
+
+.search{
+  width:100%;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:12px 14px;
+  border-radius:16px;
+  border:2px solid rgba(255,255,255,.18);
+  background:#fff;
+  box-shadow:0 16px 50px rgba(0,0,0,.45);
+}
+
+.search input{
+  width:100%;
+  background:transparent;
+  border:0;
+  outline:0;
+  color:#111;
+  font-size:16px;
+  caret-color:#000;
+}
+
+.search:focus-within{
+  box-shadow:0 20px 60px rgba(0,0,0,.55);
+  transform:translateY(-1px);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+
+.kbd{
+  font-size:12px;
+  color:#333;
+  border:1px solid rgba(0,0,0,.18);
+  padding:4px 8px;
+  border-radius:999px;
+  background:rgba(0,0,0,.04);
+}
+
+.nav{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:0 0 10px;
+  justify-content:center;
+}
+.nav a{
+  text-decoration:none;
+  padding:6px 12px;
+  background:rgba(255,255,255,.07);
+  border-radius:999px;
+  color:white;
+  font-size:13px;
+  font-family:"Pangolin", cursive;
+  border:1px solid rgba(255,255,255,.12);
+}
+
+/* Top banner */
+.top-ad{
+  max-width:1100px;
+  margin:10px auto 0;
+  padding:8px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.16);
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  box-shadow:0 18px 60px rgba(0,0,0,.55);
+  backdrop-filter:blur(8px);
+}
+.top-ad .exo-slot{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:90px;
+  width:100%;
+}
+
+/* Layout */
+.layout{
+  display:grid;
+  grid-template-columns:var(--railW) 1fr var(--railW);
+  gap:var(--gap);
+  max-width:1600px;
+  margin:auto;
+  padding:10px 18px 18px;
+}
+.center{
+  max-width:1100px;
+  margin:auto;
+  width:100%;
+}
+
+/* Side rails */
+.rail{
+  position:sticky;
+  top:28px;
+  height:calc(100vh - 40px);
+  overflow:auto;
+  padding-right:6px;
+}
+.rail::-webkit-scrollbar{ width:10px; }
+.rail::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.12);
+  border-radius:999px;
+}
+.rail-stack{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.rail .exo-slot{
+  min-height:250px;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.03);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Cards */
+details{
+  margin:12px 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  border:2px solid var(--stroke);
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(8px);
+}
+
+summary{
+  cursor:pointer;
+  padding:16px 14px;
+  display:grid;
+  grid-template-columns:1fr auto 210px;
+  gap:14px;
+  align-items:center;
+}
+summary::-webkit-details-marker{ display:none; }
+
+.leftstack{ text-align:left; }
+.doc{
+  font-size:16px;
+  letter-spacing:.2px;
+  line-height:1.15;
+}
+
+/* Buttons */
+.actions{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.action-open{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  justify-content:center;
+  text-align:right;
+}
+
+.pill{
+  background:rgba(255,255,255,.10);
+  border:2px solid rgba(255,255,255,.14);
+  padding:10px 14px;
+  border-radius:999px;
+  font-size:13px;
+  text-decoration:none;
+  color:white;
+  white-space:nowrap;
+  cursor:pointer;
+  transition:transform .12s ease, background .12s ease;
+}
+.pill:hover{
+  background:rgba(255,255,255,.16);
+  transform:translateY(-1px);
+}
+.pill.primary{
+  background:rgba(255,255,255,.14);
+  border-color:rgba(255,255,255,.18);
+}
+
+.expand-btn{
+  font-family:"Jersey 25", system-ui, sans-serif;
+  letter-spacing:.6px;
+  font-size:26px;
+  padding:14px 18px;
+  background:rgba(255,255,255,.18);
+  border-color:rgba(255,255,255,.22);
+}
+
+.open-btn{
+  font-size:16px;
+  padding:12px 16px;
+}
+
+.expand-hint{
+  margin-top:6px;
+  font-size:12px;
+  color:rgba(255,255,255,.72);
+  line-height:1.2;
+  font-family:"Pangolin", cursive;
+  text-align:center;
+}
+
+.open-note{
+  margin-top:6px;
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.2;
+  font-family:"Pangolin", cursive;
+  text-align:right;
+}
+
+/* Chevron */
+.chev{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-right:2px solid rgba(255,255,255,.7);
+  border-bottom:2px solid rgba(255,255,255,.7);
+  transform:rotate(-45deg);
+  margin-left:10px;
+  opacity:.85;
+}
+details[open] .chev{
+  transform:rotate(45deg);
+  margin-top:-2px;
+}
+
+.content{
+  background:#000;
+  border-top:1px solid rgba(255,255,255,.10);
+}
+iframe{
+  width:100%;
+  height:85vh;
+  border:0;
+}
+
+/* Between ads */
+.between-ad{
+  margin:14px 0;
+  padding:14px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.35));
+  box-shadow:0 18px 60px rgba(0,0,0,.45);
+}
+.between-grid{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:14px;
+  align-items:stretch;
+}
+.between-grid .exo-slot{
+  width:100%;
+  min-height:250px;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.03);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* 24-ad block */
+.end-ads{
+  margin:18px 0 18px;
+  padding:16px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.35));
+  box-shadow:0 18px 60px rgba(0,0,0,.45);
+}
+.end-ads-title{
+  text-align:center;
+  color:var(--muted);
+  margin:0 0 12px;
+  font-size:13px;
+  font-family:"Pangolin", cursive;
+}
+.end-ads-grid{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:14px;
+  align-items:stretch;
+}
+.end-ads-grid .exo-slot{
+  width:100%;
+  min-height:250px;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.03);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Long endcap ad */
+.endcap-ad{
+  max-width:1100px;
+  margin:18px auto 70px;
+  padding:14px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.35));
+  box-shadow:0 18px 60px rgba(0,0,0,.45);
+}
+.endcap-ad .exo-slot{
+  width:100%;
+  min-height:90px;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.03);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Ad centering */
+.exo-slot ins{
+  display:block !important;
+  margin:0 auto !important;
+}
+
+/* Responsive */
+@media (max-width: 1100px){
+  .layout{ grid-template-columns:1fr; }
+  .rail{
+    position:relative;
+    top:auto;
+    height:auto;
+    overflow:visible;
+    padding-right:0;
+  }
+  .end-ads-grid{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 860px){
+  .between-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .end-ads-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px){
+  summary{
+    grid-template-columns:1fr;
+    gap:10px;
+    align-items:start;
+  }
+  .action-open{
+    align-items:center;
+    text-align:center;
+  }
+  .open-note{ text-align:center; }
+  .between-grid{ grid-template-columns:1fr; }
+  .end-ads-grid{ grid-template-columns:1fr; }
+
+  .search{
+    flex-wrap:wrap;
+    border-radius:18px;
+  }
+  .kbd{ display:none; }
+
+  .hero{
+    padding:18px 12px 8px;
+  }
+  .layout{
+    padding:8px 12px 18px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="hero">
+  <h1 class="hero-title">Full Manga Series</h1>
+  <p class="hero-sub">Expand • Read • Scroll</p>
+
+  <div class="toolbar">
+    <button class="smallbtn" id="openFirstTop" type="button">First Chapter</button>
+    <button class="smallbtn" id="openLatestTop" type="button">Latest Chapter</button>
+  </div>
+
+  <div class="meta" id="meta"></div>
+
+  <section class="search-zone" id="searchSection">
+    <div class="search-label">SEARCH BAR</div>
+
+    <nav class="nav" id="nav" style="display:none;"></nav>
+
+    <div class="search">
+      <input id="q" type="search" placeholder="Type… e.g. Volume 1 Chapter 12" autocomplete="off" />
+      <span class="kbd">Enter</span>
+      <button class="smallbtn" id="clear" type="button">Clear</button>
+    </div>
+  </section>
+
+  <div class="top-ad">
+    <div class="exo-slot" data-zone="5865232"></div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="rail">
+    <div class="rail-stack" id="leftRail">
+      <div class="exo-slot" data-zone="5865238"></div>
+    </div>
+  </aside>
+
+  <main class="center">
+    <div id="container"></div>
+  </main>
+
+  <aside class="rail">
+    <div class="rail-stack" id="rightRail">
+      <div class="exo-slot" data-zone="5865240"></div>
+    </div>
+  </aside>
+</div>
+
+<script type="application/javascript">
+(function(){
+  var adConfig = {
+    ads_host: "a.pemsrv.com",
+    syndication_host: "s.pemsrv.com",
+    idzone: 5865422,
+    popup_fallback: false,
+    popup_force: false,
+    chrome_enabled: true,
+    new_tab: false,
+    frequency_period: 720,
+    frequency_count: 1,
+    trigger_method: 3,
+    trigger_class: "",
+    trigger_delay: 0,
+    capping_enabled: true,
+    tcf_enabled: true,
+    only_inline: false
+  };
+
+  var s = document.createElement("script");
+  s.type = "application/javascript";
+  s.async = true;
+  s.src = "//" + adConfig.ads_host + "/popunder1000.js";
+  s.id = "popmagicldr";
+
+  for (var k in adConfig){
+    if(!Object.prototype.hasOwnProperty.call(adConfig, k)) continue;
+    if(k === "ads_host" || k === "syndication_host") continue;
+    s.setAttribute("data-exo-" + k, adConfig[k]);
+  }
+  document.body.appendChild(s);
+})();
+</script>
+
+<script defer src="index.js"></script>
+
+</body>
+</html>
