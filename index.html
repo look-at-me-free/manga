@@ -2,357 +2,40 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Deadman Switch Inc</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deadman Switch Inc</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double+Ink:wght@100..900&family=Pangolin&display=swap" rel="stylesheet">
+<style>
+html, body{
+  height:100%;
+  margin:0;
+  background:#ffffff;
+  font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
 
-  <!-- Exo/Magsrv loader (ONLY ONCE) -->
-  <script async type="application/javascript" src="https://a.magsrv.com/ad-provider.js"></script>
+.center{
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 
-  <style>
-    :root{
-      --bg:#07070a;
-      --ink:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.60);
-      --stroke:rgba(255,255,255,.14);
-      --radius:18px;
-      --shadow:0 20px 60px rgba(0,0,0,.7);
-      --railW:min(260px,22vw);
-      --gap:18px;
-      --max:1100px;
-    }
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      background:
-        radial-gradient(900px 500px at 15% 0%, rgba(255,255,255,.06), transparent 60%),
-        radial-gradient(800px 550px at 85% 15%, rgba(255,255,255,.05), transparent 55%),
-        var(--bg);
-      color:var(--ink);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      padding-bottom:90px; /* room for mobile sticky */
-    }
-
-    .hero{
-      text-align:center;
-      padding:28px 16px 16px;
-      border-bottom:1px solid var(--stroke);
-      background:linear-gradient(to bottom, rgba(255,255,255,.05), transparent 75%);
-    }
-    .hero-title{
-      font-family:"Bitcount Prop Double Ink", system-ui, sans-serif;
-      font-weight:700;
-      font-size:clamp(2rem,5.4vw,4rem);
-      margin:0;
-      letter-spacing:.6px;
-    }
-    .hero-sub{
-      margin:10px 0 0;
-      color:var(--muted);
-      font-family:"Pangolin", cursive;
-      font-size:16px;
-    }
-
-    /* Top banner (high viewability) */
-    .top-ad{
-      max-width:var(--max);
-      margin:14px auto 0;
-      padding:10px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.16);
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      box-shadow:0 18px 60px rgba(0,0,0,.55);
-      backdrop-filter:blur(8px);
-    }
-    .top-ad .exo-slot{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:90px;
-      width:100%;
-    }
-
-    /* Layout with sticky rails (excellent viewability on desktop) */
-    .layout{
-      display:grid;
-      grid-template-columns:var(--railW) 1fr var(--railW);
-      gap:var(--gap);
-      max-width:1600px;
-      margin:auto;
-      padding:14px 18px 18px;
-    }
-    .center{
-      max-width:var(--max);
-      margin:auto;
-      width:100%;
-    }
-
-    .rail{
-      position:sticky;
-      top:20px;
-      height:calc(100vh - 40px);
-      overflow:auto;
-      padding-right:6px;
-    }
-    .rail::-webkit-scrollbar{ width:10px; }
-    .rail::-webkit-scrollbar-thumb{
-      background:rgba(255,255,255,.12);
-      border-radius:999px;
-    }
-    .rail-stack{
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
-    .rail .exo-slot{
-      min-height:250px;
-      border-radius:14px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.03);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-    }
-
-    /* Simple scroll spacer so ads enter view (no placeholder text content) */
-    .spacer{
-      height:140vh; /* makes it scroll on most screens */
-    }
-
-    /* Between ad (single slot = higher quality impression) */
-    .between-ad{
-      margin:14px 0;
-      padding:14px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.14);
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.35));
-      box-shadow:0 18px 60px rgba(0,0,0,.45);
-    }
-    .between-ad .exo-slot{
-      width:100%;
-      min-height:250px;
-      border-radius:14px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.03);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-    }
-
-    /* Footer ads: limited so they’re actually seen */
-    .footer-ads{
-      margin:18px 0 18px;
-      padding:16px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.14);
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.35));
-      box-shadow:0 18px 60px rgba(0,0,0,.45);
-    }
-    .footer-grid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:14px;
-      align-items:stretch;
-    }
-    .footer-grid .exo-slot{
-      width:100%;
-      min-height:250px;
-      border-radius:14px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.03);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-    }
-
-    /* Mobile sticky bottom (big RPM win on phones) */
-    .mobile-sticky-ad{
-      position:fixed;
-      left:0; right:0; bottom:0;
-      z-index:9999;
-      padding:8px 10px;
-      background:rgba(0,0,0,.82);
-      border-top:1px solid rgba(255,255,255,.12);
-      display:none;
-    }
-    .mobile-sticky-ad .exo-slot{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:50px;
-      width:100%;
-    }
-
-    /* Ad centering */
-    .exo-slot ins{ display:block !important; margin:0 auto !important; }
-
-    @media (max-width:1100px){
-      .layout{ grid-template-columns:1fr; }
-      .rail{
-        position:relative;
-        top:auto;
-        height:auto;
-        overflow:visible;
-        padding-right:0;
-      }
-      .footer-grid{ grid-template-columns:1fr; }
-    }
-    @media (max-width:900px){
-      .mobile-sticky-ad{ display:block; }
-    }
-  </style>
+h1{
+  color:#000000;
+  font-size:clamp(2rem,6vw,4rem);
+  font-weight:600;
+  letter-spacing:1px;
+  margin:0;
+}
+</style>
 </head>
 
 <body>
 
-  <header class="hero">
-    <h1 class="hero-title">Deadman Switch Inc</h1>
-    <p class="hero-sub">A LANDING PAGE!</p>
-
-    <!-- Top banner (zone: 5865232) -->
-    <div class="top-ad">
-      <div class="exo-slot" data-zone="5865232"></div>
-    </div>
-  </header>
-
-  <div class="layout">
-    <!-- Left sticky rail (zone: 5865238) -->
-    <aside class="rail">
-      <div class="rail-stack" id="leftRail">
-        <div class="exo-slot" data-zone="5865238"></div>
-      </div>
-    </aside>
-
-    <!-- Main: minimal, just scroll + ads -->
-    <main class="center" id="main">
-      <div class="spacer" aria-hidden="true"></div>
-
-      <!-- Between ad (single slot, zone: 5865236) -->
-      <div class="between-ad">
-        <div class="exo-slot" data-zone="5865236"></div>
-      </div>
-
-      <div class="spacer" aria-hidden="true"></div>
-
-      <!-- Another between ad (single slot) -->
-      <div class="between-ad">
-        <div class="exo-slot" data-zone="5865236"></div>
-      </div>
-
-      <div class="spacer" aria-hidden="true"></div>
-
-      <!-- Footer ads: limited (2) -->
-      <section class="footer-ads">
-        <div class="footer-grid">
-          <div class="exo-slot" data-zone="5865236"></div>
-          <div class="exo-slot" data-zone="5865236"></div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Right sticky rail (zone: 5865240) -->
-    <aside class="rail">
-      <div class="rail-stack" id="rightRail">
-        <div class="exo-slot" data-zone="5865240"></div>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Mobile sticky bottom banner (reuses your banner zone 5865232) -->
-  <div class="mobile-sticky-ad">
-    <div class="exo-slot" data-zone="5865232"></div>
-  </div>
-
-  <!-- Popunder (your exact config) -->
-  <script type="application/javascript">
-  (function(){
-    var adConfig = {
-      ads_host: "a.pemsrv.com",
-      syndication_host: "s.pemsrv.com",
-      idzone: 5865422,
-      popup_fallback: false,
-      popup_force: false,
-      chrome_enabled: true,
-      new_tab: false,
-      frequency_period: 720,
-      frequency_count: 1,
-      trigger_method: 3,
-      trigger_class: "",
-      trigger_delay: 0,
-      capping_enabled: true,
-      tcf_enabled: true,
-      only_inline: false
-    };
-
-    var s = document.createElement("script");
-    s.type = "application/javascript";
-    s.async = true;
-    s.src = "//" + adConfig.ads_host + "/popunder1000.js";
-    s.id = "popmagicldr";
-
-    for (var k in adConfig){
-      if(!Object.prototype.hasOwnProperty.call(adConfig, k)) continue;
-      if(k === "ads_host" || k === "syndication_host") continue;
-      s.setAttribute("data-exo-" + k, adConfig[k]);
-    }
-    document.body.appendChild(s);
-  })();
-  </script>
-
-  <!-- Ad init: hybrid (above-the-fold now, everything else lazy) -->
-  <script>
-  (() => {
-    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-
-    function ensureIns(slot){
-      if(!slot || slot.dataset.inited) return;
-      slot.dataset.inited = "1";
-      const ins = document.createElement("ins");
-      ins.className = "eas6a97888e2";
-      ins.setAttribute("data-zoneid", slot.dataset.zone);
-      slot.appendChild(ins);
-    }
-    function serveAds(){
-      (window.AdProvider = window.AdProvider || []).push({ serve: {} });
-    }
-
-    // Immediate: top + rails + mobile sticky
-    const immediate = [
-      ...$$(".top-ad .exo-slot[data-zone]"),
-      ...$$("#leftRail .exo-slot[data-zone]"),
-      ...$$("#rightRail .exo-slot[data-zone]"),
-      ...$$(".mobile-sticky-ad .exo-slot[data-zone]")
-    ];
-    immediate.forEach(ensureIns);
-    serveAds();
-
-    // Lazy-load everything else (between + footer)
-    const io = new IntersectionObserver((entries) => {
-      let did = false;
-      for(const e of entries){
-        if(!e.isIntersecting) continue;
-        ensureIns(e.target);
-        io.unobserve(e.target);
-        did = true;
-      }
-      if(did) setTimeout(serveAds, 30);
-    }, { root:null, rootMargin:"900px 0px", threshold:0.01 });
-
-    $$(`.exo-slot[data-zone]`).forEach(slot => {
-      if(slot.dataset.inited) return;
-      io.observe(slot);
-    });
-
-    setTimeout(serveAds, 400);
-  })();
-  </script>
+<div class="center">
+  <h1>Coming Soon!</h1>
+</div>
 
 </body>
 </html>
