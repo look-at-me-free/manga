@@ -1,6 +1,6 @@
 // index.js
 (() => {
-  // ====== EDIT THIS LIST ======
+  // ====== EDIT THIS LIST (FULL LIST, NO PLACEHOLDERS) ======
   const ITEMS = [
     { title: "Volume 1 Chapter 1",  id: "V1-C001", url: "https://drive.google.com/file/d/1OovhU8PaSu4ZK4CsJMp4EilJ7zXM96S1/view?usp=sharing" },
     { title: "Volume 1 Chapter 2",  id: "V1-C002", url: "https://drive.google.com/file/d/1aVwsgv8L23LU_7fFZoEWO7Rj-_6aeCHl/view?usp=sharing" },
@@ -76,24 +76,29 @@
   const END_ZONE     = "5865236";
   const END_ADS      = 24;
 
-  // ✅ Long “endcap” ad under the FINAL chapter (wide rectangle)
-  // Recommended to use your banner zone (same as top banner) if you want it to look clean.
-  const ENDCAP_ZONE  = "5865232";
-
   // ====== AD DENSITY ======
   const BETWEEN_EVERY = 2;
   const BETWEEN_SLOTS = 3;
 
   // ====== BEHAVIOR ======
-  const OPEN_SMART = true;
+  const OPEN_SMART = true;                // opens first/middle/last chunk-cards after initial render
+  const OPEN_FIRST_ON_LOAD = true;        // ensures Chapter 1 is open (desktop-friendly)
   const CLOSE_OTHERS_ON_OPEN = true;
   const LAZY_ADS = true;
 
-  // ✅ FEATURED AD ABOVE CHAPTERS (OFF = looks legit)
+  // ✅ FEATURED AD ABOVE CHAPTERS (OFF by default)
   const SHOW_FEATURED_AD_ABOVE_CHAPTERS = false;
+
+  // ====== SCALE (500–800 chapters safe) ======
+  const CHUNK_SIZE = 90;                  // cards per chunk
+  const CHUNK_ROOT_MARGIN = "1800px 0px"; // preload next chunk before user hits it
 
   // ====== SCROLL ======
   const SCROLL_MAX_MS = 1500;
+
+  // ====== SEARCH ======
+  const SEARCH_MAX_RESULTS = 40;
+  const SEARCH_DEBOUNCE_MS = 90;
 
   const $  = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
@@ -165,7 +170,6 @@
     serveAds();
   }
 
-  // ====== Ad blocks ======
   function buildBetweenAd(count){
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
@@ -208,21 +212,6 @@
     return wrap;
   }
 
-  // ✅ Endcap ad: one long rectangle under the FINAL chapter
-  function buildEndcapAd(){
-    const wrap = document.createElement("section");
-    wrap.className = "endcap-ad";
-    wrap.id = "endcapAd";
-
-    const slot = document.createElement("div");
-    slot.className = "exo-slot";
-    slot.dataset.zone = ENDCAP_ZONE;
-
-    wrap.appendChild(slot);
-    return wrap;
-  }
-
-  // Optional featured above chapters (kept, but gated)
   function makeFeaturedMoneySlot(){
     const wrap = document.createElement("div");
     wrap.className = "between-ad";
@@ -280,27 +269,18 @@
     return d;
   }
 
-  function openSmart(cards){
-    if(!OPEN_SMART) return;
-    if(cards.length <= 2){
-      cards.forEach(c => c.open = true);
-      return;
-    }
-    const first = 0;
-    const mid   = Math.floor(cards.length/2);
-    const last  = cards.length - 1;
-    [first, mid, last].forEach(i => { if(cards[i]) cards[i].open = true; });
-  }
-
-  // ====== Smooth scroll helper ======
+  // ====== Smooth scroll ======
   function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
   function smoothScrollToY(targetY, maxMs = SCROLL_MAX_MS){
     const startY = window.scrollY || window.pageYOffset || 0;
     const distance = targetY - startY;
+
     if(Math.abs(distance) < 2){
       window.scrollTo(0, targetY);
       return;
     }
+
     const base = 650;
     const extra = Math.min(850, Math.abs(distance) * 0.25);
     const duration = Math.min(maxMs, base + extra);
@@ -315,130 +295,124 @@
     requestAnimationFrame(step);
   }
 
-  // ====== Nav helpers ======
-  function openFirstChapter(){
-    const first = $("details.card");
-    if(first){
-      first.open = true;
-      first.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+  function scrollToEl(el, { offset = 10, smooth = true } = {}){
+    if(!el) return;
+    const rect = el.getBoundingClientRect();
+    const y = Math.max(0, rect.top + (window.scrollY || 0) - offset);
+    if(smooth) smoothScrollToY(y, SCROLL_MAX_MS);
+    else window.scrollTo(0, y);
   }
 
-  function openLatestChapter(){
-    const lastIdx = ITEMS.length - 1;
-    const latest = $(`#item-${lastIdx}`);
-    if(latest){
-      latest.open = true;
-      latest.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
+  // ====== Chunked rendering (so 500–800 is fine) ======
+  let renderedUntil = 0;
+  let chunkSentinelObserver = null;
 
-  // ====== Render (requested layout) ======
-  // Layout near bottom becomes:
-  // ... chapters ... -> penultimate -> [24 ad block] -> final -> [long endcap ad]
-  function render(){
-    const container = $("#container");
-    if(!container) return;
+  function renderChunk(container, start, end){
+    const frag = document.createDocumentFragment();
 
-    container.replaceChildren();
+    for(let i = start; i < end; i++){
+      const item = ITEMS[i];
+      frag.appendChild(makeDetails(item, i));
 
-    // ✅ No “spammy” ad above the chapters (unless you toggle it on)
-    if(SHOW_FEATURED_AD_ABOVE_CHAPTERS){
-      container.appendChild(makeFeaturedMoneySlot());
+      const isGap = ((i + 1) % BETWEEN_EVERY === 0) && (i + 1) < ITEMS.length;
+      if(isGap) frag.appendChild(buildBetweenAd(BETWEEN_SLOTS));
     }
 
-    if(ITEMS.length === 0){
-      return;
-    }
-
-    if(ITEMS.length === 1){
-      // Single chapter: show it, then endcap
-      container.appendChild(makeDetails(ITEMS[0], 0));
-      container.appendChild(buildEndcapAd());
-      observeNewSlots(container);
-      openSmart($$("details.card", container));
-      return;
-    }
-
-    const lastIdx = ITEMS.length - 1;
-
-    // Render all chapters EXCEPT the last one
-    for(let i = 0; i < lastIdx; i++){
-      container.appendChild(makeDetails(ITEMS[i], i));
-
-      // Between-ads should NOT appear after penultimate chapter.
-      // So only allow gaps while (i+1) < lastIdx.
-      const isGap = ((i + 1) % BETWEEN_EVERY === 0) && (i + 1) < lastIdx;
-      if(isGap) container.appendChild(buildBetweenAd(BETWEEN_SLOTS));
-    }
-
-    // ✅ 24-ad block comes BEFORE final chapter
-    container.appendChild(buildEndAds());
-
-    // ✅ Final chapter (latest) comes AFTER the 24-ad block
-    container.appendChild(makeDetails(ITEMS[lastIdx], lastIdx));
-
-    // ✅ Long endcap ad under the final chapter
-    container.appendChild(buildEndcapAd());
-
+    container.appendChild(frag);
     observeNewSlots(container);
-
-    const cards = $$("details.card", container);
-    openSmart(cards);
+    renderedUntil = end;
   }
 
-  // ====== UI EVENTS ======
-  document.addEventListener("click", (e) => {
-    // Expand/Hide button
-    const btn = e.target.closest(".expbtn");
-    if(btn){
-      const d = btn.closest("details");
-      if(d){
-        d.open = !d.open;
-        e.preventDefault();
-        e.stopPropagation();
+  function ensureChunkObserver(container){
+    const sentinel = $("#chunkSentinel");
+    if(!sentinel) return;
+
+    if(chunkSentinelObserver) return;
+    chunkSentinelObserver = new IntersectionObserver((entries) => {
+      for(const entry of entries){
+        if(!entry.isIntersecting) continue;
+        if(renderedUntil >= ITEMS.length) return;
+
+        const nextEnd = Math.min(ITEMS.length, renderedUntil + CHUNK_SIZE);
+        renderChunk(container, renderedUntil, nextEnd);
+        // keep sentinel at bottom
+        container.appendChild(sentinel);
+
+        // if fully rendered, append footer ads once
+        if(renderedUntil >= ITEMS.length && !$("#endAds")){
+          container.appendChild(buildEndAds());
+          observeNewSlots(container);
+        }
+
+        // lazy serve ads after adding new slots
+        if(LAZY_ADS) setTimeout(serveAds, 60);
       }
+    }, { root:null, rootMargin: CHUNK_ROOT_MARGIN, threshold: 0.01 });
+
+    chunkSentinelObserver.observe(sentinel);
+  }
+
+  // ====== Open / Embed ======
+  function openDetails(d){
+    if(!d) return;
+    d.open = true;
+    // trigger embed build via toggle listener
+  }
+
+  function openFirstChapter({ scroll=false } = {}){
+    const first = $("#item-0");
+    if(first){
+      openDetails(first);
+      if(scroll) scrollToEl(first, { offset: 12, smooth: true });
+    }
+  }
+
+  function openLatestChapter({ scroll=true } = {}){
+    const lastIdx = ITEMS.length - 1;
+    ensureRenderedToIndex(lastIdx, () => {
+      const last = $(`#item-${lastIdx}`);
+      if(last){
+        openDetails(last);
+        if(scroll) scrollToEl(last, { offset: 12, smooth: true });
+      }
+    });
+  }
+
+  function ensureRenderedToIndex(idx, cb){
+    // Already rendered
+    if(idx < renderedUntil){
+      cb?.();
       return;
     }
 
-    // First chapter buttons
-    const of =
-      e.target.closest("#openFirst") ||
-      e.target.closest("#openFirstTop") ||
-      e.target.closest("#openFirstBottom");
-    if(of){
-      e.preventDefault();
-      e.stopPropagation();
-      openFirstChapter();
-      return;
+    const container = $("#container");
+    if(!container) { cb?.(); return; }
+
+    // Render chunks synchronously until idx is included (fast enough for button press)
+    while(renderedUntil < ITEMS.length && idx >= renderedUntil){
+      const nextEnd = Math.min(ITEMS.length, renderedUntil + CHUNK_SIZE);
+      renderChunk(container, renderedUntil, nextEnd);
     }
 
-    // Latest chapter buttons (add these IDs in HTML when you want)
-    const ol =
-      e.target.closest("#openLatest") ||
-      e.target.closest("#openLatestTop") ||
-      e.target.closest("#openLatestBottom");
-    if(ol){
-      e.preventDefault();
-      e.stopPropagation();
-      openLatestChapter();
-      return;
+    // append footer ads if not present and all rendered
+    if(renderedUntil >= ITEMS.length && !$("#endAds")){
+      container.appendChild(buildEndAds());
+      observeNewSlots(container);
     }
 
-    // If you still have a SEARCH button somewhere, make it just focus the input (no scary glide)
-    const jump = e.target.closest("#jumpSearch");
-    if(jump){
-      e.preventDefault();
-      e.stopPropagation();
-      $("#q")?.focus();
-      return;
-    }
-  });
+    // keep sentinel at bottom if present
+    const sentinel = $("#chunkSentinel");
+    if(sentinel) container.appendChild(sentinel);
 
-  // Embed viewer on open + update button label/hint
+    cb?.();
+    if(LAZY_ADS) setTimeout(serveAds, 60);
+  }
+
+  // ====== Toggle handler (iframe injection + labels) ======
   document.addEventListener("toggle", (e) => {
     const d = e.target;
     if(!(d instanceof HTMLDetailsElement)) return;
+    if(!d.classList.contains("card")) return;
 
     const content = d.querySelector(".content[data-src]");
     if(!content) return;
@@ -451,21 +425,19 @@
       if(hint) hint.textContent = "Click to collapse";
 
       const isMobile = window.matchMedia("(max-width: 900px)").matches;
-
       if(!isMobile && CLOSE_OTHERS_ON_OPEN){
         $$("details.card[open]").forEach(x => { if(x !== d) x.open = false; });
       }
 
-      if(content.querySelector("iframe")) return;
-
-      content.replaceChildren();
-
-      const iframe = document.createElement("iframe");
-      iframe.loading = "lazy";
-      iframe.referrerPolicy = "no-referrer";
-      iframe.src = content.dataset.src;
-      iframe.allow = "fullscreen";
-      content.appendChild(iframe);
+      if(!content.querySelector("iframe")){
+        content.replaceChildren();
+        const iframe = document.createElement("iframe");
+        iframe.loading = "lazy";
+        iframe.referrerPolicy = "no-referrer";
+        iframe.src = content.dataset.src;
+        iframe.allow = "fullscreen";
+        content.appendChild(iframe);
+      }
     } else {
       if(expBtn) expBtn.innerHTML = '▶ READ <span class="chev"></span>';
       if(hint) hint.textContent = "Opens below";
@@ -473,35 +445,209 @@
     }
   }, true);
 
-  // ====== SEARCH (works wherever #q is; top/bottom doesn’t matter) ======
+  // ====== Click handling ======
+  document.addEventListener("click", (e) => {
+    // Expand button toggles without summary weirdness
+    const btn = e.target.closest(".expbtn");
+    if(btn){
+      const d = btn.closest("details");
+      if(d){
+        d.open = !d.open;
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return;
+    }
+
+    // First chapter buttons
+    const firstBtn =
+      e.target.closest("#openFirstTop") ||
+      e.target.closest("#openFirstBottom") ||
+      e.target.closest("#openFirst");
+
+    if(firstBtn){
+      e.preventDefault();
+      e.stopPropagation();
+      openFirstChapter({ scroll: true });
+      return;
+    }
+
+    // Latest chapter buttons (go all the way down)
+    const latestBtn =
+      e.target.closest("#openLatestTop") ||
+      e.target.closest("#openLatestBottom") ||
+      e.target.closest("#openLatest");
+
+    if(latestBtn){
+      e.preventDefault();
+      e.stopPropagation();
+      openLatestChapter({ scroll: true });
+      return;
+    }
+  });
+
+  // ====== Fuzzy search (title + id, partial + typos) ======
+  function norm(s){
+    return String(s || "")
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  function grams3(s){
+    s = `  ${s}  `;
+    const out = [];
+    for(let i=0;i<s.length-2;i++) out.push(s.slice(i,i+3));
+    return out;
+  }
+
+  function levenshtein(a, b){
+    if(a === b) return 0;
+    a = String(a); b = String(b);
+    const al = a.length, bl = b.length;
+    if(al === 0) return bl;
+    if(bl === 0) return al;
+
+    // small optimization: ensure b is shorter for memory
+    if(bl > al){ const t=a; a=b; b=t; }
+    const n = a.length, m = b.length;
+
+    let prev = new Array(m + 1);
+    let cur  = new Array(m + 1);
+
+    for(let j=0;j<=m;j++) prev[j] = j;
+
+    for(let i=1;i<=n;i++){
+      cur[0] = i;
+      const ca = a.charCodeAt(i-1);
+      for(let j=1;j<=m;j++){
+        const cost = (ca === b.charCodeAt(j-1)) ? 0 : 1;
+        cur[j] = Math.min(
+          prev[j] + 1,
+          cur[j-1] + 1,
+          prev[j-1] + cost
+        );
+      }
+      const tmp = prev; prev = cur; cur = tmp;
+    }
+    return prev[m];
+  }
+
+  // Precompute a fast index that scales to 800+ items
   let SEARCH_INDEX = null;
   function buildSearchIndex(){
     if(SEARCH_INDEX) return SEARCH_INDEX;
-    SEARCH_INDEX = ITEMS.map((it, i) => ({
-      i,
-      t: (it.title || "").toLowerCase(),
-      title: it.title || `Item ${i+1}`,
-      url: it.url
-    }));
+
+    SEARCH_INDEX = ITEMS.map((it, i) => {
+      const titleN = norm(it.title);
+      const idN    = norm(it.id);
+      const combo  = (titleN + " " + idN).trim();
+
+      // grams set for quick overlap score
+      const g = grams3(combo);
+      const gset = new Set(g);
+
+      // tokens for cheap word matching
+      const toks = combo.split(/\s+/).filter(Boolean);
+
+      return {
+        i,
+        title: it.title || `Item ${i+1}`,
+        id: it.id || "",
+        titleN,
+        idN,
+        combo,
+        toks,
+        gset
+      };
+    });
+
     return SEARCH_INDEX;
   }
 
-  function runSearch(q){
-    q = (q || "").trim().toLowerCase();
-    if(!q) return [];
-    const toks = q.split(/\s+/).filter(Boolean);
-    const idx = buildSearchIndex();
+  function scoreItem(qN, qToks, qGrams, it){
+    let score = 0;
 
-    const out = [];
-    for(const it of idx){
-      let ok = true;
-      for(const tok of toks){
-        if(!it.t.includes(tok)) { ok = false; break; }
+    // Strong boost for substring matches (partial is enough)
+    if(it.combo.includes(qN)) score += 70;
+    if(it.titleN.includes(qN)) score += 35;
+    if(it.idN.includes(qN))    score += 55;
+
+    // Token containment (even partial tokens)
+    let tokenHits = 0;
+    for(const qt of qToks){
+      if(!qt) continue;
+      // match inside tokens or across combo
+      if(it.combo.includes(qt)) tokenHits += 1;
+      else {
+        // allow tiny typos on short tokens (e.g. "c01", "chaptr")
+        if(qt.length >= 3){
+          let best = 99;
+          for(const t of it.toks){
+            if(Math.abs(t.length - qt.length) > 2) continue;
+            const d = levenshtein(qt, t);
+            if(d < best) best = d;
+            if(best <= 1) break;
+          }
+          if(best <= 1) tokenHits += 0.6;
+        }
       }
-      if(ok) out.push(it);
-      if(out.length >= 50) break;
     }
-    return out;
+    score += tokenHits * 10;
+
+    // Trigram overlap for “similarity vibe”
+    // (good at: V1-C06 vs V1-C060, "chpater" vs "chapter", etc.)
+    if(qGrams.length){
+      let hit = 0;
+      for(const g of qGrams){
+        if(it.gset.has(g)) hit++;
+      }
+      const overlap = hit / Math.max(1, qGrams.length);
+      score += overlap * 40;
+    }
+
+    // If query is short, be stricter (avoid random noise)
+    if(qN.length <= 2) score *= 0.55;
+
+    return score;
+  }
+
+  function runSearch(query){
+    const qN = norm(query);
+    if(!qN) return [];
+
+    const qToks = qN.split(/\s+/).filter(Boolean);
+    const qGrams = grams3(qN);
+
+    const idx = buildSearchIndex();
+    const scored = [];
+
+    for(const it of idx){
+      const s = scoreItem(qN, qToks, qGrams, it);
+      if(s >= 18) scored.push({ it, s });
+    }
+
+    scored.sort((a,b) => b.s - a.s);
+
+    return scored.slice(0, SEARCH_MAX_RESULTS).map(x => ({
+      i: x.it.i,
+      title: x.it.title,
+      id: x.it.id,
+      score: x.s
+    }));
+  }
+
+  function jumpToItem(i){
+    ensureRenderedToIndex(i, () => {
+      const el = $(`#item-${i}`);
+      if(el){
+        // open it + scroll
+        openDetails(el);
+        scrollToEl(el, { offset: 12, smooth: true });
+      }
+    });
   }
 
   function wireSearchUI(){
@@ -509,21 +655,20 @@
     const meta  = $("#meta");
     const nav   = $("#nav");
 
-    const clearButtons = [
-      $("#clear"),
-      $("#clearBottom"),
-      $("#clearTop"),
-    ].filter(Boolean);
+    const clearBtn =
+      $("#clear") ||
+      $("#clearTop") ||
+      $("#clearBottom");
 
     if(meta) meta.textContent = `Items: ${ITEMS.length}`;
 
-    clearButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
+    if(clearBtn){
+      clearBtn.addEventListener("click", () => {
         if(input) input.value = "";
         if(nav) nav.style.display = "none";
         if(meta) meta.textContent = `Items: ${ITEMS.length}`;
       });
-    });
+    }
 
     if(!input) return;
 
@@ -531,38 +676,108 @@
     input.addEventListener("input", () => {
       clearTimeout(tmr);
       tmr = setTimeout(() => {
-        const q = input.value;
+        const q = input.value || "";
         if(!q.trim()){
           if(nav) nav.style.display = "none";
           if(meta) meta.textContent = `Items: ${ITEMS.length}`;
           return;
         }
+
         const hits = runSearch(q);
         if(meta) meta.textContent = hits.length ? `Matches: ${hits.length}` : "No matches.";
 
         if(nav){
-          nav.innerHTML = hits.map(h => `<a href="#item-${h.i}">${escapeHtml(h.title)}</a>`).join("");
+          nav.innerHTML = hits.map(h => {
+            const label = escapeHtml(h.title);
+            const tag   = h.id ? `<span class="nav-id">${escapeHtml(h.id)}</span>` : "";
+            // data-i lets us jump without relying on hash only
+            return `<a href="#item-${h.i}" data-i="${h.i}">${label}${tag}</a>`;
+          }).join("");
           nav.style.display = hits.length ? "flex" : "none";
         }
-      }, 140);
+      }, SEARCH_DEBOUNCE_MS);
     });
 
+    // Enter goes to best match
     input.addEventListener("keydown", (e) => {
       if(e.key !== "Enter") return;
       const hits = runSearch(input.value);
       if(hits[0]){
-        location.hash = `#item-${hits[0].i}`;
+        e.preventDefault();
+        jumpToItem(hits[0].i);
       }
     });
+
+    // Clicking a search chip should jump + open
+    if(nav){
+      nav.addEventListener("click", (e) => {
+        const a = e.target.closest("a[data-i]");
+        if(!a) return;
+        e.preventDefault();
+        const i = parseInt(a.dataset.i, 10);
+        if(Number.isFinite(i)) jumpToItem(i);
+      });
+    }
+  }
+
+  // ====== Render ======
+  function render(){
+    const container = $("#container");
+    if(!container) return;
+
+    container.replaceChildren();
+
+    // Optional featured slot above chapters
+    if(SHOW_FEATURED_AD_ABOVE_CHAPTERS){
+      container.appendChild(makeFeaturedMoneySlot());
+    }
+
+    // chunk sentinel (kept at bottom)
+    const sentinel = document.createElement("div");
+    sentinel.id = "chunkSentinel";
+    sentinel.style.height = "1px";
+    sentinel.style.width = "100%";
+    sentinel.style.opacity = "0";
+    container.appendChild(sentinel);
+
+    renderedUntil = 0;
+    // first chunk
+    const firstEnd = Math.min(ITEMS.length, CHUNK_SIZE);
+    renderChunk(container, 0, firstEnd);
+    container.appendChild(sentinel);
+
+    // if total fits in one chunk, append end ads immediately
+    if(renderedUntil >= ITEMS.length){
+      container.appendChild(buildEndAds());
+    }
+
+    ensureChunkObserver(container);
+
+    // Open smart / open first
+    if(OPEN_FIRST_ON_LOAD){
+      openFirstChapter({ scroll: false });
+    } else if(OPEN_SMART){
+      // smart open among what exists right now (first chunk)
+      const cards = $$("details.card", container);
+      if(cards.length){
+        const mid = Math.floor(cards.length / 2);
+        cards[0].open = true;
+        if(cards[mid]) cards[mid].open = true;
+        // last of chunk (not necessarily last overall)
+        cards[cards.length - 1].open = true;
+      }
+    }
   }
 
   function boot(){
     if(window.__ARCHIVE_BOOTED__) return;
     window.__ARCHIVE_BOOTED__ = true;
 
+    // render early
     render();
     wireSearchUI();
 
+    // ads
     if(LAZY_ADS){
       initLazyAds();
       setTimeout(serveAds, 900);
