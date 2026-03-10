@@ -1,46 +1,48 @@
+
 (() => {
-  // ====== DATA / ROUTING ======
-  const WORKS_FILE = "works.json";
-  const WORKS_DIR = "works";
+  "use strict";
 
-  let WORKS = [];
-  let ITEMS = [];
-  let WORK_TITLE = "";
-  let CURRENT_SLUG = "";
+  const LIBRARY_FILE = "library.json";
+  const R2_BASE_URL = "https://pub-cd01009a7c6c464aa0b093e33aa5ae51.r2.dev";
+  const WORKS_DIR = `${R2_BASE_URL}/works`;
+  const ITEM_JSON_NAME = "item.json";
+  const BOTTOM_AD_COUNT = 6;
+  const RAIL_REFRESH_MS = 75000;
+  const BANNER_REFRESH_MS = 95000;
+  const READ_PROGRESS_PREFETCH = 0.7;
+  const BOTTOM_GLOW_PROGRESS = 0.95;
+  const SEARCH_RESULTS_LIMIT = 12;
 
-  // ====== AD ZONES ======
-  const BETWEEN_ZONE = "5865236";
-  const END_ZONE = "5865236";
-  const END_ADS = 24;
+  const ZONES = {
+    topBanner: 5865232,
+    leftRail: 5865238,
+    rightRail: 5865240,
+    betweenMulti: 5867482
+  };
 
-  // ====== AD DENSITY ======
-  const BETWEEN_EVERY = 2;
-  const BETWEEN_SLOTS = 3;
+  let ARCHIVE_WORKS = [];
+  let CURRENT_WORK = null;
+  let CURRENT_ENTRY = null;
+  let CURRENT_ITEM = null;
+  let topFlyoutsWired = false;
+  let stickyControlsWired = false;
+  let searchWired = false;
+  let railRefreshTimer = null;
+  let bannerRefreshTimer = null;
+  let nextPrefetch = null;
+  let progressWatchWired = false;
+  let bottomGlowTriggered = false;
 
-  // ====== BEHAVIOR ======
-  const OPEN_SMART = true;
-  const OPEN_FIRST_ON_LOAD = true;
-  const CLOSE_OTHERS_ON_OPEN = true;
-  const LAZY_ADS = true;
-  const SHOW_FEATURED_AD_ABOVE_CHAPTERS = false;
+  function $(sel, root = document) {
+    return root.querySelector(sel);
+  }
 
-  // ====== SCALE ======
-  const CHUNK_SIZE = 90;
-  const CHUNK_ROOT_MARGIN = "1800px 0px";
+  function $$(sel, root = document) {
+    return Array.from(root.querySelectorAll(sel));
+  }
 
-  // ====== SCROLL ======
-  const SCROLL_MAX_MS = 1500;
-
-  // ====== SEARCH ======
-  const SEARCH_MAX_RESULTS = 40;
-  const SEARCH_DEBOUNCE_MS = 90;
-
-  // ====== DOM HELPERS ======
-  const $ = (s, r = document) => r.querySelector(s);
-  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-
-  function escapeHtml(s) {
-    return String(s)
+  function escapeHtml(value) {
+    return String(value ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
@@ -48,167 +50,172 @@
       .replaceAll("'", "&#39;");
   }
 
-  function slugToTitle(slug) {
-    return String(slug || "")
+  function normalizeKey(value) {
+    return String(value ?? "").trim().toLowerCase();
+  }
+
+  function titleCaseSlug(slug) {
+    return String(slug ?? "")
       .replace(/[_-]+/g, " ")
-      .replace(/\b\w/g, c => c.toUpperCase())
-      .trim();
-  }
-
-  // ====== ROUTING ======
-  function getPathSlug() {
-    const path = window.location.pathname.replace(/^\/+|\/+$/g, "");
-    return path || "index";
-  }
-
-  function setPathSlug(slug) {
-    const next = slug === "index" ? "/" : `/${encodeURIComponent(slug)}`;
-    const current = window.location.pathname + window.location.search + window.location.hash;
-    if (current !== next) {
-      history.pushState({}, "", next);
-    }
-  }
-
-  function getWorkJsonPath(slug) {
-    return `${WORKS_DIR}/${slug}.json`;
-  }
-
-  async function fetchJson(path) {
-    const res = await fetch(path, { cache: "no-store" });
-    if (!res.ok) {
-      throw new Error(`Failed to load ${path} (${res.status})`);
-    }
-    return res.json();
-  }
-
-  async function loadWorksManifest() {
-    const data = await fetchJson(WORKS_FILE);
-    WORKS = Array.isArray(data.works) ? data.works : [];
-  }
-
-  async function loadWorkBySlug(slug) {
-    const data = await fetchJson(getWorkJsonPath(slug));
-
-    CURRENT_SLUG = slug;
-    WORK_TITLE = slugToTitle(slug);
-    ITEMS = Array.isArray(data.items) ? data.items : [];
-
-    renderedUntil = 0;
-    SEARCH_INDEX = null;
-
-    const currentWorkTitle = $("#currentWorkTitle");
-    if (currentWorkTitle) {
-      currentWorkTitle.textContent = WORK_TITLE || "Expand • Read • Scroll";
-    }
-
-    const meta = $("#meta");
-    if (meta) meta.textContent = `Items: ${ITEMS.length}`;
-
-    const input = $("#q");
-    if (input) input.value = "";
-
-    const nav = $("#nav");
-    if (nav) {
-      nav.innerHTML = "";
-      nav.style.display = "none";
-    }
-  }
-
-  function renderWorksNav() {
-    const nav = $("#worksNav");
-    if (!nav) return;
-
-    nav.innerHTML = WORKS.map(work => {
-      const active = work.slug === CURRENT_SLUG ? " active" : "";
-      const label = slugToTitle(work.slug);
-
-      return `
-        <button
-          class="work-chip${active}"
-          type="button"
-          data-work-slug="${escapeHtml(work.slug)}"
-          aria-current="${work.slug === CURRENT_SLUG ? "page" : "false"}"
-        >
-          ${escapeHtml(label)}
-        </button>
-      `;
-    }).join("");
-  }
-
-  // ====== DRIVE URL HELPERS ======
-  function driveFileIdFromUrl(url) {
-    try {
-      const u = new URL(url);
-      const m = u.pathname.match(/\/file\/d\/([^/]+)/);
-      if (m && m[1]) return m[1];
-      const id = u.searchParams.get("id");
-      return id || null;
-    } catch {
-      const m = String(url).match(/\/file\/d\/([^/]+)/);
-      return m?.[1] || null;
-    }
-  }
-
-  function toDrivePreview(url) {
-    const id = driveFileIdFromUrl(url);
-    return id ? `https://drive.google.com/file/d/${id}/preview` : url;
-  }
-
-  // ====== ADS ======
-  function ensureIns(slot) {
-    if (slot.dataset.inited) return;
-    slot.dataset.inited = "1";
-    const ins = document.createElement("ins");
-    ins.className = "eas6a97888e2";
-    ins.setAttribute("data-zoneid", slot.dataset.zone);
-    slot.appendChild(ins);
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/\b\w/g, ch => ch.toUpperCase());
   }
 
   function serveAds() {
     (window.AdProvider = window.AdProvider || []).push({ serve: {} });
   }
 
-  let adObserver = null;
-
-  function initLazyAds() {
-    if (adObserver || !LAZY_ADS) return;
-
-    adObserver = new IntersectionObserver((entries) => {
-      let didInit = false;
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        const slot = entry.target;
-        ensureIns(slot);
-        adObserver.unobserve(slot);
-        didInit = true;
-      }
-      if (didInit) setTimeout(serveAds, 30);
-    }, { root: null, rootMargin: "900px 0px", threshold: 0.01 });
-
-    $$(".exo-slot[data-zone]").forEach(slot => adObserver.observe(slot));
+  function makeIns(zoneId, sub = 1, sub2 = 1, sub3 = 1) {
+    const ins = document.createElement("ins");
+    ins.className = "eas6a97888e38";
+    ins.setAttribute("data-zoneid", String(zoneId));
+    ins.setAttribute("data-sub", String(sub));
+    ins.setAttribute("data-sub2", String(sub2));
+    ins.setAttribute("data-sub3", String(sub3));
+    return ins;
   }
 
-  function observeNewSlots(root) {
-    if (!adObserver) return;
-    $$(".exo-slot[data-zone]", root).forEach(slot => adObserver.observe(slot));
+  function refillSlot(el, zoneId, sub = 1, sub2 = 1, sub3 = 1) {
+    if (!el) return;
+    el.innerHTML = "";
+    el.appendChild(makeIns(zoneId, sub, sub2, sub3));
   }
 
-  function initAllAdsNow() {
-    $$(".exo-slot[data-zone]").forEach(ensureIns);
+  function fillSlot(el, zoneId, sub = 1, sub2 = 1, sub3 = 1) {
+    refillSlot(el, zoneId, sub, sub2, sub3);
     serveAds();
   }
 
-  function buildBetweenAd(count) {
+  async function fetchJson(url) {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) {
+      throw new Error(`Failed to fetch ${url} (${res.status})`);
+    }
+    return res.json();
+  }
+
+  async function loadLibrary() {
+    const data = await fetchJson(LIBRARY_FILE);
+    ARCHIVE_WORKS = Array.isArray(data.works) ? data.works : [];
+  }
+
+  function getQueryState() {
+    const url = new URL(window.location.href);
+    return {
+      dir: url.searchParams.get("dir") || "",
+      file: url.searchParams.get("file") || ""
+    };
+  }
+
+  function setQueryState(dir, file, replace = false) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("dir", dir);
+    url.searchParams.set("file", file);
+
+    if (replace) {
+      history.replaceState({ dir, file }, "", url);
+    } else {
+      history.pushState({ dir, file }, "", url);
+    }
+  }
+
+  function getFirstEntry() {
+    for (const work of ARCHIVE_WORKS) {
+      const first = Array.isArray(work.entries) ? work.entries[0] : null;
+      if (work?.slug && first?.slug) {
+        return { work, entry: first };
+      }
+    }
+    return { work: null, entry: null };
+  }
+
+  function resolveSelection(dir, file) {
+    const d = normalizeKey(dir);
+    const f = normalizeKey(file);
+
+    for (const work of ARCHIVE_WORKS) {
+      if (normalizeKey(work.slug) !== d) continue;
+      for (const entry of work.entries || []) {
+        if (normalizeKey(entry.slug) === f) {
+          return { work, entry };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  function buildItemJsonPath(workSlug, entryPathOrSlug) {
+    const safeParts = String(entryPathOrSlug)
+      .split("/")
+      .filter(Boolean)
+      .map(part => encodeURIComponent(part));
+
+    return `${WORKS_DIR}/${encodeURIComponent(workSlug)}/${safeParts.join("/")}/${ITEM_JSON_NAME}`;
+  }
+
+  function normalizeBaseUrl(url) {
+    return String(url || "").replace(/\/+$/, "");
+  }
+
+  function buildImageList(manifest) {
+    if (Array.isArray(manifest.images) && manifest.images.length) {
+      return manifest.images;
+    }
+
+    if (Number.isFinite(manifest.pages) && manifest.pages > 0) {
+      const ext = manifest.extension || "jpg";
+      const padding = Number.isFinite(manifest.padding) ? manifest.padding : 2;
+
+      return Array.from({ length: manifest.pages }, (_, i) => {
+        const n = String(i + 1).padStart(padding, "0");
+        return `${n}.${ext}`;
+      });
+    }
+
+    return [];
+  }
+
+  function getSubids(manifest) {
+    const fallbackWork = Number(manifest.id) || Number(manifest.parent_work_id) || 1;
+
+    return {
+      work: manifest.subids?.work ?? fallbackWork,
+      top: manifest.subids?.top ?? fallbackWork + 10,
+      left: manifest.subids?.left ?? fallbackWork + 20,
+      right: manifest.subids?.right ?? fallbackWork + 30,
+      between: manifest.subids?.between ?? fallbackWork + 40
+    };
+  }
+
+  function imageBlock(src, alt) {
     const wrap = document.createElement("div");
-    wrap.className = "between-ad";
+    wrap.className = "image-wrap";
+
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = alt;
+    img.loading = "lazy";
+    img.decoding = "async";
+
+    wrap.appendChild(img);
+    return wrap;
+  }
+
+  function betweenAd(manifest, groupNumber, slotCount) {
+    const subids = getSubids(manifest);
+
+    const wrap = document.createElement("div");
+    wrap.className = "slot";
 
     const grid = document.createElement("div");
     grid.className = "between-grid";
 
-    for (let i = 0; i < count; i++) {
+    for (let i = 1; i <= slotCount; i++) {
       const slot = document.createElement("div");
-      slot.className = "exo-slot";
-      slot.dataset.zone = BETWEEN_ZONE;
+      slot.className = "slot";
+      slot.appendChild(makeIns(ZONES.betweenMulti, subids.between, subids.work, Number(`${groupNumber}${i}`)));
       grid.appendChild(slot);
     }
 
@@ -216,678 +223,490 @@
     return wrap;
   }
 
-  function buildEndAds() {
-    const wrap = document.createElement("section");
-    wrap.className = "end-ads";
-    wrap.id = "endAds";
+  function endAds(manifest, count) {
+    const subids = getSubids(manifest);
 
-    const title = document.createElement("p");
-    title.className = "end-ads-title";
-    title.textContent = "More panels";
-
-    const grid = document.createElement("div");
-    grid.className = "end-ads-grid";
-
-    for (let i = 0; i < END_ADS; i++) {
-      const slot = document.createElement("div");
-      slot.className = "exo-slot";
-      slot.dataset.zone = END_ZONE;
-      grid.appendChild(slot);
-    }
-
-    wrap.appendChild(title);
-    wrap.appendChild(grid);
-    return wrap;
-  }
-
-  function makeFeaturedMoneySlot() {
     const wrap = document.createElement("div");
-    wrap.className = "between-ad";
-    wrap.style.maxWidth = "1100px";
-    wrap.style.margin = "16px auto 0";
+    wrap.className = "slot";
 
     const grid = document.createElement("div");
-    grid.className = "between-grid featured";
+    grid.className = "end-grid";
 
-    const slot = document.createElement("div");
-    slot.className = "exo-slot";
-    slot.dataset.zone = BETWEEN_ZONE;
-    grid.appendChild(slot);
+    for (let i = 1; i <= count; i++) {
+      const slot = document.createElement("div");
+      slot.className = "slot";
+      slot.appendChild(makeIns(ZONES.betweenMulti, subids.between, subids.work, 9000 + i));
+      grid.appendChild(slot);
+    }
 
     wrap.appendChild(grid);
     return wrap;
   }
 
-  // ====== CARDS ======
-  function makeDetails(item, idx) {
-    const d = document.createElement("details");
-    d.className = "card";
-    d.dataset.idx = String(idx);
-    d.id = `item-${idx}`;
+  function fillRailStacks(subids) {
+    const leftSlots = ["leftRailSlot1","leftRailSlot2","leftRailSlot3","leftRailSlot4","leftRailSlot5","leftRailSlot6","leftRailSlot7","leftRailSlot8","leftRailSlot9","leftRailSlot10","leftRailSlot11","leftRailSlot12"];
+    const rightSlots = ["rightRailSlot1","rightRailSlot2","rightRailSlot3","rightRailSlot4","rightRailSlot5","rightRailSlot6","rightRailSlot7","rightRailSlot8","rightRailSlot9","rightRailSlot10","rightRailSlot11","rightRailSlot12"];
 
-    const title = escapeHtml(item.title || `Item ${idx + 1}`);
-    const workTitle = WORK_TITLE ? escapeHtml(WORK_TITLE) : "";
-    const openUrl = item.url;
-    const embedUrl = toDrivePreview(item.url);
+    leftSlots.forEach((id, index) => {
+      fillSlot(document.getElementById(id), ZONES.leftRail, subids.left, subids.work, index + 1);
+    });
 
-    d.innerHTML = `
-      <summary>
-        <div class="leftstack">
-          <div class="doc">${title}</div>
-          ${workTitle ? `<div class="id">${workTitle}</div>` : ``}
-        </div>
-
-        <div class="actions">
-          <button class="pill expbtn expand-btn" type="button" aria-label="Read chapter">
-            ▶ READ <span class="chev"></span>
-          </button>
-          <div class="expand-hint">Opens below</div>
-        </div>
-
-        <div class="action-open">
-          <a class="pill primary open-btn" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">OPEN</a>
-          <div class="open-note">(opens in new tab)</div>
-        </div>
-      </summary>
-
-      <div class="content" data-src="${escapeHtml(embedUrl)}"></div>
-    `;
-
-    return d;
-  }
-
-  // ====== SMOOTH SCROLL ======
-  function easeOutCubic(t) {
-    return 1 - Math.pow(1 - t, 3);
-  }
-
-  function smoothScrollToY(targetY, maxMs = SCROLL_MAX_MS) {
-    const startY = window.scrollY || window.pageYOffset || 0;
-    const distance = targetY - startY;
-
-    if (Math.abs(distance) < 2) {
-      window.scrollTo(0, targetY);
-      return;
-    }
-
-    const base = 650;
-    const extra = Math.min(850, Math.abs(distance) * 0.25);
-    const duration = Math.min(maxMs, base + extra);
-    const start = performance.now();
-
-    function step(now) {
-      const t = Math.min(1, (now - start) / duration);
-      const e = easeOutCubic(t);
-      window.scrollTo(0, Math.round(startY + distance * e));
-      if (t < 1) requestAnimationFrame(step);
-    }
-
-    requestAnimationFrame(step);
-  }
-
-  function scrollToEl(el, { offset = 10, smooth = true } = {}) {
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const y = Math.max(0, rect.top + (window.scrollY || 0) - offset);
-    if (smooth) smoothScrollToY(y, SCROLL_MAX_MS);
-    else window.scrollTo(0, y);
-  }
-
-  // ====== CHUNKED RENDERING ======
-  let renderedUntil = 0;
-  let chunkSentinelObserver = null;
-
-  function renderChunk(container, start, end) {
-    const frag = document.createDocumentFragment();
-
-    for (let i = start; i < end; i++) {
-      const item = ITEMS[i];
-      frag.appendChild(makeDetails(item, i));
-
-      const isGap = ((i + 1) % BETWEEN_EVERY === 0) && (i + 1) < ITEMS.length;
-      if (isGap) frag.appendChild(buildBetweenAd(BETWEEN_SLOTS));
-    }
-
-    container.appendChild(frag);
-    observeNewSlots(container);
-    renderedUntil = end;
-  }
-
-  function ensureChunkObserver(container) {
-    const sentinel = $("#chunkSentinel");
-    if (!sentinel) return;
-
-    if (chunkSentinelObserver) {
-      chunkSentinelObserver.disconnect();
-      chunkSentinelObserver = null;
-    }
-
-    chunkSentinelObserver = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        if (renderedUntil >= ITEMS.length) return;
-
-        const nextEnd = Math.min(ITEMS.length, renderedUntil + CHUNK_SIZE);
-        renderChunk(container, renderedUntil, nextEnd);
-        container.appendChild(sentinel);
-
-        if (renderedUntil >= ITEMS.length && !$("#endAds")) {
-          container.appendChild(buildEndAds());
-          observeNewSlots(container);
-        }
-
-        if (LAZY_ADS) setTimeout(serveAds, 60);
-      }
-    }, { root: null, rootMargin: CHUNK_ROOT_MARGIN, threshold: 0.01 });
-
-    chunkSentinelObserver.observe(sentinel);
-  }
-
-  // ====== OPEN / EMBED ======
-  function openDetails(d) {
-    if (!d) return;
-    d.open = true;
-  }
-
-  function openFirstChapter({ scroll = false } = {}) {
-    const first = $("#item-0");
-    if (first) {
-      openDetails(first);
-      if (scroll) scrollToEl(first, { offset: 12, smooth: true });
-    }
-  }
-
-  function openLatestChapter({ scroll = true } = {}) {
-    const lastIdx = ITEMS.length - 1;
-    ensureRenderedToIndex(lastIdx, () => {
-      const last = $(`#item-${lastIdx}`);
-      if (last) {
-        openDetails(last);
-        if (scroll) scrollToEl(last, { offset: 12, smooth: true });
-      }
+    rightSlots.forEach((id, index) => {
+      fillSlot(document.getElementById(id), ZONES.rightRail, subids.right, subids.work, index + 1);
     });
   }
 
-  function ensureRenderedToIndex(idx, cb) {
-    if (idx < renderedUntil) {
-      cb?.();
-      return;
-    }
-
-    const container = $("#container");
-    if (!container) {
-      cb?.();
-      return;
-    }
-
-    while (renderedUntil < ITEMS.length && idx >= renderedUntil) {
-      const nextEnd = Math.min(ITEMS.length, renderedUntil + CHUNK_SIZE);
-      renderChunk(container, renderedUntil, nextEnd);
-    }
-
-    if (renderedUntil >= ITEMS.length && !$("#endAds")) {
-      container.appendChild(buildEndAds());
-      observeNewSlots(container);
-    }
-
-    const sentinel = $("#chunkSentinel");
-    if (sentinel) container.appendChild(sentinel);
-
-    cb?.();
-    if (LAZY_ADS) setTimeout(serveAds, 60);
-  }
-
-  // ====== TOGGLE HANDLER ======
-  document.addEventListener("toggle", (e) => {
-    const d = e.target;
-    if (!(d instanceof HTMLDetailsElement)) return;
-    if (!d.classList.contains("card")) return;
-
-    const content = d.querySelector(".content[data-src]");
-    if (!content) return;
-
-    const expBtn = d.querySelector(".expbtn");
-    const hint = d.querySelector(".expand-hint");
-
-    if (d.open) {
-      if (expBtn) expBtn.innerHTML = '▲ HIDE <span class="chev"></span>';
-      if (hint) hint.textContent = "Click to collapse";
-
-      const isMobile = window.matchMedia("(max-width: 900px)").matches;
-      if (!isMobile && CLOSE_OTHERS_ON_OPEN) {
-        $$("details.card[open]").forEach(x => {
-          if (x !== d) x.open = false;
+  function flattenEntries() {
+    const rows = [];
+    for (const work of ARCHIVE_WORKS) {
+      for (const entry of work.entries || []) {
+        rows.push({
+          workSlug: work.slug,
+          workLabel: work.display || titleCaseSlug(work.slug),
+          entrySlug: entry.slug,
+          entryLabel: entry.subtitle || titleCaseSlug(entry.slug),
+          searchKey: normalizeKey(`${work.display || work.slug} ${entry.subtitle || entry.slug} ${entry.slug}`)
         });
       }
-
-      if (!content.querySelector("iframe")) {
-        content.replaceChildren();
-        const iframe = document.createElement("iframe");
-        iframe.loading = "lazy";
-        iframe.referrerPolicy = "no-referrer";
-        iframe.src = content.dataset.src;
-        iframe.allow = "fullscreen";
-        content.appendChild(iframe);
-      }
-    } else {
-      if (expBtn) expBtn.innerHTML = '▶ READ <span class="chev"></span>';
-      if (hint) hint.textContent = "Opens below";
-      content.replaceChildren();
     }
-  }, true);
+    return rows;
+  }
 
-  // ====== CLICK HANDLING ======
-  document.addEventListener("click", (e) => {
-    const workBtn = e.target.closest("[data-work-slug]");
-    if (workBtn) {
-      e.preventDefault();
-      e.stopPropagation();
+  function renderSearchResults(items) {
+    const results = document.getElementById("chapterSearchResults");
+    const stat = document.getElementById("chapterSearchStat");
+    if (!results || !stat) return;
 
-      const slug = workBtn.dataset.workSlug;
-      if (!slug || slug === CURRENT_SLUG) return;
-
-      setPathSlug(slug);
-
-      switchWork(slug).catch(err => {
-        console.error(err);
-        const meta = $("#meta");
-        if (meta) meta.textContent = "Failed to load selected work.";
-      });
+    if (!items.length) {
+      results.innerHTML = "";
+      stat.textContent = "No matches yet";
       return;
     }
 
-    const btn = e.target.closest(".expbtn");
-    if (btn) {
-      const d = btn.closest("details");
-      if (d) {
-        d.open = !d.open;
-        e.preventDefault();
-        e.stopPropagation();
-      }
-      return;
-    }
-
-    const firstBtn =
-      e.target.closest("#openFirstTop") ||
-      e.target.closest("#openFirstBottom") ||
-      e.target.closest("#openFirst");
-
-    if (firstBtn) {
-      e.preventDefault();
-      e.stopPropagation();
-      openFirstChapter({ scroll: true });
-      return;
-    }
-
-    const latestBtn =
-      e.target.closest("#openLatestTop") ||
-      e.target.closest("#openLatestBottom") ||
-      e.target.closest("#openLatest");
-
-    if (latestBtn) {
-      e.preventDefault();
-      e.stopPropagation();
-      openLatestChapter({ scroll: true });
-    }
-  });
-
-  // ====== SEARCH ======
-  function norm(s) {
-    return String(s || "")
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, " ")
-      .trim();
+    stat.textContent = `${items.length} quick jump${items.length === 1 ? "" : "s"}`;
+    results.innerHTML = items.map(item => `
+      <button class="search-result-pill" type="button" data-dir="${escapeHtml(item.workSlug)}" data-file="${escapeHtml(item.entrySlug)}">
+        ${escapeHtml(item.workLabel)} · ${escapeHtml(item.entryLabel)}
+      </button>
+    `).join("");
   }
 
-  function grams3(s) {
-    s = `  ${s}  `;
-    const out = [];
-    for (let i = 0; i < s.length - 2; i++) out.push(s.slice(i, i + 3));
-    return out;
-  }
-
-  function levenshtein(a, b) {
-    if (a === b) return 0;
-    a = String(a);
-    b = String(b);
-
-    const al = a.length;
-    const bl = b.length;
-    if (al === 0) return bl;
-    if (bl === 0) return al;
-
-    if (bl > al) {
-      const t = a;
-      a = b;
-      b = t;
-    }
-
-    const n = a.length;
-    const m = b.length;
-    let prev = new Array(m + 1);
-    let cur = new Array(m + 1);
-
-    for (let j = 0; j <= m; j++) prev[j] = j;
-
-    for (let i = 1; i <= n; i++) {
-      cur[0] = i;
-      const ca = a.charCodeAt(i - 1);
-
-      for (let j = 1; j <= m; j++) {
-        const cost = ca === b.charCodeAt(j - 1) ? 0 : 1;
-        cur[j] = Math.min(
-          prev[j] + 1,
-          cur[j - 1] + 1,
-          prev[j - 1] + cost
-        );
-      }
-
-      const tmp = prev;
-      prev = cur;
-      cur = tmp;
-    }
-
-    return prev[m];
-  }
-
-  let SEARCH_INDEX = null;
-  let searchWired = false;
-
-  function buildSearchIndex() {
-    if (SEARCH_INDEX) return SEARCH_INDEX;
-
-    SEARCH_INDEX = ITEMS.map((it, i) => {
-      const titleN = norm(it.title);
-      const workN = norm(WORK_TITLE);
-      const combo = (titleN + " " + workN).trim();
-      const g = grams3(combo);
-      const gset = new Set(g);
-      const toks = combo.split(/\s+/).filter(Boolean);
-
-      return {
-        i,
-        title: it.title || `Item ${i + 1}`,
-        work_title: WORK_TITLE,
-        titleN,
-        workN,
-        combo,
-        toks,
-        gset
-      };
-    });
-
-    return SEARCH_INDEX;
-  }
-
-  function scoreItem(qN, qToks, qGrams, it) {
-    let score = 0;
-
-    if (it.combo.includes(qN)) score += 70;
-    if (it.titleN.includes(qN)) score += 35;
-    if (it.workN.includes(qN)) score += 20;
-
-    let tokenHits = 0;
-    for (const qt of qToks) {
-      if (!qt) continue;
-
-      if (it.combo.includes(qt)) {
-        tokenHits += 1;
-      } else if (qt.length >= 3) {
-        let best = 99;
-        for (const t of it.toks) {
-          if (Math.abs(t.length - qt.length) > 2) continue;
-          const d = levenshtein(qt, t);
-          if (d < best) best = d;
-          if (best <= 1) break;
-        }
-        if (best <= 1) tokenHits += 0.6;
-      }
-    }
-
-    score += tokenHits * 10;
-
-    if (qGrams.length) {
-      let hit = 0;
-      for (const g of qGrams) {
-        if (it.gset.has(g)) hit++;
-      }
-      const overlap = hit / Math.max(1, qGrams.length);
-      score += overlap * 40;
-    }
-
-    if (qN.length <= 2) score *= 0.55;
-
-    return score;
-  }
-
-  function runSearch(query) {
-    const qN = norm(query);
-    if (!qN) return [];
-
-    const qToks = qN.split(/\s+/).filter(Boolean);
-    const qGrams = grams3(qN);
-
-    const idx = buildSearchIndex();
-    const scored = [];
-
-    for (const it of idx) {
-      const s = scoreItem(qN, qToks, qGrams, it);
-      if (s >= 18) scored.push({ it, s });
-    }
-
-    scored.sort((a, b) => b.s - a.s);
-
-    return scored.slice(0, SEARCH_MAX_RESULTS).map(x => ({
-      i: x.it.i,
-      title: x.it.title,
-      work_title: x.it.work_title,
-      score: x.s
-    }));
-  }
-
-  function jumpToItem(i) {
-    ensureRenderedToIndex(i, () => {
-      const el = $(`#item-${i}`);
-      if (el) {
-        openDetails(el);
-        scrollToEl(el, { offset: 12, smooth: true });
-      }
-    });
-  }
-
-  function updateSearchResults(query) {
-    const meta = $("#meta");
-    const nav = $("#nav");
-
-    if (!query.trim()) {
-      if (nav) {
-        nav.innerHTML = "";
-        nav.style.display = "none";
-      }
-      if (meta) meta.textContent = `Items: ${ITEMS.length}`;
-      return;
-    }
-
-    const hits = runSearch(query);
-    if (meta) meta.textContent = hits.length ? `Matches: ${hits.length}` : "No matches.";
-
-    if (nav) {
-      nav.innerHTML = hits.map(h => {
-        const label = escapeHtml(h.title);
-        const tag = h.work_title ? `<span class="nav-id">${escapeHtml(h.work_title)}</span>` : "";
-        return `<a href="#item-${h.i}" data-i="${h.i}">${label}${tag}</a>`;
-      }).join("");
-      nav.style.display = hits.length ? "flex" : "none";
-    }
-  }
-
-  function wireSearchUI() {
+  function wireSearch() {
     if (searchWired) return;
     searchWired = true;
 
-    const input = $("#q");
-    const meta = $("#meta");
-    const nav = $("#nav");
+    const input = document.getElementById("chapterSearchInput");
+    const results = document.getElementById("chapterSearchResults");
+    const stat = document.getElementById("chapterSearchStat");
+    if (!input || !results || !stat) return;
 
-    const clearBtn =
-      $("#clear") ||
-      $("#clearTop") ||
-      $("#clearBottom");
+    const all = flattenEntries();
 
-    if (meta) meta.textContent = `Items: ${ITEMS.length}`;
+    const refresh = () => {
+      const query = normalizeKey(input.value);
+      if (!query) {
+        const seeded = all
+          .filter(item => item.workSlug === CURRENT_WORK?.slug)
+          .slice(0, SEARCH_RESULTS_LIMIT);
+        renderSearchResults(seeded);
+        stat.textContent = seeded.length ? `Showing ${seeded.length} in this work` : "Ready to jump";
+        return;
+      }
 
-    if (clearBtn) {
-      clearBtn.addEventListener("click", () => {
-        if (input) input.value = "";
-        if (nav) {
-          nav.innerHTML = "";
-          nav.style.display = "none";
-        }
-        if (meta) meta.textContent = `Items: ${ITEMS.length}`;
-      });
+      const matched = all
+        .filter(item => item.searchKey.includes(query))
+        .slice(0, SEARCH_RESULTS_LIMIT);
+      renderSearchResults(matched);
+      stat.textContent = matched.length ? `${matched.length} result${matched.length === 1 ? "" : "s"}` : "No matches";
+    };
+
+    input.addEventListener("input", refresh);
+    results.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-dir][data-file]");
+      if (!btn) return;
+      input.value = "";
+      switchEntry(btn.dataset.dir, btn.dataset.file, false);
+    });
+
+    refresh();
+  }
+
+  function syncSearchSeed() {
+    const input = document.getElementById("chapterSearchInput");
+    const stat = document.getElementById("chapterSearchStat");
+    if (!input || !stat) return;
+    if (input.value.trim()) return;
+    const seeded = flattenEntries().filter(item => item.workSlug === CURRENT_WORK?.slug).slice(0, SEARCH_RESULTS_LIMIT);
+    renderSearchResults(seeded);
+    stat.textContent = seeded.length ? `Showing ${seeded.length} in this work` : "Ready to jump";
+  }
+
+  function renderWorksNav() {
+    const nav = document.getElementById("worksNav");
+    if (!nav) return;
+
+    let html = "";
+
+    for (const work of ARCHIVE_WORKS.filter(w => w.top_pill !== false)) {
+      const isActive = normalizeKey(work.slug) === normalizeKey(CURRENT_WORK?.slug);
+      const entries = Array.isArray(work.entries) ? work.entries : [];
+
+      html += `
+        <div class="topworks-item${isActive ? " active" : ""}">
+          <button class="topworks-trigger" type="button">
+            <span>${escapeHtml(work.display || titleCaseSlug(work.slug))}</span>
+            <span class="topworks-caret"></span>
+          </button>
+          <div class="topworks-flyout">
+            <div class="topworks-links">
+      `;
+
+      for (const entry of entries) {
+        const label = `${work.display || titleCaseSlug(work.slug)} · ${entry.subtitle || titleCaseSlug(entry.slug)}`;
+        const active = isActive && normalizeKey(entry.slug) === normalizeKey(CURRENT_ENTRY?.slug) ? " active" : "";
+        html += `
+          <a href="?dir=${encodeURIComponent(work.slug)}&file=${encodeURIComponent(entry.slug)}" class="topworks-link${active}" data-dir="${escapeHtml(work.slug)}" data-file="${escapeHtml(entry.slug)}">${escapeHtml(label)}</a>
+        `;
+      }
+
+      html += `</div></div></div>`;
     }
 
-    if (!input) return;
+    nav.innerHTML = html;
+    nav.onclick = (e) => {
+      const a = e.target.closest("a[data-dir][data-file]");
+      if (!a) return;
+      e.preventDefault();
+      switchEntry(a.dataset.dir, a.dataset.file, false);
+    };
+  }
 
-    let tmr = null;
+  function wireTopFlyouts() {
+    if (topFlyoutsWired) return;
+    topFlyoutsWired = true;
 
-    input.addEventListener("input", () => {
-      clearTimeout(tmr);
-      tmr = setTimeout(() => {
-        updateSearchResults(input.value || "");
-      }, SEARCH_DEBOUNCE_MS);
-    });
-
-    input.addEventListener("keydown", (e) => {
-      if (e.key !== "Enter") return;
-      const hits = runSearch(input.value);
-      if (hits[0]) {
+    document.addEventListener("click", (e) => {
+      const trigger = e.target.closest(".topworks-trigger");
+      if (trigger) {
+        const item = trigger.closest(".topworks-item");
+        if (!item) return;
         e.preventDefault();
-        jumpToItem(hits[0].i);
+        const wasOpen = item.classList.contains("open");
+        $$(".topworks-item.open").forEach(x => x.classList.remove("open"));
+        if (!wasOpen) item.classList.add("open");
+        return;
+      }
+
+      if (!e.target.closest(".topworks-item")) {
+        $$(".topworks-item.open").forEach(x => x.classList.remove("open"));
       }
     });
+  }
 
-    if (nav) {
-      nav.addEventListener("click", (e) => {
-        const a = e.target.closest("a[data-i]");
-        if (!a) return;
-        e.preventDefault();
-        const i = parseInt(a.dataset.i, 10);
-        if (Number.isFinite(i)) jumpToItem(i);
-      });
+  function getEntryContext() {
+    const entries = Array.isArray(CURRENT_WORK?.entries) ? CURRENT_WORK.entries : [];
+    const currentIndex = entries.findIndex(entry => normalizeKey(entry.slug) === normalizeKey(CURRENT_ENTRY?.slug));
+    return {
+      entries,
+      currentIndex,
+      prev: currentIndex > 0 ? entries[currentIndex - 1] : null,
+      next: currentIndex >= 0 && currentIndex < entries.length - 1 ? entries[currentIndex + 1] : null
+    };
+  }
+
+  function makeTraversalPill(label, onClick, extraClass = "") {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `traversal-pill${extraClass ? ` ${extraClass}` : ""}`;
+    btn.textContent = label;
+    btn.addEventListener("click", onClick);
+    return btn;
+  }
+
+  function buildTraversal(position = "top") {
+    const shell = document.createElement("section");
+    shell.className = `traversal-shell ${position}`;
+    if (position === "bottom") shell.id = "bottomTraversal";
+
+    const kicker = document.createElement("p");
+    kicker.className = "traversal-kicker";
+    kicker.textContent = position === "top" ? "Chapter Navigation" : "Keep The Scroll Alive";
+    shell.appendChild(kicker);
+
+    if (position === "bottom") {
+      const prompt = document.createElement("div");
+      prompt.className = "continue-prompt";
+      prompt.textContent = "Finished this chapter? Pick the next move right here.";
+      shell.appendChild(prompt);
+    }
+
+    const bar = document.createElement("div");
+    bar.className = "traversal-bar";
+    const { entries, prev, next } = getEntryContext();
+
+    if (prev) bar.appendChild(makeTraversalPill("← Previous", () => switchEntry(CURRENT_WORK.slug, prev.slug, false)));
+
+    for (const entry of entries) {
+      const isCurrent = normalizeKey(entry.slug) === normalizeKey(CURRENT_ENTRY?.slug);
+      const label = entry.subtitle || titleCaseSlug(entry.slug);
+      bar.appendChild(makeTraversalPill(label, () => switchEntry(CURRENT_WORK.slug, entry.slug, false), isCurrent ? "current" : ""));
+    }
+
+    if (next) bar.appendChild(makeTraversalPill("Next →", () => switchEntry(CURRENT_WORK.slug, next.slug, false)));
+
+    shell.appendChild(bar);
+    return shell;
+  }
+
+  function updateChapterProgress(progress = 0) {
+    const clamped = Math.max(0, Math.min(1, progress));
+    const percent = Math.round(clamped * 100);
+    const pageBar = document.getElementById("pageProgressBar");
+    const fill = document.getElementById("chapterProgressFill");
+    const label = document.getElementById("chapterProgressLabel");
+    const text = document.getElementById("chapterProgressPercent");
+
+    if (pageBar) pageBar.style.width = `${percent}%`;
+    if (fill) fill.style.width = `${percent}%`;
+    if (text) text.textContent = `${percent}%`;
+    if (label) label.textContent = CURRENT_ENTRY?.subtitle || CURRENT_ITEM?.subtitle || "Chapter Progress";
+
+    const bottomBtn = document.getElementById("scrollToBottomTraversalBtn");
+    if (bottomBtn && clamped >= BOTTOM_GLOW_PROGRESS && !bottomGlowTriggered) {
+      bottomGlowTriggered = true;
+      bottomBtn.classList.add("pulse");
+    }
+    if (bottomBtn && clamped < BOTTOM_GLOW_PROGRESS) {
+      bottomGlowTriggered = false;
+      bottomBtn.classList.remove("pulse");
     }
   }
 
-  // ====== RENDER ======
-  function render() {
-    const container = $("#container");
-    if (!container) return;
+  function wireStickyControls() {
+    if (stickyControlsWired) return;
+    stickyControlsWired = true;
 
-    container.replaceChildren();
+    const topBtn = document.getElementById("scrollToSearchBtn");
+    const bottomBtn = document.getElementById("scrollToBottomTraversalBtn");
+    if (!topBtn || !bottomBtn) return;
 
-    if (SHOW_FEATURED_AD_ABOVE_CHAPTERS) {
-      container.appendChild(makeFeaturedMoneySlot());
-    }
+    topBtn.addEventListener("click", () => {
+      const target = document.getElementById("searchBarAnchor") || document.querySelector(".hero");
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
 
-    const sentinel = document.createElement("div");
-    sentinel.id = "chunkSentinel";
-    sentinel.style.height = "1px";
-    sentinel.style.width = "100%";
-    sentinel.style.opacity = "0";
-    container.appendChild(sentinel);
-
-    renderedUntil = 0;
-    SEARCH_INDEX = null;
-
-    const firstEnd = Math.min(ITEMS.length, CHUNK_SIZE);
-    renderChunk(container, 0, firstEnd);
-    container.appendChild(sentinel);
-
-    if (renderedUntil >= ITEMS.length) {
-      container.appendChild(buildEndAds());
-    }
-
-    ensureChunkObserver(container);
-
-    if (OPEN_FIRST_ON_LOAD) {
-      openFirstChapter({ scroll: false });
-    } else if (OPEN_SMART) {
-      const cards = $$("details.card", container);
-      if (cards.length) {
-        const mid = Math.floor(cards.length / 2);
-        cards[0].open = true;
-        if (cards[mid]) cards[mid].open = true;
-        cards[cards.length - 1].open = true;
-      }
-    }
-
-    if (LAZY_ADS) {
-      setTimeout(serveAds, 80);
-    }
+    bottomBtn.addEventListener("click", () => {
+      const target = document.getElementById("bottomTraversal") || document.getElementById("readerBottomAnchor");
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
-  async function switchWork(slug) {
-    await loadWorkBySlug(slug);
+  function clearRefreshTimers() {
+    if (railRefreshTimer) clearInterval(railRefreshTimer);
+    if (bannerRefreshTimer) clearInterval(bannerRefreshTimer);
+    railRefreshTimer = null;
+    bannerRefreshTimer = null;
+  }
+
+  function startRefreshTimers() {
+    clearRefreshTimers();
+
+    railRefreshTimer = window.setInterval(() => {
+      if (document.hidden || !CURRENT_ITEM) return;
+      const subids = getSubids(CURRENT_ITEM);
+      const leftSlots = ["leftRailSlot1","leftRailSlot2","leftRailSlot3","leftRailSlot4","leftRailSlot5","leftRailSlot6","leftRailSlot7","leftRailSlot8","leftRailSlot9","leftRailSlot10","leftRailSlot11","leftRailSlot12"];
+      const rightSlots = ["rightRailSlot1","rightRailSlot2","rightRailSlot3","rightRailSlot4","rightRailSlot5","rightRailSlot6","rightRailSlot7","rightRailSlot8","rightRailSlot9","rightRailSlot10","rightRailSlot11","rightRailSlot12"];
+      leftSlots.forEach((id, index) => refillSlot(document.getElementById(id), ZONES.leftRail, subids.left, subids.work, index + 1));
+      rightSlots.forEach((id, index) => refillSlot(document.getElementById(id), ZONES.rightRail, subids.right, subids.work, index + 1));
+      serveAds();
+    }, RAIL_REFRESH_MS);
+
+    bannerRefreshTimer = window.setInterval(() => {
+      if (document.hidden || !CURRENT_ITEM) return;
+      const subids = getSubids(CURRENT_ITEM);
+      refillSlot(document.getElementById("topBannerSlot"), ZONES.topBanner, subids.top, subids.work, 1);
+      serveAds();
+    }, BANNER_REFRESH_MS);
+  }
+
+  function maybePreloadNextChapter() {
+    if (nextPrefetch || !CURRENT_WORK || !CURRENT_ENTRY) return;
+    const { next } = getEntryContext();
+    if (!next) return;
+
+    const entryPath = next.path || next.slug;
+    const itemUrl = buildItemJsonPath(CURRENT_WORK.slug, entryPath);
+
+    nextPrefetch = fetchJson(itemUrl)
+      .then(manifest => {
+        const images = buildImageList(manifest).slice(0, 3);
+        const base = normalizeBaseUrl(manifest.base_url);
+        images.forEach(name => {
+          const img = new Image();
+          img.decoding = "async";
+          img.src = `${base}/${name}`;
+        });
+        return manifest;
+      })
+      .catch(() => null);
+  }
+
+  function wireProgressWatch() {
+    if (progressWatchWired) return;
+    progressWatchWired = true;
+
+    window.addEventListener("scroll", () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
+      updateChapterProgress(progress);
+      if (progress >= READ_PROGRESS_PREFETCH) maybePreloadNextChapter();
+    }, { passive: true });
+  }
+
+  function buildChapterMeta(manifest, imageCount) {
+    const meta = document.createElement("section");
+    meta.className = "chapter-meta";
+
+    const row = document.createElement("div");
+    row.className = "meta-row";
+
+    const leftTag = document.createElement("div");
+    leftTag.className = "chapter-tag";
+    leftTag.textContent = `${manifest.title || CURRENT_WORK.display || titleCaseSlug(CURRENT_WORK.slug)} · ${manifest.subtitle || CURRENT_ENTRY.subtitle || titleCaseSlug(CURRENT_ENTRY.slug)}`;
+
+    const rightTag = document.createElement("div");
+    rightTag.className = "chapter-tag";
+    rightTag.textContent = `${imageCount} page${imageCount === 1 ? "" : "s"}`;
+
+    row.appendChild(leftTag);
+    row.appendChild(rightTag);
+
+    const note = document.createElement("div");
+    note.className = "chapter-note";
+    note.textContent = "Use the search bar for instant jumps, keep the quick controls in view, and roll straight into the next chapter when you hit the end.";
+
+    meta.appendChild(row);
+    meta.appendChild(note);
+    return meta;
+  }
+
+  async function buildReader() {
+    const reader = document.getElementById("reader");
+    if (!reader) return;
+
+    nextPrefetch = null;
+    bottomGlowTriggered = false;
+    updateChapterProgress(0);
+
+    const state = getQueryState();
+    let resolved = resolveSelection(state.dir, state.file);
+    if (!resolved) {
+      const first = getFirstEntry();
+      resolved = first.work && first.entry ? first : null;
+      if (resolved) setQueryState(resolved.work.slug, resolved.entry.slug, true);
+    }
+    if (!resolved) throw new Error("No works found in library.json");
+
+    CURRENT_WORK = resolved.work;
+    CURRENT_ENTRY = resolved.entry;
+
+    const entryPath = resolved.entry.path || resolved.entry.slug;
+    const itemUrl = buildItemJsonPath(resolved.work.slug, entryPath);
+    const manifest = await fetchJson(itemUrl);
+    CURRENT_ITEM = manifest;
+
+    const title = `${resolved.work.display || titleCaseSlug(resolved.work.slug)} · ${manifest.subtitle || resolved.entry.subtitle || titleCaseSlug(resolved.entry.slug)}`;
+    const workTitleEl = document.getElementById("workTitle");
+    if (workTitleEl) workTitleEl.textContent = title;
+
     renderWorksNav();
-    render();
+    syncSearchSeed();
 
-    const meta = $("#meta");
-    if (meta) meta.textContent = `Items: ${ITEMS.length}`;
+    const subids = getSubids(manifest);
+    fillSlot(document.getElementById("topBannerSlot"), ZONES.topBanner, subids.top, subids.work, 1);
+    fillRailStacks(subids);
+
+    reader.innerHTML = "";
+
+    const topAnchor = document.createElement("span");
+    topAnchor.id = "readerTopAnchor";
+    topAnchor.className = "reader-anchor";
+    reader.appendChild(topAnchor);
+
+    const images = buildImageList(manifest);
+    const base = normalizeBaseUrl(manifest.base_url);
+    if (!base) throw new Error(`Manifest for ${resolved.entry.slug} is missing base_url`);
+    if (!images.length) throw new Error(`Manifest for ${resolved.entry.slug} has no images`);
+
+    reader.appendChild(buildChapterMeta(manifest, images.length));
+
+    const note = document.createElement("div");
+    note.className = "note";
+    note.textContent = "At most they simply have to scroll. And that’s easy.";
+    reader.appendChild(note);
+    reader.appendChild(buildTraversal("top"));
+
+    const betweenEvery = Number(manifest.ads?.between_every) || 0;
+    const betweenSlots = Number(manifest.ads?.between_slots) || 3;
+    const finalBlock = Math.max(Number(manifest.ads?.final_block) || 0, BOTTOM_AD_COUNT);
+
+    let groupNumber = 0;
+    for (let i = 0; i < images.length; i++) {
+      reader.appendChild(imageBlock(`${base}/${images[i]}`, `${manifest.title || resolved.work.display || resolved.work.slug} page ${i + 1}`));
+      const pageNumber = i + 1;
+      const shouldInsertBetween = betweenEvery > 0 && pageNumber % betweenEvery === 0 && pageNumber < images.length;
+      if (shouldInsertBetween) {
+        groupNumber += 1;
+        reader.appendChild(betweenAd(manifest, groupNumber, betweenSlots));
+      }
+    }
+
+    if (finalBlock > 0) reader.appendChild(endAds(manifest, finalBlock));
+    reader.appendChild(buildTraversal("bottom"));
+
+    const bottomAnchor = document.createElement("span");
+    bottomAnchor.id = "readerBottomAnchor";
+    bottomAnchor.className = "reader-anchor";
+    reader.appendChild(bottomAnchor);
+
+    serveAds();
+    startRefreshTimers();
+    updateChapterProgress(0);
   }
 
-  // ====== BOOT ======
+  async function switchEntry(dir, file, replace = false) {
+    setQueryState(dir, file, replace);
+    await buildReader();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   async function boot() {
-    if (window.__ARCHIVE_BOOTED__) return;
-    window.__ARCHIVE_BOOTED__ = true;
+    await loadLibrary();
+    wireTopFlyouts();
+    wireStickyControls();
+    wireProgressWatch();
+    wireSearch();
+    await buildReader();
 
-    await loadWorksManifest();
-
-    let slug = getPathSlug();
-    if (!WORKS.some(w => w.slug === slug)) {
-      slug = WORKS[0]?.slug || "index";
-      setPathSlug(slug);
-    }
-
-    await loadWorkBySlug(slug);
-    renderWorksNav();
-    render();
-    wireSearchUI();
-
-    if (LAZY_ADS) {
-      initLazyAds();
-      setTimeout(serveAds, 900);
-    } else {
-      initAllAdsNow();
-    }
+    window.addEventListener("popstate", async () => {
+      await buildReader();
+    });
   }
 
-  window.addEventListener("popstate", () => {
-    const slug = getPathSlug();
-
-    if (!WORKS.some(w => w.slug === slug)) return;
-
-    switchWork(slug).catch(err => {
-      console.error(err);
-      const meta = $("#meta");
-      if (meta) meta.textContent = "Failed to load archive.";
-    });
-  });
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      boot().catch(err => {
-        console.error(err);
-        const meta = $("#meta");
-        if (meta) meta.textContent = "Failed to load archive.";
-      });
-    }, { once: true });
-  } else {
+  document.addEventListener("DOMContentLoaded", () => {
     boot().catch(err => {
       console.error(err);
-      const meta = $("#meta");
-      if (meta) meta.textContent = "Failed to load archive.";
+      clearRefreshTimers();
+      const workTitleEl = document.getElementById("workTitle");
+      if (workTitleEl) workTitleEl.textContent = "Failed to load work";
+      const reader = document.getElementById("reader");
+      if (reader) {
+        reader.innerHTML = `
+          <div class="note">
+            Failed to load this work. Please check library.json, item.json, base_url, and image filenames.
+          </div>
+        `;
+      }
     });
-  }
+  });
 })();
