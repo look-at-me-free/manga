@@ -4,7 +4,7 @@
     {
       "id": 101,
       "slug": "barato",
-      "display": "Naruto",
+      "display": "Barato",
       "top_pill": true,
       "entries": [
         {
@@ -114,7 +114,7 @@
     {
       "id": 201,
       "slug": "jaja",
-      "display": "Jojo's Bizarre Adventure",
+      "display": "Jaja",
       "top_pill": true,
       "entries": [
         {
@@ -140,7 +140,7 @@
     {
       "id": 301,
       "slug": "golden",
-      "display": "Golden Boy",
+      "display": "Golden",
       "top_pill": true,
       "entries": [
         {
@@ -178,7 +178,7 @@
     {
       "id": 401,
       "slug": "bark",
-      "display": "Berserk",
+      "display": "Bark",
       "top_pill": true,
       "entries": [
         {
@@ -348,6 +348,38 @@
           "path": "book_1/official_extras",
           "type": "chapter",
           "subtitle": "Official Extras"
+        }
+      ]
+    },
+    {
+      "id": 801,
+      "slug": "Attack_on_Titan",
+      "display": "Attack on Titan",
+      "top_pill": true,
+      "entries": [
+        {
+          "slug": "episode_1",
+          "path": "episode_1",
+          "type": "chapter",
+          "subtitle": "Episode 1"
+        },
+        {
+          "slug": "episode_2",
+          "path": "episode_2",
+          "type": "chapter",
+          "subtitle": "Episode 2"
+        },
+        {
+          "slug": "episode_3",
+          "path": "episode_3",
+          "type": "chapter",
+          "subtitle": "Episode 3"
+        },
+        {
+          "slug": "episode_4",
+          "path": "episode_4",
+          "type": "chapter",
+          "subtitle": "Episode 4"
         }
       ]
     }
