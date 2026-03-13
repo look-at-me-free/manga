@@ -1,4 +1,3 @@
-
 (() => {
   "use strict";
 
@@ -12,6 +11,7 @@
   const READ_PROGRESS_PREFETCH = 0.7;
   const BOTTOM_GLOW_PROGRESS = 0.95;
   const SEARCH_RESULTS_LIMIT = 12;
+  const IS_MOBILE_READER = document.body?.dataset?.readerMode === "mobile";
 
   const ZONES = {
     topBanner: 5865232,
@@ -20,10 +20,21 @@
     betweenMulti: 5867482
   };
 
+  const LEFT_RAIL_IDS = [
+    "leftRailSlot1","leftRailSlot2","leftRailSlot3","leftRailSlot4","leftRailSlot5","leftRailSlot6",
+    "leftRailSlot7","leftRailSlot8","leftRailSlot9","leftRailSlot10","leftRailSlot11","leftRailSlot12"
+  ];
+
+  const RIGHT_RAIL_IDS = [
+    "rightRailSlot1","rightRailSlot2","rightRailSlot3","rightRailSlot4","rightRailSlot5","rightRailSlot6",
+    "rightRailSlot7","rightRailSlot8","rightRailSlot9","rightRailSlot10","rightRailSlot11","rightRailSlot12"
+  ];
+
   let ARCHIVE_WORKS = [];
   let CURRENT_WORK = null;
   let CURRENT_ENTRY = null;
   let CURRENT_ITEM = null;
+
   let topFlyoutsWired = false;
   let stickyControlsWired = false;
   let searchWired = false;
@@ -32,6 +43,9 @@
   let nextPrefetch = null;
   let progressWatchWired = false;
   let bottomGlowTriggered = false;
+  let mobileWorksWired = false;
+  let mobileOpenWorkSlug = "";
+  let dialWired = false;
 
   function $(sel, root = document) {
     return root.querySelector(sel);
@@ -62,6 +76,107 @@
       .replace(/\b\w/g, ch => ch.toUpperCase());
   }
 
+  function scrollToReaderTop() {
+    const target =
+      document.getElementById("readerTopAnchor") ||
+      document.getElementById("reader") ||
+      document.getElementById("searchBarAnchor");
+
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  function scrollToSearchBar() {
+    const target =
+      document.getElementById("searchBarAnchor") ||
+      document.querySelector(".hero");
+
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  function setMobileOpenWork(workSlug) {
+    mobileOpenWorkSlug = normalizeKey(workSlug || "");
+
+    const items = $$(".mobile-work-item");
+    items.forEach(item => {
+      const isOpen = normalizeKey(item.dataset.workSlug) === mobileOpenWorkSlug;
+      item.classList.toggle("open", isOpen);
+      item.classList.toggle("active", isOpen);
+    });
+  }
+
+  function syncDialThumb() {
+    if (!IS_MOBILE_READER) return;
+
+    const scrollEl = document.getElementById("worksNav");
+    const track = document.getElementById("dialTrack");
+    const thumb = document.getElementById("dialThumb");
+    if (!scrollEl || !track || !thumb) return;
+
+    const maxScroll = Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
+    const trackH = track.clientHeight;
+    const thumbH = thumb.offsetHeight;
+    const maxTop = Math.max(0, trackH - thumbH);
+
+    const ratio = maxScroll > 0 ? scrollEl.scrollTop / maxScroll : 0;
+    thumb.style.top = `${maxTop * ratio}px`;
+  }
+
+  function wireMobileDial() {
+    if (!IS_MOBILE_READER || dialWired) return;
+    dialWired = true;
+
+    const scrollEl = document.getElementById("worksNav");
+    const track = document.getElementById("dialTrack");
+    const thumb = document.getElementById("dialThumb");
+    if (!scrollEl || !track || !thumb) return;
+
+    let dragging = false;
+
+    const moveThumb = (clientY) => {
+      const rect = track.getBoundingClientRect();
+      const thumbH = thumb.offsetHeight;
+      const maxTop = Math.max(0, rect.height - thumbH);
+
+      let top = clientY - rect.top - thumbH / 2;
+      top = Math.max(0, Math.min(maxTop, top));
+
+      const ratio = maxTop > 0 ? top / maxTop : 0;
+      const maxScroll = Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
+
+      scrollEl.scrollTop = maxScroll * ratio;
+      thumb.style.top = `${top}px`;
+    };
+
+    track.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      track.setPointerCapture?.(e.pointerId);
+      moveThumb(e.clientY);
+    });
+
+    track.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      moveThumb(e.clientY);
+    });
+
+    track.addEventListener("pointerup", (e) => {
+      dragging = false;
+      track.releasePointerCapture?.(e.pointerId);
+    });
+
+    track.addEventListener("pointercancel", () => {
+      dragging = false;
+    });
+
+    scrollEl.addEventListener("scroll", syncDialThumb, { passive: true });
+    window.addEventListener("resize", syncDialThumb);
+
+    syncDialThumb();
+  }
+
   function serveAds() {
     (window.AdProvider = window.AdProvider || []).push({ serve: {} });
   }
@@ -83,6 +198,7 @@
   }
 
   function fillSlot(el, zoneId, sub = 1, sub2 = 1, sub3 = 1) {
+    if (!el) return;
     refillSlot(el, zoneId, sub, sub2, sub3);
     serveAds();
   }
@@ -178,7 +294,7 @@
   }
 
   function getSubids(manifest) {
-    const fallbackWork = Number(manifest.id) || Number(manifest.parent_work_id) || 1;
+    const fallbackWork = Number(manifest.parent_work_id) || 1;
 
     return {
       work: manifest.subids?.work ?? fallbackWork,
@@ -207,19 +323,17 @@
     const subids = getSubids(manifest);
 
     const wrap = document.createElement("div");
-    wrap.className = "slot";
-
-    const grid = document.createElement("div");
-    grid.className = "between-grid";
+    wrap.className = "between-grid";
 
     for (let i = 1; i <= slotCount; i++) {
       const slot = document.createElement("div");
       slot.className = "slot";
-      slot.appendChild(makeIns(ZONES.betweenMulti, subids.between, subids.work, Number(`${groupNumber}${i}`)));
-      grid.appendChild(slot);
+      slot.appendChild(
+        makeIns(ZONES.betweenMulti, subids.between, subids.work, Number(`${groupNumber}${i}`))
+      );
+      wrap.appendChild(slot);
     }
 
-    wrap.appendChild(grid);
     return wrap;
   }
 
@@ -227,37 +341,31 @@
     const subids = getSubids(manifest);
 
     const wrap = document.createElement("div");
-    wrap.className = "slot";
-
-    const grid = document.createElement("div");
-    grid.className = "end-grid";
+    wrap.className = "end-grid";
 
     for (let i = 1; i <= count; i++) {
       const slot = document.createElement("div");
       slot.className = "slot";
       slot.appendChild(makeIns(ZONES.betweenMulti, subids.between, subids.work, 9000 + i));
-      grid.appendChild(slot);
+      wrap.appendChild(slot);
     }
 
-    wrap.appendChild(grid);
     return wrap;
   }
 
   function fillRailStacks(subids) {
-    const leftSlots = ["leftRailSlot1","leftRailSlot2","leftRailSlot3","leftRailSlot4","leftRailSlot5","leftRailSlot6","leftRailSlot7","leftRailSlot8","leftRailSlot9","leftRailSlot10","leftRailSlot11","leftRailSlot12"];
-    const rightSlots = ["rightRailSlot1","rightRailSlot2","rightRailSlot3","rightRailSlot4","rightRailSlot5","rightRailSlot6","rightRailSlot7","rightRailSlot8","rightRailSlot9","rightRailSlot10","rightRailSlot11","rightRailSlot12"];
-
-    leftSlots.forEach((id, index) => {
+    LEFT_RAIL_IDS.forEach((id, index) => {
       fillSlot(document.getElementById(id), ZONES.leftRail, subids.left, subids.work, index + 1);
     });
 
-    rightSlots.forEach((id, index) => {
+    RIGHT_RAIL_IDS.forEach((id, index) => {
       fillSlot(document.getElementById(id), ZONES.rightRail, subids.right, subids.work, index + 1);
     });
   }
 
   function flattenEntries() {
     const rows = [];
+
     for (const work of ARCHIVE_WORKS) {
       for (const entry of work.entries || []) {
         rows.push({
@@ -265,10 +373,13 @@
           workLabel: work.display || titleCaseSlug(work.slug),
           entrySlug: entry.slug,
           entryLabel: entry.subtitle || titleCaseSlug(entry.slug),
-          searchKey: normalizeKey(`${work.display || work.slug} ${entry.subtitle || entry.slug} ${entry.slug}`)
+          searchKey: normalizeKey(
+            `${work.display || work.slug} ${entry.subtitle || entry.slug} ${entry.slug}`
+          )
         });
       }
     }
+
     return rows;
   }
 
@@ -279,7 +390,7 @@
 
     if (!items.length) {
       results.innerHTML = "";
-      stat.textContent = "No matches yet";
+      stat.textContent = IS_MOBILE_READER ? "Type to search" : "No matches yet";
       return;
     }
 
@@ -304,10 +415,18 @@
 
     const refresh = () => {
       const query = normalizeKey(input.value);
+
       if (!query) {
+        if (IS_MOBILE_READER) {
+          results.innerHTML = "";
+          stat.textContent = "Type to search";
+          return;
+        }
+
         const seeded = all
           .filter(item => item.workSlug === CURRENT_WORK?.slug)
           .slice(0, SEARCH_RESULTS_LIMIT);
+
         renderSearchResults(seeded);
         stat.textContent = seeded.length ? `Showing ${seeded.length} in this work` : "Ready to jump";
         return;
@@ -316,16 +435,30 @@
       const matched = all
         .filter(item => item.searchKey.includes(query))
         .slice(0, SEARCH_RESULTS_LIMIT);
+
       renderSearchResults(matched);
       stat.textContent = matched.length ? `${matched.length} result${matched.length === 1 ? "" : "s"}` : "No matches";
     };
 
     input.addEventListener("input", refresh);
-    results.addEventListener("click", (e) => {
+
+    results.addEventListener("click", async (e) => {
       const btn = e.target.closest("button[data-dir][data-file]");
       if (!btn) return;
+
       input.value = "";
-      switchEntry(btn.dataset.dir, btn.dataset.file, false);
+
+      if (IS_MOBILE_READER) {
+        results.innerHTML = "";
+        stat.textContent = "Type to search";
+        setMobileOpenWork(btn.dataset.dir);
+      }
+
+      await switchEntry(btn.dataset.dir, btn.dataset.file, false);
+
+      if (IS_MOBILE_READER) {
+        scrollToReaderTop();
+      }
     });
 
     refresh();
@@ -334,9 +467,20 @@
   function syncSearchSeed() {
     const input = document.getElementById("chapterSearchInput");
     const stat = document.getElementById("chapterSearchStat");
-    if (!input || !stat) return;
+    const results = document.getElementById("chapterSearchResults");
+    if (!input || !stat || !results) return;
     if (input.value.trim()) return;
-    const seeded = flattenEntries().filter(item => item.workSlug === CURRENT_WORK?.slug).slice(0, SEARCH_RESULTS_LIMIT);
+
+    if (IS_MOBILE_READER) {
+      results.innerHTML = "";
+      stat.textContent = "Type to search";
+      return;
+    }
+
+    const seeded = flattenEntries()
+      .filter(item => item.workSlug === CURRENT_WORK?.slug)
+      .slice(0, SEARCH_RESULTS_LIMIT);
+
     renderSearchResults(seeded);
     stat.textContent = seeded.length ? `Showing ${seeded.length} in this work` : "Ready to jump";
   }
@@ -344,6 +488,52 @@
   function renderWorksNav() {
     const nav = document.getElementById("worksNav");
     if (!nav) return;
+
+    if (IS_MOBILE_READER) {
+      let html = "";
+
+      for (const work of ARCHIVE_WORKS.filter(w => w.top_pill !== false)) {
+        const isActiveWork = normalizeKey(work.slug) === normalizeKey(CURRENT_WORK?.slug);
+        const isOpen = normalizeKey(work.slug) === normalizeKey(mobileOpenWorkSlug || CURRENT_WORK?.slug);
+        const entries = Array.isArray(work.entries) ? work.entries : [];
+
+        html += `
+          <section class="mobile-work-item${isActiveWork ? " active" : ""}${isOpen ? " open" : ""}" data-work-slug="${escapeHtml(work.slug)}">
+            <button class="mobile-work-trigger" type="button" data-work-toggle="${escapeHtml(work.slug)}">
+              <span class="label">${escapeHtml(work.display || titleCaseSlug(work.slug))}</span>
+              <span class="count">${entries.length} ${entries.length === 1 ? "chapter" : "chapters"}</span>
+            </button>
+            <div class="mobile-chapters">
+        `;
+
+        for (const entry of entries) {
+          const active =
+            isActiveWork && normalizeKey(entry.slug) === normalizeKey(CURRENT_ENTRY?.slug)
+              ? " current"
+              : "";
+
+          html += `
+            <button
+              class="mobile-chapter-link${active}"
+              type="button"
+              data-dir="${escapeHtml(work.slug)}"
+              data-file="${escapeHtml(entry.slug)}"
+            >
+              ${escapeHtml(entry.subtitle || titleCaseSlug(entry.slug))}
+            </button>
+          `;
+        }
+
+        html += `
+            </div>
+          </section>
+        `;
+      }
+
+      nav.innerHTML = html;
+      syncDialThumb();
+      return;
+    }
 
     let html = "";
 
@@ -364,15 +554,21 @@
       for (const entry of entries) {
         const label = `${work.display || titleCaseSlug(work.slug)} · ${entry.subtitle || titleCaseSlug(entry.slug)}`;
         const active = isActive && normalizeKey(entry.slug) === normalizeKey(CURRENT_ENTRY?.slug) ? " active" : "";
+
         html += `
           <a href="?dir=${encodeURIComponent(work.slug)}&file=${encodeURIComponent(entry.slug)}" class="topworks-link${active}" data-dir="${escapeHtml(work.slug)}" data-file="${escapeHtml(entry.slug)}">${escapeHtml(label)}</a>
         `;
       }
 
-      html += `</div></div></div>`;
+      html += `
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     nav.innerHTML = html;
+
     nav.onclick = (e) => {
       const a = e.target.closest("a[data-dir][data-file]");
       if (!a) return;
@@ -390,6 +586,7 @@
       if (trigger) {
         const item = trigger.closest(".topworks-item");
         if (!item) return;
+
         e.preventDefault();
         const wasOpen = item.classList.contains("open");
         $$(".topworks-item.open").forEach(x => x.classList.remove("open"));
@@ -403,9 +600,41 @@
     });
   }
 
+  function wireMobileWorksNav() {
+    if (!IS_MOBILE_READER || mobileWorksWired) return;
+    mobileWorksWired = true;
+
+    const nav = document.getElementById("worksNav");
+    if (!nav) return;
+
+    nav.addEventListener("click", async (e) => {
+      const toggle = e.target.closest("[data-work-toggle]");
+      if (toggle) {
+        const slug = toggle.dataset.workToggle;
+        const normalized = normalizeKey(slug);
+        const isAlreadyOpen = normalized === normalizeKey(mobileOpenWorkSlug);
+
+        setMobileOpenWork(isAlreadyOpen ? "" : slug);
+        syncDialThumb();
+        return;
+      }
+
+      const chapterBtn = e.target.closest("button[data-dir][data-file]");
+      if (!chapterBtn) return;
+
+      const dir = chapterBtn.dataset.dir;
+      const file = chapterBtn.dataset.file;
+
+      setMobileOpenWork(dir);
+      await switchEntry(dir, file, false);
+      scrollToReaderTop();
+    });
+  }
+
   function getEntryContext() {
     const entries = Array.isArray(CURRENT_WORK?.entries) ? CURRENT_WORK.entries : [];
     const currentIndex = entries.findIndex(entry => normalizeKey(entry.slug) === normalizeKey(CURRENT_ENTRY?.slug));
+
     return {
       entries,
       currentIndex,
@@ -414,12 +643,17 @@
     };
   }
 
-  function makeTraversalPill(label, onClick, extraClass = "") {
+  function makeTraversalPill(label, onClick, extraClass = "", disabled = false) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = `traversal-pill${extraClass ? ` ${extraClass}` : ""}`;
     btn.textContent = label;
-    btn.addEventListener("click", onClick);
+    btn.disabled = !!disabled;
+
+    if (!disabled && typeof onClick === "function") {
+      btn.addEventListener("click", onClick);
+    }
+
     return btn;
   }
 
@@ -430,10 +664,12 @@
 
     const kicker = document.createElement("p");
     kicker.className = "traversal-kicker";
-    kicker.textContent = position === "top" ? "Chapter Navigation" : "Keep The Scroll Alive";
+    kicker.textContent = IS_MOBILE_READER
+      ? "Quick Chapter Jump"
+      : (position === "top" ? "Chapter Navigation" : "Keep The Scroll Alive");
     shell.appendChild(kicker);
 
-    if (position === "bottom") {
+    if (!IS_MOBILE_READER && position === "bottom") {
       const prompt = document.createElement("div");
       prompt.className = "continue-prompt";
       prompt.textContent = "Finished this chapter? Pick the next move right here.";
@@ -442,17 +678,51 @@
 
     const bar = document.createElement("div");
     bar.className = "traversal-bar";
+
     const { entries, prev, next } = getEntryContext();
 
-    if (prev) bar.appendChild(makeTraversalPill("← Previous", () => switchEntry(CURRENT_WORK.slug, prev.slug, false)));
+    if (IS_MOBILE_READER) {
+      bar.appendChild(
+        makeTraversalPill(
+          "← Previous",
+          prev ? () => switchEntry(CURRENT_WORK.slug, prev.slug, false) : null,
+          "",
+          !prev
+        )
+      );
+
+      bar.appendChild(
+        makeTraversalPill("Search", () => scrollToSearchBar())
+      );
+
+      bar.appendChild(
+        makeTraversalPill(
+          "Next →",
+          next ? () => switchEntry(CURRENT_WORK.slug, next.slug, false) : null,
+          "",
+          !next
+        )
+      );
+
+      shell.appendChild(bar);
+      return shell;
+    }
+
+    if (prev) {
+      bar.appendChild(makeTraversalPill("← Previous", () => switchEntry(CURRENT_WORK.slug, prev.slug, false)));
+    }
 
     for (const entry of entries) {
       const isCurrent = normalizeKey(entry.slug) === normalizeKey(CURRENT_ENTRY?.slug);
       const label = entry.subtitle || titleCaseSlug(entry.slug);
-      bar.appendChild(makeTraversalPill(label, () => switchEntry(CURRENT_WORK.slug, entry.slug, false), isCurrent ? "current" : ""));
+      bar.appendChild(
+        makeTraversalPill(label, () => switchEntry(CURRENT_WORK.slug, entry.slug, false), isCurrent ? "current" : "")
+      );
     }
 
-    if (next) bar.appendChild(makeTraversalPill("Next →", () => switchEntry(CURRENT_WORK.slug, next.slug, false)));
+    if (next) {
+      bar.appendChild(makeTraversalPill("Next →", () => switchEntry(CURRENT_WORK.slug, next.slug, false)));
+    }
 
     shell.appendChild(bar);
     return shell;
@@ -461,6 +731,7 @@
   function updateChapterProgress(progress = 0) {
     const clamped = Math.max(0, Math.min(1, progress));
     const percent = Math.round(clamped * 100);
+
     const pageBar = document.getElementById("pageProgressBar");
     const fill = document.getElementById("chapterProgressFill");
     const label = document.getElementById("chapterProgressLabel");
@@ -476,6 +747,7 @@
       bottomGlowTriggered = true;
       bottomBtn.classList.add("pulse");
     }
+
     if (bottomBtn && clamped < BOTTOM_GLOW_PROGRESS) {
       bottomGlowTriggered = false;
       bottomBtn.classList.remove("pulse");
@@ -488,17 +760,19 @@
 
     const topBtn = document.getElementById("scrollToSearchBtn");
     const bottomBtn = document.getElementById("scrollToBottomTraversalBtn");
-    if (!topBtn || !bottomBtn) return;
 
-    topBtn.addEventListener("click", () => {
-      const target = document.getElementById("searchBarAnchor") || document.querySelector(".hero");
-      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    if (topBtn) {
+      topBtn.addEventListener("click", () => {
+        scrollToSearchBar();
+      });
+    }
 
-    bottomBtn.addEventListener("click", () => {
-      const target = document.getElementById("bottomTraversal") || document.getElementById("readerBottomAnchor");
-      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    if (bottomBtn) {
+      bottomBtn.addEventListener("click", () => {
+        const target = document.getElementById("bottomTraversal") || document.getElementById("readerBottomAnchor");
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
   }
 
   function clearRefreshTimers() {
@@ -511,18 +785,27 @@
   function startRefreshTimers() {
     clearRefreshTimers();
 
+    if (IS_MOBILE_READER) return;
+
     railRefreshTimer = window.setInterval(() => {
       if (document.hidden || !CURRENT_ITEM) return;
+
       const subids = getSubids(CURRENT_ITEM);
-      const leftSlots = ["leftRailSlot1","leftRailSlot2","leftRailSlot3","leftRailSlot4","leftRailSlot5","leftRailSlot6","leftRailSlot7","leftRailSlot8","leftRailSlot9","leftRailSlot10","leftRailSlot11","leftRailSlot12"];
-      const rightSlots = ["rightRailSlot1","rightRailSlot2","rightRailSlot3","rightRailSlot4","rightRailSlot5","rightRailSlot6","rightRailSlot7","rightRailSlot8","rightRailSlot9","rightRailSlot10","rightRailSlot11","rightRailSlot12"];
-      leftSlots.forEach((id, index) => refillSlot(document.getElementById(id), ZONES.leftRail, subids.left, subids.work, index + 1));
-      rightSlots.forEach((id, index) => refillSlot(document.getElementById(id), ZONES.rightRail, subids.right, subids.work, index + 1));
+
+      LEFT_RAIL_IDS.forEach((id, index) => {
+        refillSlot(document.getElementById(id), ZONES.leftRail, subids.left, subids.work, index + 1);
+      });
+
+      RIGHT_RAIL_IDS.forEach((id, index) => {
+        refillSlot(document.getElementById(id), ZONES.rightRail, subids.right, subids.work, index + 1);
+      });
+
       serveAds();
     }, RAIL_REFRESH_MS);
 
     bannerRefreshTimer = window.setInterval(() => {
       if (document.hidden || !CURRENT_ITEM) return;
+
       const subids = getSubids(CURRENT_ITEM);
       refillSlot(document.getElementById("topBannerSlot"), ZONES.topBanner, subids.top, subids.work, 1);
       serveAds();
@@ -531,6 +814,7 @@
 
   function maybePreloadNextChapter() {
     if (nextPrefetch || !CURRENT_WORK || !CURRENT_ENTRY) return;
+
     const { next } = getEntryContext();
     if (!next) return;
 
@@ -541,11 +825,13 @@
       .then(manifest => {
         const images = buildImageList(manifest).slice(0, 3);
         const base = normalizeBaseUrl(manifest.base_url);
+
         images.forEach(name => {
           const img = new Image();
           img.decoding = "async";
           img.src = `${base}/${name}`;
         });
+
         return manifest;
       })
       .catch(() => null);
@@ -558,8 +844,12 @@
     window.addEventListener("scroll", () => {
       const scrollable = document.documentElement.scrollHeight - window.innerHeight;
       const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
+
       updateChapterProgress(progress);
-      if (progress >= READ_PROGRESS_PREFETCH) maybePreloadNextChapter();
+
+      if (progress >= READ_PROGRESS_PREFETCH) {
+        maybePreloadNextChapter();
+      }
     }, { passive: true });
   }
 
@@ -583,11 +873,24 @@
 
     const note = document.createElement("div");
     note.className = "chapter-note";
-    note.textContent = "Use the search bar for instant jumps, keep the quick controls in view, and roll straight into the next chapter when you hit the end.";
+    note.textContent = IS_MOBILE_READER
+      ? "Use the chapter controls above or below the pages whenever you want to jump fast."
+      : "Use the search bar for instant jumps, keep the quick controls in view, and roll straight into the next chapter when you hit the end.";
 
     meta.appendChild(row);
     meta.appendChild(note);
+
     return meta;
+  }
+
+  function clearDesktopAdShells() {
+    const topBanner = document.getElementById("topBannerSlot");
+    if (topBanner) topBanner.innerHTML = "";
+
+    [...LEFT_RAIL_IDS, ...RIGHT_RAIL_IDS].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = "";
+    });
   }
 
   async function buildReader() {
@@ -600,15 +903,23 @@
 
     const state = getQueryState();
     let resolved = resolveSelection(state.dir, state.file);
+
     if (!resolved) {
       const first = getFirstEntry();
       resolved = first.work && first.entry ? first : null;
       if (resolved) setQueryState(resolved.work.slug, resolved.entry.slug, true);
     }
-    if (!resolved) throw new Error("No works found in library.json");
+
+    if (!resolved) {
+      throw new Error("No works found in library.json");
+    }
 
     CURRENT_WORK = resolved.work;
     CURRENT_ENTRY = resolved.entry;
+
+    if (IS_MOBILE_READER) {
+      mobileOpenWorkSlug = resolved.work.slug;
+    }
 
     const entryPath = resolved.entry.path || resolved.entry.slug;
     const itemUrl = buildItemJsonPath(resolved.work.slug, entryPath);
@@ -623,8 +934,13 @@
     syncSearchSeed();
 
     const subids = getSubids(manifest);
-    fillSlot(document.getElementById("topBannerSlot"), ZONES.topBanner, subids.top, subids.work, 1);
-    fillRailStacks(subids);
+
+    if (!IS_MOBILE_READER) {
+      fillSlot(document.getElementById("topBannerSlot"), ZONES.topBanner, subids.top, subids.work, 1);
+      fillRailStacks(subids);
+    } else {
+      clearDesktopAdShells();
+    }
 
     reader.innerHTML = "";
 
@@ -635,6 +951,7 @@
 
     const images = buildImageList(manifest);
     const base = normalizeBaseUrl(manifest.base_url);
+
     if (!base) throw new Error(`Manifest for ${resolved.entry.slug} is missing base_url`);
     if (!images.length) throw new Error(`Manifest for ${resolved.entry.slug} has no images`);
 
@@ -642,26 +959,43 @@
 
     const note = document.createElement("div");
     note.className = "note";
-    note.textContent = "At most they simply have to scroll. And that’s easy.";
+    note.textContent = IS_MOBILE_READER
+      ? "Tap through chapters up top, then just sink into the scroll."
+      : "At most they simply have to scroll. And that’s easy.";
     reader.appendChild(note);
+
     reader.appendChild(buildTraversal("top"));
 
-    const betweenEvery = Number(manifest.ads?.between_every) || 0;
-    const betweenSlots = Number(manifest.ads?.between_slots) || 3;
-    const finalBlock = Math.max(Number(manifest.ads?.final_block) || 0, BOTTOM_AD_COUNT);
+    const betweenEvery = IS_MOBILE_READER ? 2 : (Number(manifest.ads?.between_every) || 0);
+    const betweenSlots = IS_MOBILE_READER ? 1 : (Number(manifest.ads?.between_slots) || 3);
+    const finalBlock = IS_MOBILE_READER ? 0 : Math.max(Number(manifest.ads?.final_block) || 0, BOTTOM_AD_COUNT);
 
     let groupNumber = 0;
+
     for (let i = 0; i < images.length; i++) {
-      reader.appendChild(imageBlock(`${base}/${images[i]}`, `${manifest.title || resolved.work.display || resolved.work.slug} page ${i + 1}`));
+      reader.appendChild(
+        imageBlock(
+          `${base}/${images[i]}`,
+          `${manifest.title || resolved.work.display || resolved.work.slug} page ${i + 1}`
+        )
+      );
+
       const pageNumber = i + 1;
-      const shouldInsertBetween = betweenEvery > 0 && pageNumber % betweenEvery === 0 && pageNumber < images.length;
+      const shouldInsertBetween =
+        betweenEvery > 0 &&
+        pageNumber % betweenEvery === 0 &&
+        pageNumber < images.length;
+
       if (shouldInsertBetween) {
         groupNumber += 1;
         reader.appendChild(betweenAd(manifest, groupNumber, betweenSlots));
       }
     }
 
-    if (finalBlock > 0) reader.appendChild(endAds(manifest, finalBlock));
+    if (finalBlock > 0) {
+      reader.appendChild(endAds(manifest, finalBlock));
+    }
+
     reader.appendChild(buildTraversal("bottom"));
 
     const bottomAnchor = document.createElement("span");
@@ -672,20 +1006,33 @@
     serveAds();
     startRefreshTimers();
     updateChapterProgress(0);
+
+    if (IS_MOBILE_READER) {
+      syncDialThumb();
+    }
   }
 
   async function switchEntry(dir, file, replace = false) {
     setQueryState(dir, file, replace);
     await buildReader();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (IS_MOBILE_READER) {
+      scrollToReaderTop();
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 
   async function boot() {
     await loadLibrary();
+
     wireTopFlyouts();
     wireStickyControls();
     wireProgressWatch();
     wireSearch();
+    wireMobileWorksNav();
+    wireMobileDial();
+
     await buildReader();
 
     window.addEventListener("popstate", async () => {
@@ -697,8 +1044,10 @@
     boot().catch(err => {
       console.error(err);
       clearRefreshTimers();
+
       const workTitleEl = document.getElementById("workTitle");
       if (workTitleEl) workTitleEl.textContent = "Failed to load work";
+
       const reader = document.getElementById("reader");
       if (reader) {
         reader.innerHTML = `
