@@ -203,6 +203,21 @@
         { "slug": "chapter_8", "path": "chapter_8", "type": "chapter", "subtitle": "Chapter 8" },
         { "slug": "chapter_9", "path": "chapter_9", "type": "chapter", "subtitle": "Chapter 9" }
       ]
+    },
+    {
+      "id": 999,
+      "slug": "death_note",
+      "display": "Death Note",
+      "top_pill": true,
+      "entries": [
+        { "slug": "chapter_1", "path": "volume_1/chapter_1", "type": "chapter", "subtitle": "Chapter 1" },
+        { "slug": "chapter_2", "path": "volume_1/chapter_2", "type": "chapter", "subtitle": "Chapter 2" },
+        { "slug": "chapter_3", "path": "volume_1/chapter_3", "type": "chapter", "subtitle": "Chapter 3" },
+        { "slug": "chapter_4", "path": "volume_1/chapter_4", "type": "chapter", "subtitle": "Chapter 4" },
+        { "slug": "chapter_5", "path": "volume_1/chapter_5", "type": "chapter", "subtitle": "Chapter 5" },
+        { "slug": "chapter_6", "path": "volume_1/chapter_6", "type": "chapter", "subtitle": "Chapter 6" },
+        { "slug": "chapter_7", "path": "volume_1/chapter_7", "type": "chapter", "subtitle": "Chapter 7" }
+      ]
     }
   ]
 }
