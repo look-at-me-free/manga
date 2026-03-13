@@ -4,7 +4,7 @@
     {
       "id": 101,
       "slug": "barato",
-      "display": "Barato",
+      "display": "Naruto",
       "top_pill": true,
       "entries": [
         {
@@ -114,7 +114,7 @@
     {
       "id": 201,
       "slug": "jaja",
-      "display": "Jaja",
+      "display": "Jojo's Bizarre Adventure",
       "top_pill": true,
       "entries": [
         {
@@ -188,7 +188,7 @@
     {
       "id": 301,
       "slug": "golden",
-      "display": "Golden",
+      "display": "Goldenboy",
       "top_pill": true,
       "entries": [
         {
@@ -226,7 +226,7 @@
     {
       "id": 401,
       "slug": "bark",
-      "display": "Bark",
+      "display": "Berserk",
       "top_pill": true,
       "entries": [
         {
