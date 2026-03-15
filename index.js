@@ -2,8 +2,7 @@
   "use strict";
 
   const LIBRARY_FILE = "library.json";
-  const R2_BASE_URL = "https://pub-cd01009a7c6c464aa0b093e33aa5ae51.r2.dev";
-  const WORKS_DIR = `${R2_BASE_URL}/works`;
+  const DEFAULT_WORKS_BASE = "https://pub-cd01009a7c6c464aa0b093e33aa5ae51.r2.dev/works";
   const ITEM_JSON_NAME = "item.json";
   const BOTTOM_AD_COUNT = 6;
   const RAIL_REFRESH_MS = 75000;
@@ -31,6 +30,7 @@
   ];
 
   let ARCHIVE_WORKS = [];
+  let SOURCE_MAP = {};
   let CURRENT_WORK = null;
   let CURRENT_ENTRY = null;
   let CURRENT_ITEM = null;
@@ -74,6 +74,42 @@
       .replace(/\s+/g, " ")
       .trim()
       .replace(/\b\w/g, ch => ch.toUpperCase());
+  }
+
+  function normalizeBaseUrl(url) {
+    return String(url || "").replace(/\/+$/, "");
+  }
+
+  function resolveSourceKey(work, entry) {
+    return entry?.source || work?.source || "";
+  }
+
+  function getSourceBaseByKey(sourceKey) {
+    if (!sourceKey) return "";
+    return normalizeBaseUrl(SOURCE_MAP[sourceKey] || "");
+  }
+
+  function getWorkBase(work, entry) {
+    return normalizeBaseUrl(
+      entry?.base_url ||
+      getSourceBaseByKey(resolveSourceKey(work, entry)) ||
+      work?.base_url ||
+      DEFAULT_WORKS_BASE
+    );
+  }
+
+  function getItemJsonUrl(work, entry) {
+    if (entry?.item_url) {
+      return entry.item_url;
+    }
+
+    const entryPathOrSlug = entry?.path || entry?.slug || "";
+    const safeParts = String(entryPathOrSlug)
+      .split("/")
+      .filter(Boolean)
+      .map(part => encodeURIComponent(part));
+
+    return `${getWorkBase(work, entry)}/${encodeURIComponent(work.slug)}/${safeParts.join("/")}/${ITEM_JSON_NAME}`;
   }
 
   function scrollToReaderTop() {
@@ -214,6 +250,7 @@
   async function loadLibrary() {
     const data = await fetchJson(LIBRARY_FILE);
     ARCHIVE_WORKS = Array.isArray(data.works) ? data.works : [];
+    SOURCE_MAP = data && typeof data.sources === "object" && data.sources ? data.sources : {};
   }
 
   function getQueryState() {
@@ -260,19 +297,6 @@
     }
 
     return null;
-  }
-
-  function buildItemJsonPath(workSlug, entryPathOrSlug) {
-    const safeParts = String(entryPathOrSlug)
-      .split("/")
-      .filter(Boolean)
-      .map(part => encodeURIComponent(part));
-
-    return `${WORKS_DIR}/${encodeURIComponent(workSlug)}/${safeParts.join("/")}/${ITEM_JSON_NAME}`;
-  }
-
-  function normalizeBaseUrl(url) {
-    return String(url || "").replace(/\/+$/, "");
   }
 
   function buildImageList(manifest) {
@@ -818,8 +842,7 @@
     const { next } = getEntryContext();
     if (!next) return;
 
-    const entryPath = next.path || next.slug;
-    const itemUrl = buildItemJsonPath(CURRENT_WORK.slug, entryPath);
+    const itemUrl = getItemJsonUrl(CURRENT_WORK, next);
 
     nextPrefetch = fetchJson(itemUrl)
       .then(manifest => {
@@ -921,8 +944,7 @@
       mobileOpenWorkSlug = resolved.work.slug;
     }
 
-    const entryPath = resolved.entry.path || resolved.entry.slug;
-    const itemUrl = buildItemJsonPath(resolved.work.slug, entryPath);
+    const itemUrl = getItemJsonUrl(resolved.work, resolved.entry);
     const manifest = await fetchJson(itemUrl);
     CURRENT_ITEM = manifest;
 
@@ -1052,7 +1074,7 @@
       if (reader) {
         reader.innerHTML = `
           <div class="note">
-            Failed to load this work. Please check library.json, item.json, base_url, and image filenames.
+            Failed to load this work. Please check library.json, sources, item.json, base_url, and image filenames.
           </div>
         `;
       }
