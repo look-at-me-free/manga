@@ -377,7 +377,7 @@
         { "slug": "Act_7", "path": "Volume_1/Act_7", "type": "chapter", "subtitle": "Volume 1 · Act 7" }
       ]
     },
-    {
+        {
       "id": 1001,
       "slug": "Parasyte",
       "display": "Parasyte",
@@ -392,7 +392,69 @@
         { "slug": "chapter_6", "path": "chapter_6", "type": "chapter", "subtitle": "Chapter 6" },
         { "slug": "chapter_7", "path": "chapter_7", "type": "chapter", "subtitle": "Chapter 7" },
         { "slug": "chapter_8", "path": "chapter_8", "type": "chapter", "subtitle": "Chapter 8" },
-        { "slug": "chapter_9", "path": "chapter_9", "type": "chapter", "subtitle": "Chapter 9" }
+        { "slug": "chapter_9", "path": "chapter_9", "type": "chapter", "subtitle": "Chapter 9" },
+
+        { "slug": "chapter_10", "path": "volume_2/chapter_10", "type": "chapter", "subtitle": "Chapter 10", "source": "b" },
+        { "slug": "chapter_11", "path": "volume_2/chapter_11", "type": "chapter", "subtitle": "Chapter 11", "source": "b" },
+        { "slug": "chapter_12", "path": "volume_2/chapter_12", "type": "chapter", "subtitle": "Chapter 12", "source": "b" },
+        { "slug": "chapter_13", "path": "volume_2/chapter_13", "type": "chapter", "subtitle": "Chapter 13", "source": "b" },
+        { "slug": "chapter_14", "path": "volume_2/chapter_14", "type": "chapter", "subtitle": "Chapter 14", "source": "b" },
+        { "slug": "chapter_15", "path": "volume_2/chapter_15", "type": "chapter", "subtitle": "Chapter 15", "source": "b" },
+        { "slug": "chapter_16", "path": "volume_2/chapter_16", "type": "chapter", "subtitle": "Chapter 16", "source": "b" },
+        { "slug": "chapter_17", "path": "volume_2/chapter_17", "type": "chapter", "subtitle": "Chapter 17", "source": "b" },
+
+        { "slug": "chapter_18", "path": "volume_3/chapter_18", "type": "chapter", "subtitle": "Chapter 18", "source": "b" },
+        { "slug": "chapter_19", "path": "volume_3/chapter_19", "type": "chapter", "subtitle": "Chapter 19", "source": "b" },
+        { "slug": "chapter_20", "path": "volume_3/chapter_20", "type": "chapter", "subtitle": "Chapter 20", "source": "b" },
+        { "slug": "chapter_21", "path": "volume_3/chapter_21", "type": "chapter", "subtitle": "Chapter 21", "source": "b" },
+        { "slug": "chapter_22", "path": "volume_3/chapter_22", "type": "chapter", "subtitle": "Chapter 22", "source": "b" },
+        { "slug": "chapter_23", "path": "volume_3/chapter_23", "type": "chapter", "subtitle": "Chapter 23", "source": "b" },
+        { "slug": "chapter_24", "path": "volume_3/chapter_24", "type": "chapter", "subtitle": "Chapter 24", "source": "b" },
+        { "slug": "chapter_25", "path": "volume_3/chapter_25", "type": "chapter", "subtitle": "Chapter 25", "source": "b" },
+
+        { "slug": "chapter_26", "path": "volume_4/chapter_26", "type": "chapter", "subtitle": "Chapter 26", "source": "b" },
+        { "slug": "chapter_27", "path": "volume_4/chapter_27", "type": "chapter", "subtitle": "Chapter 27", "source": "b" },
+        { "slug": "chapter_28", "path": "volume_4/chapter_28", "type": "chapter", "subtitle": "Chapter 28", "source": "b" },
+        { "slug": "chapter_29", "path": "volume_4/chapter_29", "type": "chapter", "subtitle": "Chapter 29", "source": "b" },
+        { "slug": "chapter_30", "path": "volume_4/chapter_30", "type": "chapter", "subtitle": "Chapter 30", "source": "b" },
+        { "slug": "chapter_31", "path": "volume_4/chapter_31", "type": "chapter", "subtitle": "Chapter 31", "source": "b" },
+        { "slug": "chapter_32", "path": "volume_4/chapter_32", "type": "chapter", "subtitle": "Chapter 32", "source": "b" },
+        { "slug": "chapter_33", "path": "volume_4/chapter_33", "type": "chapter", "subtitle": "Chapter 33", "source": "b" },
+
+        { "slug": "chapter_34", "path": "volume_5/chapter_34", "type": "chapter", "subtitle": "Chapter 34", "source": "b" },
+        { "slug": "chapter_35", "path": "volume_5/chapter_35", "type": "chapter", "subtitle": "Chapter 35", "source": "b" },
+        { "slug": "chapter_36", "path": "volume_5/chapter_36", "type": "chapter", "subtitle": "Chapter 36", "source": "b" },
+        { "slug": "chapter_37", "path": "volume_5/chapter_37", "type": "chapter", "subtitle": "Chapter 37", "source": "b" },
+        { "slug": "chapter_38", "path": "volume_5/chapter_38", "type": "chapter", "subtitle": "Chapter 38", "source": "b" },
+        { "slug": "chapter_39", "path": "volume_5/chapter_39", "type": "chapter", "subtitle": "Chapter 39", "source": "b" },
+        { "slug": "chapter_40", "path": "volume_5/chapter_40", "type": "chapter", "subtitle": "Chapter 40", "source": "b" },
+        { "slug": "chapter_41", "path": "volume_5/chapter_41", "type": "chapter", "subtitle": "Chapter 41", "source": "b" },
+
+        { "slug": "chapter_42", "path": "volume_6/chapter_42", "type": "chapter", "subtitle": "Chapter 42", "source": "b" },
+        { "slug": "chapter_43", "path": "volume_6/chapter_43", "type": "chapter", "subtitle": "Chapter 43", "source": "b" },
+        { "slug": "chapter_44", "path": "volume_6/chapter_44", "type": "chapter", "subtitle": "Chapter 44", "source": "b" },
+        { "slug": "chapter_45", "path": "volume_6/chapter_45", "type": "chapter", "subtitle": "Chapter 45", "source": "b" },
+        { "slug": "chapter_46", "path": "volume_6/chapter_46", "type": "chapter", "subtitle": "Chapter 46", "source": "b" },
+        { "slug": "chapter_47", "path": "volume_6/chapter_47", "type": "chapter", "subtitle": "Chapter 47", "source": "b" },
+        { "slug": "chapter_48", "path": "volume_6/chapter_48", "type": "chapter", "subtitle": "Chapter 48", "source": "b" },
+        { "slug": "chapter_49", "path": "volume_6/chapter_49", "type": "chapter", "subtitle": "Chapter 49", "source": "b" },
+
+        { "slug": "chapter_50", "path": "volume_7/chapter_50", "type": "chapter", "subtitle": "Chapter 50", "source": "b" },
+        { "slug": "chapter_51", "path": "volume_7/chapter_51", "type": "chapter", "subtitle": "Chapter 51", "source": "b" },
+        { "slug": "chapter_52", "path": "volume_7/chapter_52", "type": "chapter", "subtitle": "Chapter 52", "source": "b" },
+        { "slug": "chapter_53", "path": "volume_7/chapter_53", "type": "chapter", "subtitle": "Chapter 53", "source": "b" },
+        { "slug": "chapter_54", "path": "volume_7/chapter_54", "type": "chapter", "subtitle": "Chapter 54", "source": "b" },
+        { "slug": "chapter_55", "path": "volume_7/chapter_55", "type": "chapter", "subtitle": "Chapter 55", "source": "b" },
+        { "slug": "chapter_56", "path": "volume_7/chapter_56", "type": "chapter", "subtitle": "Chapter 56", "source": "b" },
+        { "slug": "chapter_57", "path": "volume_7/chapter_57", "type": "chapter", "subtitle": "Chapter 57", "source": "b" },
+
+        { "slug": "chapter_58", "path": "volume_8/chapter_58", "type": "chapter", "subtitle": "Chapter 58", "source": "b" },
+        { "slug": "chapter_59", "path": "volume_8/chapter_59", "type": "chapter", "subtitle": "Chapter 59", "source": "b" },
+        { "slug": "chapter_60", "path": "volume_8/chapter_60", "type": "chapter", "subtitle": "Chapter 60", "source": "b" },
+        { "slug": "chapter_61", "path": "volume_8/chapter_61", "type": "chapter", "subtitle": "Chapter 61", "source": "b" },
+        { "slug": "chapter_62", "path": "volume_8/chapter_62", "type": "chapter", "subtitle": "Chapter 62", "source": "b" },
+        { "slug": "chapter_63", "path": "volume_8/chapter_63", "type": "chapter", "subtitle": "Chapter 63", "source": "b" },
+        { "slug": "chapter_64", "path": "volume_8/chapter_64", "type": "chapter", "subtitle": "Chapter 64", "source": "b" }
       ]
     }
   ]

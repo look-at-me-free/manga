@@ -983,7 +983,7 @@
     note.className = "note";
     note.textContent = IS_MOBILE_READER
       ? "Tap through chapters up top, then just sink into the scroll."
-      : "W̸e̴l̷c̷o̷m̷e̶ ̸B̴a̷c̸k";
+      : "W̸e̴l̷c̷o̷m̷e̶ ̸B̴a̷c̸k̴,̷ ̶D̶e̸g̴e̶n̴e̴r̷a̸t̸e̷";
     reader.appendChild(note);
 
     reader.appendChild(buildTraversal("top"));
