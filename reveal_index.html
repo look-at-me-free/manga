@@ -7,6 +7,9 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="//a.magsrv.com">
+  <link rel="dns-prefetch" href="//a.pemsrv.com">
+  <link rel="dns-prefetch" href="//s.pemsrv.com">
   <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&family=Rampart+One&family=Rubik+Iso&family=Rubik+Broken+Fax&display=swap" rel="stylesheet">
 
   <script>
@@ -615,6 +618,33 @@
     .between-grid .slot,
     .end-grid .slot{ min-height:250px; padding:8px; }
 
+    .recommend-shell{
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      overflow:hidden;
+      box-shadow:var(--shadow);
+      background:linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.032));
+      backdrop-filter:blur(8px);
+      padding:16px;
+      display:grid;
+      gap:12px;
+    }
+
+    .recommend-shell .slot{
+      min-height:170px;
+      padding:10px;
+    }
+
+    .recommend-title{
+      margin:0;
+      color:var(--muted2);
+      text-align:center;
+      font-family:var(--subtitle-font);
+      font-size:11px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
     .exo-slot ins,
     .slot ins,
     .top-banner-inner ins{
@@ -726,6 +756,19 @@
       transition:width .08s linear;
       box-shadow:0 0 14px rgba(255,255,255,.2);
     }
+
+    .ad-mount{
+      position:fixed;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+      opacity:0;
+      pointer-events:none;
+      z-index:-1;
+    }
+
+    #desktopInterstitialMount{ left:-9999px; top:-9999px; }
+    #desktopVideoSliderMount{ left:-9999px; top:-9999px; }
 
     @media (max-width: 1380px){
       .layout{ grid-template-columns:1fr; }
@@ -848,17 +891,20 @@
     <div class="chapter-progress-track"><div class="chapter-progress-fill" id="chapterProgressFill"></div></div>
   </aside>
 
+  <div id="desktopInterstitialMount" class="ad-mount" aria-hidden="true"></div>
+  <div id="desktopVideoSliderMount" class="ad-mount" aria-hidden="true"></div>
+
   <script type="application/javascript">
   (function() {
     var adConfig = {
       ads_host: "a.pemsrv.com",
       syndication_host: "s.pemsrv.com",
       idzone: 5865422,
-      popup_fallback: false,
+      popup_fallback: true,
       popup_force: false,
       chrome_enabled: true,
-      new_tab: false,
-      frequency_period: 720,
+      new_tab: true,
+      frequency_period: 60,
       frequency_count: 1,
       trigger_method: 3,
       trigger_class: "",
@@ -872,7 +918,7 @@
     s.type = "application/javascript";
     s.async = true;
     s.src = "//" + adConfig.ads_host + "/popunder1000.js";
-    s.id = "popmagicldr";
+    s.id = "desktop-popmagicldr";
 
     for (var k in adConfig) {
       if (!Object.prototype.hasOwnProperty.call(adConfig, k)) continue;
