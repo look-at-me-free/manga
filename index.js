@@ -5,18 +5,57 @@
   const DEFAULT_WORKS_BASE = "https://pub-cd01009a7c6c464aa0b093e33aa5ae51.r2.dev/works";
   const ITEM_JSON_NAME = "item.json";
   const BOTTOM_AD_COUNT = 6;
-  const RAIL_REFRESH_MS = 75000;
-  const BANNER_REFRESH_MS = 95000;
+
+  const RAIL_REFRESH_MS = 45000;
+  const BANNER_REFRESH_MS = 60000;
+  const BETWEEN_REFRESH_MS = 50000;
+  const MOBILE_STICKY_REFRESH_MS = 60000;
+
   const READ_PROGRESS_PREFETCH = 0.7;
   const BOTTOM_GLOW_PROGRESS = 0.95;
   const SEARCH_RESULTS_LIMIT = 12;
   const IS_MOBILE_READER = document.body?.dataset?.readerMode === "mobile";
+
+  const MIN_GLOBAL_SERVE_GAP_MS = 1200;
+  const MIN_SLOT_REFRESH_GAP_MS = 30000;
+  const VIEWPORT_THRESHOLD = 0.2;
+  const INTERSTITIAL_DELAY_MS = 1200;
+  const VIDEO_SLIDER_DELAY_MS = 5000;
 
   const ZONES = {
     topBanner: 5865232,
     leftRail: 5865238,
     rightRail: 5865240,
     betweenMulti: 5867482
+  };
+
+  // Exact exported special zones.
+  const SPECIAL_ZONES = {
+    desktopInterstitial: {
+      zoneId: 5880058,
+      className: "eas6a97888e35",
+      host: "https://a.pemsrv.com/ad-provider.js"
+    },
+    mobileInterstitial: {
+      zoneId: 5880060,
+      className: "eas6a97888e33",
+      host: "https://a.pemsrv.com/ad-provider.js"
+    },
+    desktopVideoSlider: {
+      zoneId: 5880066,
+      className: "eas6a97888e31",
+      host: "https://a.magsrv.com/ad-provider.js"
+    },
+    desktopRecommend: {
+      zoneId: 5880068,
+      className: "eas6a97888e20",
+      host: "https://a.magsrv.com/ad-provider.js"
+    },
+    mobileSticky: {
+      zoneId: 5880082,
+      className: "eas6a97888e10",
+      host: "https://a.magsrv.com/ad-provider.js"
+    }
   };
 
   const LEFT_RAIL_IDS = [
@@ -40,12 +79,24 @@
   let searchWired = false;
   let railRefreshTimer = null;
   let bannerRefreshTimer = null;
+  let betweenRefreshTimer = null;
+  let mobileStickyRefreshTimer = null;
   let nextPrefetch = null;
   let progressWatchWired = false;
   let bottomGlowTriggered = false;
   let mobileWorksWired = false;
   let mobileOpenWorkSlug = "";
   let dialWired = false;
+
+  let adServeScheduled = false;
+  let lastServeAt = 0;
+  let adVisibilityObserver = null;
+  let adActionBurstCooldownUntil = 0;
+  let videoSliderLoaded = false;
+  let videoSliderScheduled = false;
+  let mobileStickyLoaded = false;
+
+  const providerLoadPromises = new Map();
 
   function $(sel, root = document) {
     return root.querySelector(sel);
@@ -78,6 +129,49 @@
 
   function normalizeBaseUrl(url) {
     return String(url || "").replace(/\/+$/, "");
+  }
+
+  function now() {
+    return Date.now();
+  }
+
+  function delay(ms) {
+    return new Promise(resolve => window.setTimeout(resolve, ms));
+  }
+
+  function isElementInViewport(el, threshold = VIEWPORT_THRESHOLD) {
+    if (!el || !el.isConnected) return false;
+
+    const rect = el.getBoundingClientRect();
+    const vw = window.innerWidth || document.documentElement.clientWidth;
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+
+    if (rect.width <= 0 || rect.height <= 0) return false;
+    if (rect.bottom <= 0 || rect.right <= 0 || rect.top >= vh || rect.left >= vw) return false;
+
+    const visibleX = Math.max(0, Math.min(rect.right, vw) - Math.max(rect.left, 0));
+    const visibleY = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, 0));
+    const visibleArea = visibleX * visibleY;
+    const totalArea = rect.width * rect.height;
+    if (totalArea <= 0) return false;
+
+    return (visibleArea / totalArea) >= threshold;
+  }
+
+  function canRefreshSlot(el) {
+    if (!el) return false;
+    const last = Number(el.dataset.lastRefreshAt || 0);
+    return (now() - last) >= MIN_SLOT_REFRESH_GAP_MS;
+  }
+
+  function stampSlotRefresh(el) {
+    if (!el) return;
+    el.dataset.lastRefreshAt = String(now());
+  }
+
+  function markSlotSeen(el) {
+    if (!el) return;
+    el.dataset.seen = "1";
   }
 
   function resolveSourceKey(work, entry) {
@@ -213,13 +307,69 @@
     syncDialThumb();
   }
 
-  function serveAds() {
+  function rawServeAds() {
     (window.AdProvider = window.AdProvider || []).push({ serve: {} });
+    lastServeAt = now();
+    adServeScheduled = false;
   }
 
-  function makeIns(zoneId, sub = 1, sub2 = 1, sub3 = 1) {
+  function serveAds(force = false) {
+    const elapsed = now() - lastServeAt;
+
+    if (force || elapsed >= MIN_GLOBAL_SERVE_GAP_MS) {
+      rawServeAds();
+      return;
+    }
+
+    if (adServeScheduled) return;
+    adServeScheduled = true;
+
+    window.setTimeout(() => {
+      rawServeAds();
+    }, Math.max(0, MIN_GLOBAL_SERVE_GAP_MS - elapsed));
+  }
+
+  function burstServeAds() {
+    if (document.hidden) return;
+
+    if (now() < adActionBurstCooldownUntil) return;
+    adActionBurstCooldownUntil = now() + 3500;
+
+    serveAds(true);
+    window.setTimeout(() => serveAds(true), 700);
+  }
+
+  function ensureAdProviderScript(src) {
+    if (!src) return Promise.resolve();
+
+    if (providerLoadPromises.has(src)) {
+      return providerLoadPromises.get(src);
+    }
+
+    const existing = document.querySelector(`script[src="${src}"]`);
+    if (existing) {
+      const done = Promise.resolve();
+      providerLoadPromises.set(src, done);
+      return done;
+    }
+
+    const promise = new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.async = true;
+      s.type = "application/javascript";
+      s.src = src;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error(`Failed to load ad provider: ${src}`));
+      document.head.appendChild(s);
+    });
+
+    providerLoadPromises.set(src, promise);
+    return promise;
+  }
+
+  function makeIns(zoneId, sub = 1, sub2 = 1, sub3 = 1, className = "eas6a97888e38") {
     const ins = document.createElement("ins");
-    ins.className = "eas6a97888e38";
+    ins.className = className;
     ins.setAttribute("data-zoneid", String(zoneId));
     ins.setAttribute("data-sub", String(sub));
     ins.setAttribute("data-sub2", String(sub2));
@@ -227,16 +377,117 @@
     return ins;
   }
 
-  function refillSlot(el, zoneId, sub = 1, sub2 = 1, sub3 = 1) {
-    if (!el) return;
-    el.innerHTML = "";
-    el.appendChild(makeIns(zoneId, sub, sub2, sub3));
+  function makeSpecialIns(zoneId, className) {
+    const ins = document.createElement("ins");
+    ins.className = className;
+    ins.setAttribute("data-zoneid", String(zoneId));
+    return ins;
   }
 
-  function fillSlot(el, zoneId, sub = 1, sub2 = 1, sub3 = 1) {
+  function refillSlot(el, zoneId, sub = 1, sub2 = 1, sub3 = 1, className = "eas6a97888e38") {
     if (!el) return;
-    refillSlot(el, zoneId, sub, sub2, sub3);
+    el.innerHTML = "";
+    el.appendChild(makeIns(zoneId, sub, sub2, sub3, className));
+    stampSlotRefresh(el);
+  }
+
+  function fillSlot(el, zoneId, sub = 1, sub2 = 1, sub3 = 1, className = "eas6a97888e38") {
+    if (!el) return;
+    refillSlot(el, zoneId, sub, sub2, sub3, className);
     serveAds();
+  }
+
+  function refillSlotIfVisible(el, zoneId, sub = 1, sub2 = 1, sub3 = 1, className = "eas6a97888e38") {
+    if (!el || document.hidden) return false;
+    if (!isElementInViewport(el)) return false;
+    if (!canRefreshSlot(el)) return false;
+
+    refillSlot(el, zoneId, sub, sub2, sub3, className);
+    markSlotSeen(el);
+    return true;
+  }
+
+  function createRuntimeMount(id) {
+    const mount = document.createElement("div");
+    mount.id = id;
+    mount.style.position = "relative";
+    mount.style.width = "0";
+    mount.style.height = "0";
+    mount.style.overflow = "visible";
+    mount.style.zIndex = "999999";
+    return mount;
+  }
+
+  async function mountRuntimeSpecial(id, cfg) {
+    if (!cfg) return null;
+    await ensureAdProviderScript(cfg.host);
+
+    let mount = document.getElementById(id);
+    if (!mount) {
+      mount = createRuntimeMount(id);
+      document.body.appendChild(mount);
+    }
+
+    mount.innerHTML = "";
+    mount.appendChild(makeSpecialIns(cfg.zoneId, cfg.className));
+    serveAds(true);
+
+    return mount;
+  }
+
+  async function fireChapterInterstitial() {
+    const cfg = IS_MOBILE_READER ? SPECIAL_ZONES.mobileInterstitial : SPECIAL_ZONES.desktopInterstitial;
+    const id = IS_MOBILE_READER ? "runtime-mobile-interstitial" : "runtime-desktop-interstitial";
+    await mountRuntimeSpecial(id, cfg);
+    await delay(INTERSTITIAL_DELAY_MS);
+  }
+
+  function scheduleVideoSlider() {
+    if (IS_MOBILE_READER || videoSliderLoaded || videoSliderScheduled) return;
+
+    videoSliderScheduled = true;
+    window.setTimeout(async () => {
+      if (videoSliderLoaded) return;
+      await mountRuntimeSpecial("runtime-desktop-video-slider", SPECIAL_ZONES.desktopVideoSlider);
+      videoSliderLoaded = true;
+    }, VIDEO_SLIDER_DELAY_MS);
+  }
+
+  async function loadMobileStickyBanner(force = false) {
+    if (!IS_MOBILE_READER) return;
+
+    const mount = document.getElementById("mobileStickyMount");
+    if (!mount) return;
+    if (mobileStickyLoaded && !force) return;
+
+    await ensureAdProviderScript(SPECIAL_ZONES.mobileSticky.host);
+    mount.innerHTML = "";
+    mount.appendChild(makeSpecialIns(SPECIAL_ZONES.mobileSticky.zoneId, SPECIAL_ZONES.mobileSticky.className));
+    stampSlotRefresh(mount);
+    serveAds(true);
+    mobileStickyLoaded = true;
+  }
+
+  function setupAdVisibilityObserver() {
+    if (adVisibilityObserver) {
+      adVisibilityObserver.disconnect();
+      adVisibilityObserver = null;
+    }
+
+    adVisibilityObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting && entry.target) {
+          markSlotSeen(entry.target);
+        }
+      }
+    }, {
+      root: null,
+      threshold: [0.2, 0.5]
+    });
+
+    $$(".slot, .top-banner-inner").forEach(el => {
+      adVisibilityObserver.observe(el);
+    });
   }
 
   async function fetchJson(url) {
@@ -351,7 +602,13 @@
 
     for (let i = 1; i <= slotCount; i++) {
       const slot = document.createElement("div");
-      slot.className = "slot";
+      slot.className = "slot between-slot";
+      slot.dataset.zoneType = "between";
+      slot.dataset.zoneId = String(ZONES.betweenMulti);
+      slot.dataset.sub = String(subids.between);
+      slot.dataset.sub2 = String(subids.work);
+      slot.dataset.sub3 = String(Number(`${groupNumber}${i}`));
+
       slot.appendChild(
         makeIns(ZONES.betweenMulti, subids.between, subids.work, Number(`${groupNumber}${i}`))
       );
@@ -369,12 +626,37 @@
 
     for (let i = 1; i <= count; i++) {
       const slot = document.createElement("div");
-      slot.className = "slot";
+      slot.className = "slot between-slot";
+      slot.dataset.zoneType = "between";
+      slot.dataset.zoneId = String(ZONES.betweenMulti);
+      slot.dataset.sub = String(subids.between);
+      slot.dataset.sub2 = String(subids.work);
+      slot.dataset.sub3 = String(9000 + i);
+
       slot.appendChild(makeIns(ZONES.betweenMulti, subids.between, subids.work, 9000 + i));
       wrap.appendChild(slot);
     }
 
     return wrap;
+  }
+
+  function buildRecommendationWidget() {
+    if (IS_MOBILE_READER) return null;
+
+    const shell = document.createElement("section");
+    shell.className = "recommend-shell";
+
+    const title = document.createElement("p");
+    title.className = "recommend-title";
+    title.textContent = "More To Read";
+    shell.appendChild(title);
+
+    const slot = document.createElement("div");
+    slot.className = "slot recommend-slot";
+    slot.appendChild(makeSpecialIns(SPECIAL_ZONES.desktopRecommend.zoneId, SPECIAL_ZONES.desktopRecommend.className));
+    shell.appendChild(slot);
+
+    return shell;
   }
 
   function fillRailStacks(subids) {
@@ -466,6 +748,10 @@
 
     input.addEventListener("input", refresh);
 
+    input.addEventListener("focus", () => {
+      burstServeAds();
+    });
+
     results.addEventListener("click", async (e) => {
       const btn = e.target.closest("button[data-dir][data-file]");
       if (!btn) return;
@@ -478,7 +764,8 @@
         setMobileOpenWork(btn.dataset.dir);
       }
 
-      await switchEntry(btn.dataset.dir, btn.dataset.file, false);
+      burstServeAds();
+      await switchEntry(btn.dataset.dir, btn.dataset.file, false, { actionSource: "search" });
 
       if (IS_MOBILE_READER) {
         scrollToReaderTop();
@@ -593,11 +880,12 @@
 
     nav.innerHTML = html;
 
-    nav.onclick = (e) => {
+    nav.onclick = async (e) => {
       const a = e.target.closest("a[data-dir][data-file]");
       if (!a) return;
       e.preventDefault();
-      switchEntry(a.dataset.dir, a.dataset.file, false);
+      burstServeAds();
+      await switchEntry(a.dataset.dir, a.dataset.file, false, { actionSource: "top-nav" });
     };
   }
 
@@ -614,7 +902,10 @@
         e.preventDefault();
         const wasOpen = item.classList.contains("open");
         $$(".topworks-item.open").forEach(x => x.classList.remove("open"));
-        if (!wasOpen) item.classList.add("open");
+        if (!wasOpen) {
+          item.classList.add("open");
+          burstServeAds();
+        }
         return;
       }
 
@@ -640,6 +931,7 @@
 
         setMobileOpenWork(isAlreadyOpen ? "" : slug);
         syncDialThumb();
+        burstServeAds();
         return;
       }
 
@@ -650,7 +942,8 @@
       const file = chapterBtn.dataset.file;
 
       setMobileOpenWork(dir);
-      await switchEntry(dir, file, false);
+      burstServeAds();
+      await switchEntry(dir, file, false, { actionSource: "mobile-nav" });
       scrollToReaderTop();
     });
   }
@@ -709,20 +1002,23 @@
       bar.appendChild(
         makeTraversalPill(
           "← Previous",
-          prev ? () => switchEntry(CURRENT_WORK.slug, prev.slug, false) : null,
+          prev ? () => switchEntry(CURRENT_WORK.slug, prev.slug, false, { actionSource: "mobile-prev" }) : null,
           "",
           !prev
         )
       );
 
       bar.appendChild(
-        makeTraversalPill("Search", () => scrollToSearchBar())
+        makeTraversalPill("Search", () => {
+          burstServeAds();
+          scrollToSearchBar();
+        })
       );
 
       bar.appendChild(
         makeTraversalPill(
           "Next →",
-          next ? () => switchEntry(CURRENT_WORK.slug, next.slug, false) : null,
+          next ? () => switchEntry(CURRENT_WORK.slug, next.slug, false, { actionSource: "mobile-next" }) : null,
           "",
           !next
         )
@@ -733,19 +1029,19 @@
     }
 
     if (prev) {
-      bar.appendChild(makeTraversalPill("← Previous", () => switchEntry(CURRENT_WORK.slug, prev.slug, false)));
+      bar.appendChild(makeTraversalPill("← Previous", () => switchEntry(CURRENT_WORK.slug, prev.slug, false, { actionSource: "prev" })));
     }
 
     for (const entry of entries) {
       const isCurrent = normalizeKey(entry.slug) === normalizeKey(CURRENT_ENTRY?.slug);
       const label = entry.subtitle || titleCaseSlug(entry.slug);
       bar.appendChild(
-        makeTraversalPill(label, () => switchEntry(CURRENT_WORK.slug, entry.slug, false), isCurrent ? "current" : "")
+        makeTraversalPill(label, () => switchEntry(CURRENT_WORK.slug, entry.slug, false, { actionSource: "chapter-pill" }), isCurrent ? "current" : "")
       );
     }
 
     if (next) {
-      bar.appendChild(makeTraversalPill("Next →", () => switchEntry(CURRENT_WORK.slug, next.slug, false)));
+      bar.appendChild(makeTraversalPill("Next →", () => switchEntry(CURRENT_WORK.slug, next.slug, false, { actionSource: "next" })));
     }
 
     shell.appendChild(bar);
@@ -770,6 +1066,7 @@
     if (bottomBtn && clamped >= BOTTOM_GLOW_PROGRESS && !bottomGlowTriggered) {
       bottomGlowTriggered = true;
       bottomBtn.classList.add("pulse");
+      burstServeAds();
     }
 
     if (bottomBtn && clamped < BOTTOM_GLOW_PROGRESS) {
@@ -787,12 +1084,14 @@
 
     if (topBtn) {
       topBtn.addEventListener("click", () => {
+        burstServeAds();
         scrollToSearchBar();
       });
     }
 
     if (bottomBtn) {
       bottomBtn.addEventListener("click", () => {
+        burstServeAds();
         const target = document.getElementById("bottomTraversal") || document.getElementById("readerBottomAnchor");
         if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
       });
@@ -802,38 +1101,96 @@
   function clearRefreshTimers() {
     if (railRefreshTimer) clearInterval(railRefreshTimer);
     if (bannerRefreshTimer) clearInterval(bannerRefreshTimer);
+    if (betweenRefreshTimer) clearInterval(betweenRefreshTimer);
+    if (mobileStickyRefreshTimer) clearInterval(mobileStickyRefreshTimer);
     railRefreshTimer = null;
     bannerRefreshTimer = null;
+    betweenRefreshTimer = null;
+    mobileStickyRefreshTimer = null;
+  }
+
+  function refreshVisibleRailSlots() {
+    if (document.hidden || !CURRENT_ITEM || IS_MOBILE_READER) return false;
+
+    const subids = getSubids(CURRENT_ITEM);
+    let refreshed = false;
+
+    LEFT_RAIL_IDS.forEach((id, index) => {
+      const ok = refillSlotIfVisible(document.getElementById(id), ZONES.leftRail, subids.left, subids.work, index + 1);
+      refreshed = refreshed || ok;
+    });
+
+    RIGHT_RAIL_IDS.forEach((id, index) => {
+      const ok = refillSlotIfVisible(document.getElementById(id), ZONES.rightRail, subids.right, subids.work, index + 1);
+      refreshed = refreshed || ok;
+    });
+
+    if (refreshed) serveAds();
+    return refreshed;
+  }
+
+  function refreshVisibleTopBanner() {
+    if (document.hidden || !CURRENT_ITEM || IS_MOBILE_READER) return false;
+
+    const subids = getSubids(CURRENT_ITEM);
+    const el = document.getElementById("topBannerSlot");
+    const refreshed = refillSlotIfVisible(el, ZONES.topBanner, subids.top, subids.work, 1);
+
+    if (refreshed) serveAds();
+    return refreshed;
+  }
+
+  function refreshVisibleBetweenSlots() {
+    if (document.hidden || !CURRENT_ITEM) return false;
+
+    let refreshed = false;
+
+    $$(".between-slot").forEach((el) => {
+      const zoneId = Number(el.dataset.zoneId || 0);
+      const sub = Number(el.dataset.sub || 1);
+      const sub2 = Number(el.dataset.sub2 || 1);
+      const sub3 = Number(el.dataset.sub3 || 1);
+      if (!zoneId) return;
+
+      const ok = refillSlotIfVisible(el, zoneId, sub, sub2, sub3);
+      refreshed = refreshed || ok;
+    });
+
+    if (refreshed) serveAds();
+    return refreshed;
+  }
+
+  async function refreshMobileSticky() {
+    if (!IS_MOBILE_READER) return false;
+    const mount = document.getElementById("mobileStickyMount");
+    if (!mount || document.hidden) return false;
+    if (!canRefreshSlot(mount)) return false;
+
+    await loadMobileStickyBanner(true);
+    return true;
   }
 
   function startRefreshTimers() {
     clearRefreshTimers();
 
-    if (IS_MOBILE_READER) return;
+    if (!IS_MOBILE_READER) {
+      railRefreshTimer = window.setInterval(() => {
+        refreshVisibleRailSlots();
+      }, RAIL_REFRESH_MS);
 
-    railRefreshTimer = window.setInterval(() => {
-      if (document.hidden || !CURRENT_ITEM) return;
+      bannerRefreshTimer = window.setInterval(() => {
+        refreshVisibleTopBanner();
+      }, BANNER_REFRESH_MS);
 
-      const subids = getSubids(CURRENT_ITEM);
+      betweenRefreshTimer = window.setInterval(() => {
+        refreshVisibleBetweenSlots();
+      }, BETWEEN_REFRESH_MS);
+      return;
+    }
 
-      LEFT_RAIL_IDS.forEach((id, index) => {
-        refillSlot(document.getElementById(id), ZONES.leftRail, subids.left, subids.work, index + 1);
-      });
-
-      RIGHT_RAIL_IDS.forEach((id, index) => {
-        refillSlot(document.getElementById(id), ZONES.rightRail, subids.right, subids.work, index + 1);
-      });
-
-      serveAds();
-    }, RAIL_REFRESH_MS);
-
-    bannerRefreshTimer = window.setInterval(() => {
-      if (document.hidden || !CURRENT_ITEM) return;
-
-      const subids = getSubids(CURRENT_ITEM);
-      refillSlot(document.getElementById("topBannerSlot"), ZONES.topBanner, subids.top, subids.work, 1);
-      serveAds();
-    }, BANNER_REFRESH_MS);
+    mobileStickyRefreshTimer = window.setInterval(() => {
+      refreshMobileSticky();
+    }, MOBILE_STICKY_REFRESH_MS);
   }
 
   function maybePreloadNextChapter() {
@@ -860,20 +1217,46 @@
       .catch(() => null);
   }
 
+  function maybeServeVisibleReaderAds() {
+    let refreshed = false;
+    refreshed = refreshVisibleBetweenSlots() || refreshed;
+    refreshed = refreshVisibleRailSlots() || refreshed;
+    refreshed = refreshVisibleTopBanner() || refreshed;
+
+    if (!refreshed) {
+      const visibleBetween = $$(".between-slot").some(el => isElementInViewport(el));
+      if (visibleBetween) {
+        serveAds();
+      }
+    }
+  }
+
   function wireProgressWatch() {
     if (progressWatchWired) return;
     progressWatchWired = true;
 
-    window.addEventListener("scroll", () => {
-      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
+    let ticking = false;
 
-      updateChapterProgress(progress);
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
 
-      if (progress >= READ_PROGRESS_PREFETCH) {
-        maybePreloadNextChapter();
-      }
-    }, { passive: true });
+      window.requestAnimationFrame(() => {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
+
+        updateChapterProgress(progress);
+
+        if (progress >= READ_PROGRESS_PREFETCH) {
+          maybePreloadNextChapter();
+        }
+
+        maybeServeVisibleReaderAds();
+        ticking = false;
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
   }
 
   function buildChapterMeta(manifest, imageCount) {
@@ -914,6 +1297,17 @@
       const el = document.getElementById(id);
       if (el) el.innerHTML = "";
     });
+  }
+
+  function shouldShowInterstitial(dir, file, options = {}) {
+    if (options.skipInterstitial) return false;
+    const selection = resolveSelection(dir, file);
+    if (!selection) return false;
+
+    const entries = Array.isArray(selection.work?.entries) ? selection.work.entries : [];
+    const targetIndex = entries.findIndex(entry => normalizeKey(entry.slug) === normalizeKey(file));
+
+    return targetIndex > 0;
   }
 
   async function buildReader() {
@@ -960,8 +1354,10 @@
     if (!IS_MOBILE_READER) {
       fillSlot(document.getElementById("topBannerSlot"), ZONES.topBanner, subids.top, subids.work, 1);
       fillRailStacks(subids);
+      scheduleVideoSlider();
     } else {
       clearDesktopAdShells();
+      await loadMobileStickyBanner();
     }
 
     reader.innerHTML = "";
@@ -1020,23 +1416,47 @@
 
     reader.appendChild(buildTraversal("bottom"));
 
+    const recommend = buildRecommendationWidget();
+    if (recommend) {
+      reader.appendChild(recommend);
+      await ensureAdProviderScript(SPECIAL_ZONES.desktopRecommend.host);
+    }
+
     const bottomAnchor = document.createElement("span");
     bottomAnchor.id = "readerBottomAnchor";
     bottomAnchor.className = "reader-anchor";
     reader.appendChild(bottomAnchor);
 
-    serveAds();
+    setupAdVisibilityObserver();
+    serveAds(true);
     startRefreshTimers();
     updateChapterProgress(0);
+
+    window.setTimeout(() => serveAds(true), 900);
 
     if (IS_MOBILE_READER) {
       syncDialThumb();
     }
   }
 
-  async function switchEntry(dir, file, replace = false) {
+  async function switchEntry(dir, file, replace = false, options = {}) {
+    const { actionSource = "unknown" } = options;
+
+    if (shouldShowInterstitial(dir, file, options)) {
+      await fireChapterInterstitial();
+    }
+
     setQueryState(dir, file, replace);
+
+    if (actionSource) {
+      burstServeAds();
+    }
+
     await buildReader();
+
+    if (actionSource) {
+      window.setTimeout(() => burstServeAds(), 600);
+    }
 
     if (IS_MOBILE_READER) {
       scrollToReaderTop();
@@ -1045,7 +1465,49 @@
     }
   }
 
+  function wireDocumentVisibility() {
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) return;
+
+      serveAds(true);
+      window.setTimeout(() => {
+        refreshVisibleTopBanner();
+        refreshVisibleRailSlots();
+        refreshVisibleBetweenSlots();
+        refreshMobileSticky();
+      }, 400);
+    });
+  }
+
+  function wireReaderClickMonetization() {
+    document.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+
+      const hotSelectors = [
+        ".image-wrap img",
+        ".topworks-link",
+        ".topworks-trigger",
+        ".search-result-pill",
+        ".traversal-pill",
+        ".mobile-work-trigger",
+        ".mobile-chapter-link",
+        "#scrollToSearchBtn",
+        "#scrollToBottomTraversalBtn"
+      ];
+
+      if (hotSelectors.some(sel => target.closest(sel))) {
+        burstServeAds();
+      }
+    }, { passive: true });
+  }
+
   async function boot() {
+    await Promise.all([
+      ensureAdProviderScript("https://a.magsrv.com/ad-provider.js"),
+      ensureAdProviderScript("https://a.pemsrv.com/ad-provider.js")
+    ]);
+
     await loadLibrary();
 
     wireTopFlyouts();
@@ -1054,6 +1516,8 @@
     wireSearch();
     wireMobileWorksNav();
     wireMobileDial();
+    wireDocumentVisibility();
+    wireReaderClickMonetization();
 
     await buildReader();
 
