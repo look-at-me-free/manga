@@ -6,7 +6,7 @@
     "c": "https://pub-ae2fd7e640274ff2acbc15b6752eee51.r2.dev/works",
     "d": "https://pub-f78ac228b8f14431804e721a35484412.r2.dev/works"
 
-  },"C:\Users\mahan\Downloads\Scum's Wish (2016-2018) (Digital) (LuCaZ)\Scums_Wish\manifest_work_block_Scums_Wish.json"-
+  },
   "works":  [
     {
       "id": 1101,
@@ -16,7 +16,6 @@
       "source": "c",
       "entries": [
         { "slug": "chapter_1", "path": "chapter_1", "type": "chapter", "subtitle": "Chapter 1" },
-        
         { "slug": "chapter_2", "path": "chapter_2", "type": "chapter", "subtitle": "Chapter 2" },
         { "slug": "chapter_3", "path": "chapter_3", "type": "chapter", "subtitle": "Chapter 3" },
         { "slug": "chapter_4", "path": "chapter_4", "type": "chapter", "subtitle": "Chapter 4" },
@@ -2880,6 +2879,44 @@
                         "path":  "volume_1/chapter_8",
                         "type":  "chapter",
                         "subtitle":  "Volume 1 - Chapter 8"
+                    }
+                ]
+},{
+    "id":  4554,
+    "slug":  "Scums_Wish",
+    "display":  "Scum\u0027s Wish",
+    "top_pill":  true,
+    "source":  "d",
+    "entries":  [
+                    {
+                        "slug":  "v1_c1",
+                        "path":  "volume_1/chapter_1",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 1"
+                    },
+                    {
+                        "slug":  "v1_c2",
+                        "path":  "volume_1/chapter_2",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 2"
+                    },
+                    {
+                        "slug":  "v1_c3",
+                        "path":  "volume_1/chapter_3",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 3"
+                    },
+                    {
+                        "slug":  "v1_c4",
+                        "path":  "volume_1/chapter_4",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 4"
+                    },
+                    {
+                        "slug":  "v1_c5",
+                        "path":  "volume_1/chapter_5",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 5"
                     }
                 ]
 },
