@@ -6,7 +6,7 @@
     "c": "https://pub-ae2fd7e640274ff2acbc15b6752eee51.r2.dev/works",
     "d": "https://pub-f78ac228b8f14431804e721a35484412.r2.dev/works"
 
-  },
+  },"C:\Users\mahan\Downloads\Scum's Wish (2016-2018) (Digital) (LuCaZ)\Scums_Wish\manifest_work_block_Scums_Wish.json"-
   "works":  [
     {
       "id": 1101,
@@ -16,6 +16,7 @@
       "source": "c",
       "entries": [
         { "slug": "chapter_1", "path": "chapter_1", "type": "chapter", "subtitle": "Chapter 1" },
+        
         { "slug": "chapter_2", "path": "chapter_2", "type": "chapter", "subtitle": "Chapter 2" },
         { "slug": "chapter_3", "path": "chapter_3", "type": "chapter", "subtitle": "Chapter 3" },
         { "slug": "chapter_4", "path": "chapter_4", "type": "chapter", "subtitle": "Chapter 4" },
