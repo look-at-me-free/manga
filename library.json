@@ -4737,62 +4737,13 @@
         { "slug": "chapter_11", "path": "volume_1/chapter_11", "type": "chapter", "subtitle": "Chapter 11" }
       ]
     },{
-    "id":  91,
-    "slug":  "Sundome",
-    "display":  "Sundome",
-    "top_pill":  true,
-    "source":  "d",
-    "entries":  [
-                    {
-                        "slug":  "v1_c1",
-                        "path":  "volume_1/chapter_1",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 1"
-                    },
-                    {
-                        "slug":  "v1_c2",
-                        "path":  "volume_1/chapter_2",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 2"
-                    },
-                    {
-                        "slug":  "v1_c3",
-                        "path":  "volume_1/chapter_3",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 3"
-                    },
-                    {
-                        "slug":  "v1_c4",
-                        "path":  "volume_1/chapter_4",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 4"
-                    },
-                    {
-                        "slug":  "v1_c5",
-                        "path":  "volume_1/chapter_5",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 5"
-                    },
-                    {
-                        "slug":  "v1_c6",
-                        "path":  "volume_1/chapter_6",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 6"
-                    },
-                    {
-                        "slug":  "v1_c7",
-                        "path":  "volume_1/chapter_7",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 7"
-                    },
-                    {
-                        "slug":  "v1_c8",
-                        "path":  "volume_1/chapter_8",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 8"
-                    }
-                ]
-},{
+  "id": 91462,
+  "slug": "Sundome",
+  "display": "Sundome",
+  "top_pill": true,
+  "source": "e",
+  "manifest": "manifests/Sundome.json"
+}, {
     "id":  52351989,
     "slug":  "Ghost_In_The_Shell(1989)",
     "display":  "Ghost In The Shell(1989)",
@@ -4900,6 +4851,13 @@
                     }
                 ]
 },{
+  "id": 7041208,
+  "slug": "Hajirau_Kimi_ga_Mitainda",
+  "display": "Hajirau Kimi ga Mitainda",
+  "top_pill": true,
+  "source": "e",
+  "manifest": "manifests/Hajirau_Kimi_ga_Mitainda.json"
+},{
     "id":  117,
     "slug":  "Dorohedoro",
     "display":  "Dorohedoro",
@@ -4947,6 +4905,770 @@
                         "path":  "volume_1/chapter_6.5",
                         "type":  "chapter",
                         "subtitle":  "Chapter 6.5"
+                    }
+                ]
+},{
+    "id":  4302071,
+    "slug":  "Eden_Its_an_Endless_World",
+    "display":  "Eden It\u0027s an Endless World",
+    "top_pill":  true,
+    "source":  "e",
+    "entries":  [
+                    {
+                        "slug":  "v1_c1",
+                        "path":  "volume_01/chapter_1",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 1"
+                    },
+                    {
+                        "slug":  "v1_c2",
+                        "path":  "volume_01/chapter_2",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 2"
+                    },
+                    {
+                        "slug":  "v1_c3",
+                        "path":  "volume_01/chapter_3",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 3"
+                    },
+                    {
+                        "slug":  "v1_c4",
+                        "path":  "volume_01/chapter_4",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 4"
+                    },
+                    {
+                        "slug":  "v2_c5",
+                        "path":  "volume_02/chapter_5",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 5"
+                    },
+                    {
+                        "slug":  "v2_c6",
+                        "path":  "volume_02/chapter_6",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 6"
+                    },
+                    {
+                        "slug":  "v2_c7",
+                        "path":  "volume_02/chapter_7",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 7"
+                    },
+                    {
+                        "slug":  "v2_c8",
+                        "path":  "volume_02/chapter_8",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 8"
+                    },
+                    {
+                        "slug":  "v2_c9",
+                        "path":  "volume_02/chapter_9",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 9"
+                    },
+                    {
+                        "slug":  "v2_c10",
+                        "path":  "volume_02/chapter_10",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 10"
+                    },
+                    {
+                        "slug":  "v2_c11",
+                        "path":  "volume_02/chapter_11",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 11"
+                    },
+                    {
+                        "slug":  "v3_c12",
+                        "path":  "volume_03/chapter_12",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 12"
+                    },
+                    {
+                        "slug":  "v3_c13",
+                        "path":  "volume_03/chapter_13",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 13"
+                    },
+                    {
+                        "slug":  "v3_c14",
+                        "path":  "volume_03/chapter_14",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 14"
+                    },
+                    {
+                        "slug":  "v3_c15",
+                        "path":  "volume_03/chapter_15",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 15"
+                    },
+                    {
+                        "slug":  "v3_c16",
+                        "path":  "volume_03/chapter_16",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 16"
+                    },
+                    {
+                        "slug":  "v3_c17",
+                        "path":  "volume_03/chapter_17",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 17"
+                    },
+                    {
+                        "slug":  "v3_c18",
+                        "path":  "volume_03/chapter_18",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 18"
+                    },
+                    {
+                        "slug":  "v4_c19",
+                        "path":  "volume_04/chapter_19",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 19"
+                    },
+                    {
+                        "slug":  "v4_c20",
+                        "path":  "volume_04/chapter_20",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 20"
+                    },
+                    {
+                        "slug":  "v4_c21",
+                        "path":  "volume_04/chapter_21",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 21"
+                    },
+                    {
+                        "slug":  "v4_c22",
+                        "path":  "volume_04/chapter_22",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 22"
+                    },
+                    {
+                        "slug":  "v4_c23",
+                        "path":  "volume_04/chapter_23",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 23"
+                    },
+                    {
+                        "slug":  "v4_c24",
+                        "path":  "volume_04/chapter_24",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 24"
+                    },
+                    {
+                        "slug":  "v5_c25",
+                        "path":  "volume_05/chapter_25",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 25"
+                    },
+                    {
+                        "slug":  "v5_c26",
+                        "path":  "volume_05/chapter_26",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 26"
+                    },
+                    {
+                        "slug":  "v5_c27",
+                        "path":  "volume_05/chapter_27",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 27"
+                    },
+                    {
+                        "slug":  "v5_c28",
+                        "path":  "volume_05/chapter_28",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 28"
+                    },
+                    {
+                        "slug":  "v5_c29",
+                        "path":  "volume_05/chapter_29",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 29"
+                    },
+                    {
+                        "slug":  "v5_c30",
+                        "path":  "volume_05/chapter_30",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 30"
+                    },
+                    {
+                        "slug":  "v5_c31",
+                        "path":  "volume_05/chapter_31",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 31"
+                    },
+                    {
+                        "slug":  "v6_c32",
+                        "path":  "volume_06/chapter_32",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 32"
+                    },
+                    {
+                        "slug":  "v6_c33",
+                        "path":  "volume_06/chapter_33",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 33"
+                    },
+                    {
+                        "slug":  "v6_c34",
+                        "path":  "volume_06/chapter_34",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 34"
+                    },
+                    {
+                        "slug":  "v6_c35",
+                        "path":  "volume_06/chapter_35",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 35"
+                    },
+                    {
+                        "slug":  "v6_c36",
+                        "path":  "volume_06/chapter_36",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 36"
+                    },
+                    {
+                        "slug":  "v6_c37",
+                        "path":  "volume_06/chapter_37",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 37"
+                    },
+                    {
+                        "slug":  "v6_c38",
+                        "path":  "volume_06/chapter_38",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 38"
+                    },
+                    {
+                        "slug":  "v6_c39",
+                        "path":  "volume_06/chapter_39",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 39"
+                    },
+                    {
+                        "slug":  "v7_c40",
+                        "path":  "volume_07/chapter_40",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 40"
+                    },
+                    {
+                        "slug":  "v7_c41",
+                        "path":  "volume_07/chapter_41",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 41"
+                    },
+                    {
+                        "slug":  "v7_c42",
+                        "path":  "volume_07/chapter_42",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 42"
+                    },
+                    {
+                        "slug":  "v7_c43",
+                        "path":  "volume_07/chapter_43",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 43"
+                    },
+                    {
+                        "slug":  "v7_c44",
+                        "path":  "volume_07/chapter_44",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 44"
+                    },
+                    {
+                        "slug":  "v7_c45",
+                        "path":  "volume_07/chapter_45",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 45"
+                    },
+                    {
+                        "slug":  "v7_c46",
+                        "path":  "volume_07/chapter_46",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 46"
+                    },
+                    {
+                        "slug":  "v7_c47",
+                        "path":  "volume_07/chapter_47",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 47"
+                    },
+                    {
+                        "slug":  "v8_c48",
+                        "path":  "volume_08/chapter_48",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 48"
+                    },
+                    {
+                        "slug":  "v8_c49",
+                        "path":  "volume_08/chapter_49",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 49"
+                    },
+                    {
+                        "slug":  "v8_c50",
+                        "path":  "volume_08/chapter_50",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 50"
+                    },
+                    {
+                        "slug":  "v8_c51",
+                        "path":  "volume_08/chapter_51",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 51"
+                    },
+                    {
+                        "slug":  "v8_c52",
+                        "path":  "volume_08/chapter_52",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 52"
+                    },
+                    {
+                        "slug":  "v8_c53",
+                        "path":  "volume_08/chapter_53",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 53"
+                    },
+                    {
+                        "slug":  "v9_c54",
+                        "path":  "volume_09/chapter_54",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 54"
+                    },
+                    {
+                        "slug":  "v9_c55",
+                        "path":  "volume_09/chapter_55",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 55"
+                    },
+                    {
+                        "slug":  "v9_c56",
+                        "path":  "volume_09/chapter_56",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 56"
+                    },
+                    {
+                        "slug":  "v9_c57",
+                        "path":  "volume_09/chapter_57",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 57"
+                    },
+                    {
+                        "slug":  "v9_c58",
+                        "path":  "volume_09/chapter_58",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 58"
+                    },
+                    {
+                        "slug":  "v9_c59",
+                        "path":  "volume_09/chapter_59",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 59"
+                    },
+                    {
+                        "slug":  "v9_c60",
+                        "path":  "volume_09/chapter_60",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 60"
+                    },
+                    {
+                        "slug":  "v9_c61",
+                        "path":  "volume_09/chapter_61",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 61"
+                    },
+                    {
+                        "slug":  "v10_c62",
+                        "path":  "volume_10/chapter_62",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 62"
+                    },
+                    {
+                        "slug":  "v10_c63",
+                        "path":  "volume_10/chapter_63",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 63"
+                    },
+                    {
+                        "slug":  "v10_c64",
+                        "path":  "volume_10/chapter_64",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 64"
+                    },
+                    {
+                        "slug":  "v10_c65",
+                        "path":  "volume_10/chapter_65",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 65"
+                    },
+                    {
+                        "slug":  "v10_c66",
+                        "path":  "volume_10/chapter_66",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 66"
+                    },
+                    {
+                        "slug":  "v10_c67",
+                        "path":  "volume_10/chapter_67",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 67"
+                    },
+                    {
+                        "slug":  "v10_c68",
+                        "path":  "volume_10/chapter_68",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 68"
+                    },
+                    {
+                        "slug":  "v11_c69",
+                        "path":  "volume_11/chapter_69",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 69"
+                    },
+                    {
+                        "slug":  "v11_c70",
+                        "path":  "volume_11/chapter_70",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 70"
+                    },
+                    {
+                        "slug":  "v11_c71",
+                        "path":  "volume_11/chapter_71",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 71"
+                    },
+                    {
+                        "slug":  "v11_c72",
+                        "path":  "volume_11/chapter_72",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 72"
+                    },
+                    {
+                        "slug":  "v11_c73",
+                        "path":  "volume_11/chapter_73",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 73"
+                    },
+                    {
+                        "slug":  "v11_c74",
+                        "path":  "volume_11/chapter_74",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 74"
+                    },
+                    {
+                        "slug":  "v11_c75",
+                        "path":  "volume_11/chapter_75",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 75"
+                    },
+                    {
+                        "slug":  "v11_c76",
+                        "path":  "volume_11/chapter_76",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 76"
+                    },
+                    {
+                        "slug":  "v12_c77",
+                        "path":  "volume_12/chapter_77",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 77"
+                    },
+                    {
+                        "slug":  "v12_c78",
+                        "path":  "volume_12/chapter_78",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 78"
+                    },
+                    {
+                        "slug":  "v12_c79",
+                        "path":  "volume_12/chapter_79",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 79"
+                    },
+                    {
+                        "slug":  "v12_c80",
+                        "path":  "volume_12/chapter_80",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 80"
+                    },
+                    {
+                        "slug":  "v12_c81",
+                        "path":  "volume_12/chapter_81",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 81"
+                    },
+                    {
+                        "slug":  "v12_c82",
+                        "path":  "volume_12/chapter_82",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 82"
+                    },
+                    {
+                        "slug":  "v12_c83",
+                        "path":  "volume_12/chapter_83",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 83"
+                    },
+                    {
+                        "slug":  "v13_c84",
+                        "path":  "volume_13/chapter_84",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 84"
+                    },
+                    {
+                        "slug":  "v13_c85",
+                        "path":  "volume_13/chapter_85",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 85"
+                    },
+                    {
+                        "slug":  "v13_c86",
+                        "path":  "volume_13/chapter_86",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 86"
+                    },
+                    {
+                        "slug":  "v13_c87",
+                        "path":  "volume_13/chapter_87",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 87"
+                    },
+                    {
+                        "slug":  "v13_c88",
+                        "path":  "volume_13/chapter_88",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 88"
+                    },
+                    {
+                        "slug":  "v13_c89",
+                        "path":  "volume_13/chapter_89",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 89"
+                    },
+                    {
+                        "slug":  "v13_c90",
+                        "path":  "volume_13/chapter_90",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 90"
+                    },
+                    {
+                        "slug":  "v14_c91",
+                        "path":  "volume_14/chapter_91",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 91"
+                    },
+                    {
+                        "slug":  "v14_c92",
+                        "path":  "volume_14/chapter_92",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 92"
+                    },
+                    {
+                        "slug":  "v14_c93",
+                        "path":  "volume_14/chapter_93",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 93"
+                    },
+                    {
+                        "slug":  "v14_c94",
+                        "path":  "volume_14/chapter_94",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 94"
+                    },
+                    {
+                        "slug":  "v14_c95",
+                        "path":  "volume_14/chapter_95",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 95"
+                    },
+                    {
+                        "slug":  "v14_c96",
+                        "path":  "volume_14/chapter_96",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 96"
+                    },
+                    {
+                        "slug":  "v14_c97",
+                        "path":  "volume_14/chapter_97",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 97"
+                    },
+                    {
+                        "slug":  "v15_c98",
+                        "path":  "volume_15/chapter_98",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 98"
+                    },
+                    {
+                        "slug":  "v15_c99",
+                        "path":  "volume_15/chapter_99",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 99"
+                    },
+                    {
+                        "slug":  "v15_c100",
+                        "path":  "volume_15/chapter_100",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 100"
+                    },
+                    {
+                        "slug":  "v15_c101",
+                        "path":  "volume_15/chapter_101",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 101"
+                    },
+                    {
+                        "slug":  "v15_c102",
+                        "path":  "volume_15/chapter_102",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 102"
+                    },
+                    {
+                        "slug":  "v15_c103",
+                        "path":  "volume_15/chapter_103",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 103"
+                    },
+                    {
+                        "slug":  "v15_c104",
+                        "path":  "volume_15/chapter_104",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 104"
+                    },
+                    {
+                        "slug":  "v16_c105",
+                        "path":  "volume_16/chapter_105",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 105"
+                    },
+                    {
+                        "slug":  "v16_c106",
+                        "path":  "volume_16/chapter_106",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 106"
+                    },
+                    {
+                        "slug":  "v16_c107",
+                        "path":  "volume_16/chapter_107",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 107"
+                    },
+                    {
+                        "slug":  "v16_c108",
+                        "path":  "volume_16/chapter_108",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 108"
+                    },
+                    {
+                        "slug":  "v16_c109",
+                        "path":  "volume_16/chapter_109",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 109"
+                    },
+                    {
+                        "slug":  "v16_c110",
+                        "path":  "volume_16/chapter_110",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 110"
+                    },
+                    {
+                        "slug":  "v16_c111",
+                        "path":  "volume_16/chapter_111",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 111"
+                    },
+                    {
+                        "slug":  "v17_c112",
+                        "path":  "volume_17/chapter_112",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 112"
+                    },
+                    {
+                        "slug":  "v17_c113",
+                        "path":  "volume_17/chapter_113",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 113"
+                    },
+                    {
+                        "slug":  "v17_c114",
+                        "path":  "volume_17/chapter_114",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 114"
+                    },
+                    {
+                        "slug":  "v17_c115",
+                        "path":  "volume_17/chapter_115",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 115"
+                    },
+                    {
+                        "slug":  "v17_c116",
+                        "path":  "volume_17/chapter_116",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 116"
+                    },
+                    {
+                        "slug":  "v17_c117",
+                        "path":  "volume_17/chapter_117",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 117"
+                    },
+                    {
+                        "slug":  "v17_c118",
+                        "path":  "volume_17/chapter_118",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 118"
+                    },
+                    {
+                        "slug":  "v18_c119",
+                        "path":  "volume_18/chapter_119",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 119"
+                    },
+                    {
+                        "slug":  "v18_c120",
+                        "path":  "volume_18/chapter_120",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 120"
+                    },
+                    {
+                        "slug":  "v18_c121",
+                        "path":  "volume_18/chapter_121",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 121"
+                    },
+                    {
+                        "slug":  "v18_c122",
+                        "path":  "volume_18/chapter_122",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 122"
+                    },
+                    {
+                        "slug":  "v18_c123",
+                        "path":  "volume_18/chapter_123",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 123"
+                    },
+                    {
+                        "slug":  "v18_c124",
+                        "path":  "volume_18/chapter_124",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 124"
+                    },
+                    {
+                        "slug":  "v18_c125",
+                        "path":  "volume_18/chapter_125",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 125"
+                    },
+                    {
+                        "slug":  "v18_c126",
+                        "path":  "volume_18/chapter_126",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 126"
                     }
                 ]
 }, {
@@ -8917,67 +9639,12 @@
         { "slug": "chapter_11", "path": "book_1/chapter_11", "type": "chapter", "subtitle": "Chapter 11" }
       ]
     },{
-    "id":  6363,
-    "slug":  "Nozoki_Ana",
-    "display":  "Nozoki Ana",
-    "top_pill":  true,
-    "source":  "d",
-    "entries":  [
-                    {
-                        "slug":  "v1_c1",
-                        "path":  "volume_1/chapter_1",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 1"
-                    },
-                    {
-                        "slug":  "v1_c2",
-                        "path":  "volume_1/chapter_2",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 2"
-                    },
-                    {
-                        "slug":  "v1_c3",
-                        "path":  "volume_1/chapter_3",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 3"
-                    },
-                    {
-                        "slug":  "v1_c4",
-                        "path":  "volume_1/chapter_4",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 4"
-                    },
-                    {
-                        "slug":  "v1_c5",
-                        "path":  "volume_1/chapter_5",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 5"
-                    },
-                    {
-                        "slug":  "v1_c6",
-                        "path":  "volume_1/chapter_6",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 6"
-                    },
-                    {
-                        "slug":  "v1_c7",
-                        "path":  "volume_1/chapter_7",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 7"
-                    },
-                    {
-                        "slug":  "v1_c8",
-                        "path":  "volume_1/chapter_8",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 8"
-                    },
-                    {
-                        "slug":  "v1_c9",
-                        "path":  "volume_1/chapter_9",
-                        "type":  "chapter",
-                        "subtitle":  "Volume 1 - Chapter 9"
-                    }
-                ]
+  "id": 60401,
+  "slug": "Nozoki_Ana",
+  "display": "Nozoki Ana",
+  "top_pill": true,
+  "source": "e",
+  "manifest": "manifests/Nozoki_Ana.json"
 },{
     "id":  3212026,
     "slug":  "BASTARD!!",
@@ -9054,11 +9721,11 @@
     { "slug": "v1_c10", "path": "volume_1/chapter_10", "type": "chapter", "subtitle": "Volume 1 - Chapter 10" }
   ]
 },{
-    "id":  425,
+    "id":  4021578,
     "slug":  "Nana_to_Kaoru",
     "display":  "Nana to Kaoru",
     "top_pill":  true,
-    "source":  "d",
+    "source":  "e",
     "entries":  [
                     {
                         "slug":  "v1_c1",
@@ -9107,6 +9774,900 @@
                         "path":  "volume_1/chapter_8",
                         "type":  "chapter",
                         "subtitle":  "Volume 1 - Chapter 8"
+                    },
+                    {
+                        "slug":  "v2_c9",
+                        "path":  "volume_2/chapter_9",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 9"
+                    },
+                    {
+                        "slug":  "v2_c10",
+                        "path":  "volume_2/chapter_10",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 10"
+                    },
+                    {
+                        "slug":  "v2_c11",
+                        "path":  "volume_2/chapter_11",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 11"
+                    },
+                    {
+                        "slug":  "v2_c12",
+                        "path":  "volume_2/chapter_12",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 12"
+                    },
+                    {
+                        "slug":  "v2_c13",
+                        "path":  "volume_2/chapter_13",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 13"
+                    },
+                    {
+                        "slug":  "v2_c14",
+                        "path":  "volume_2/chapter_14",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 14"
+                    },
+                    {
+                        "slug":  "v3_i3",
+                        "path":  "volume_3/Vol.03 Ch.0015 - A Rope, Again (gb) [Free Time]",
+                        "type":  "chapter",
+                        "subtitle":  "Vol.03 Ch.0015 - A Rope, Again (gb) [Free Time]"
+                    },
+                    {
+                        "slug":  "v3_i3",
+                        "path":  "volume_3/Vol.03 Ch.0016 - Flowers (gb) [Free Time]",
+                        "type":  "chapter",
+                        "subtitle":  "Vol.03 Ch.0016 - Flowers (gb) [Free Time]"
+                    },
+                    {
+                        "slug":  "v3_i3",
+                        "path":  "volume_3/Vol.03 Ch.0017 - Premonitions of a Three-Way (gb) [Free Time]",
+                        "type":  "chapter",
+                        "subtitle":  "Vol.03 Ch.0017 - Premonitions Of A Three-Way (gb) [Free Time]"
+                    },
+                    {
+                        "slug":  "v3_i3",
+                        "path":  "volume_3/Vol.03 Ch.0018 - Preparations for a three-way (gb) [Free Time]",
+                        "type":  "chapter",
+                        "subtitle":  "Vol.03 Ch.0018 - Preparations For A Three-way (gb) [Free Time]"
+                    },
+                    {
+                        "slug":  "v3_i3",
+                        "path":  "volume_3/Vol.03 Ch.0018.5 - Special 3 (gb) [Nomad Scans]",
+                        "type":  "chapter",
+                        "subtitle":  "Vol.03 Ch.0018.5 - Special 3 (gb) [Nomad Scans]"
+                    },
+                    {
+                        "slug":  "v3_i3",
+                        "path":  "volume_3/Vol.03 Ch.0019 - Starting on the 3P (gb) [Free Time]",
+                        "type":  "chapter",
+                        "subtitle":  "Vol.03 Ch.0019 - Starting On The 3P (gb) [Free Time]"
+                    },
+                    {
+                        "slug":  "v3_i3",
+                        "path":  "volume_3/Vol.03 Ch.0020 - Abandoning The Threeway (gb) [Free Time]",
+                        "type":  "chapter",
+                        "subtitle":  "Vol.03 Ch.0020 - Abandoning The Threeway (gb) [Free Time]"
+                    },
+                    {
+                        "slug":  "v3_i3",
+                        "path":  "volume_3/Vol.03 Ch.0021 - Piss Panic Pinch (gb) [Free Time]",
+                        "type":  "chapter",
+                        "subtitle":  "Vol.03 Ch.0021 - Piss Panic Pinch (gb) [Free Time]"
+                    },
+                    {
+                        "slug":  "v4_c22",
+                        "path":  "volume_4/chapter_22",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 22"
+                    },
+                    {
+                        "slug":  "v4_c23",
+                        "path":  "volume_4/chapter_23",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 23"
+                    },
+                    {
+                        "slug":  "v4_c24",
+                        "path":  "volume_4/chapter_24",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 24"
+                    },
+                    {
+                        "slug":  "v4_c25",
+                        "path":  "volume_4/chapter_25",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 25"
+                    },
+                    {
+                        "slug":  "v4_c26",
+                        "path":  "volume_4/chapter_26",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 26"
+                    },
+                    {
+                        "slug":  "v4_c27",
+                        "path":  "volume_4/chapter_27",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 27"
+                    },
+                    {
+                        "slug":  "v4_c28",
+                        "path":  "volume_4/chapter_28",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 28"
+                    },
+                    {
+                        "slug":  "v4_c29",
+                        "path":  "volume_4/chapter_29",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 29"
+                    },
+                    {
+                        "slug":  "v5_c30",
+                        "path":  "volume_5/chapter_30",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 30"
+                    },
+                    {
+                        "slug":  "v5_c31",
+                        "path":  "volume_5/chapter_31",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 31"
+                    },
+                    {
+                        "slug":  "v5_c32",
+                        "path":  "volume_5/chapter_32",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 32"
+                    },
+                    {
+                        "slug":  "v5_c33",
+                        "path":  "volume_5/chapter_33",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 33"
+                    },
+                    {
+                        "slug":  "v5_c34",
+                        "path":  "volume_5/chapter_34",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 34"
+                    },
+                    {
+                        "slug":  "v5_c35",
+                        "path":  "volume_5/chapter_35",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 35"
+                    },
+                    {
+                        "slug":  "v5_c36",
+                        "path":  "volume_5/chapter_36",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 36"
+                    },
+                    {
+                        "slug":  "v5_c37",
+                        "path":  "volume_5/chapter_37",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 37"
+                    },
+                    {
+                        "slug":  "v5_c38",
+                        "path":  "volume_5/chapter_38",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 38"
+                    },
+                    {
+                        "slug":  "v6_c39",
+                        "path":  "volume_6/chapter_39",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 39"
+                    },
+                    {
+                        "slug":  "v6_c40",
+                        "path":  "volume_6/chapter_40",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 40"
+                    },
+                    {
+                        "slug":  "v6_c41",
+                        "path":  "volume_6/chapter_41",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 41"
+                    },
+                    {
+                        "slug":  "v6_c42",
+                        "path":  "volume_6/chapter_42",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 42"
+                    },
+                    {
+                        "slug":  "v6_c43",
+                        "path":  "volume_6/chapter_43",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 43"
+                    },
+                    {
+                        "slug":  "v6_c44",
+                        "path":  "volume_6/chapter_44",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 44"
+                    },
+                    {
+                        "slug":  "v6_c45",
+                        "path":  "volume_6/chapter_45",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 45"
+                    },
+                    {
+                        "slug":  "v6_c46",
+                        "path":  "volume_6/chapter_46",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 46"
+                    },
+                    {
+                        "slug":  "v6_c47",
+                        "path":  "volume_6/chapter_47",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 47"
+                    },
+                    {
+                        "slug":  "v7_c48",
+                        "path":  "volume_7/chapter_48",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 48"
+                    },
+                    {
+                        "slug":  "v7_c49",
+                        "path":  "volume_7/chapter_49",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 49"
+                    },
+                    {
+                        "slug":  "v7_c50",
+                        "path":  "volume_7/chapter_50",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 50"
+                    },
+                    {
+                        "slug":  "v7_c51",
+                        "path":  "volume_7/chapter_51",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 51"
+                    },
+                    {
+                        "slug":  "v7_c52",
+                        "path":  "volume_7/chapter_52",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 52"
+                    },
+                    {
+                        "slug":  "v7_c53",
+                        "path":  "volume_7/chapter_53",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 53"
+                    },
+                    {
+                        "slug":  "v7_c54",
+                        "path":  "volume_7/chapter_54",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 54"
+                    },
+                    {
+                        "slug":  "v7_c55",
+                        "path":  "volume_7/chapter_55",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 55"
+                    },
+                    {
+                        "slug":  "v7_c56",
+                        "path":  "volume_7/chapter_56",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 56"
+                    },
+                    {
+                        "slug":  "v8_c57",
+                        "path":  "volume_8/chapter_57",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 57"
+                    },
+                    {
+                        "slug":  "v8_c58",
+                        "path":  "volume_8/chapter_58",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 58"
+                    },
+                    {
+                        "slug":  "v8_c59",
+                        "path":  "volume_8/chapter_59",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 59"
+                    },
+                    {
+                        "slug":  "v8_c60",
+                        "path":  "volume_8/chapter_60",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 60"
+                    },
+                    {
+                        "slug":  "v8_c61",
+                        "path":  "volume_8/chapter_61",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 61"
+                    },
+                    {
+                        "slug":  "v8_c62",
+                        "path":  "volume_8/chapter_62",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 62"
+                    },
+                    {
+                        "slug":  "v8_c63",
+                        "path":  "volume_8/chapter_63",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 63"
+                    },
+                    {
+                        "slug":  "v8_c64",
+                        "path":  "volume_8/chapter_64",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 64"
+                    },
+                    {
+                        "slug":  "v8_c65",
+                        "path":  "volume_8/chapter_65",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 65"
+                    },
+                    {
+                        "slug":  "v9_c66",
+                        "path":  "volume_9/chapter_66",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 66"
+                    },
+                    {
+                        "slug":  "v9_c67",
+                        "path":  "volume_9/chapter_67",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 67"
+                    },
+                    {
+                        "slug":  "v9_c68",
+                        "path":  "volume_9/chapter_68",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 68"
+                    },
+                    {
+                        "slug":  "v9_c69",
+                        "path":  "volume_9/chapter_69",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 69"
+                    },
+                    {
+                        "slug":  "v9_c70",
+                        "path":  "volume_9/chapter_70",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 70"
+                    },
+                    {
+                        "slug":  "v9_c71",
+                        "path":  "volume_9/chapter_71",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 71"
+                    },
+                    {
+                        "slug":  "v9_c72",
+                        "path":  "volume_9/chapter_72",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 72"
+                    },
+                    {
+                        "slug":  "v9_c73",
+                        "path":  "volume_9/chapter_73",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 73"
+                    },
+                    {
+                        "slug":  "v9_c74",
+                        "path":  "volume_9/chapter_74",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 74"
+                    },
+                    {
+                        "slug":  "v10_c75",
+                        "path":  "volume_10/chapter_75",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 75"
+                    },
+                    {
+                        "slug":  "v10_c76",
+                        "path":  "volume_10/chapter_76",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 76"
+                    },
+                    {
+                        "slug":  "v10_c77",
+                        "path":  "volume_10/chapter_77",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 77"
+                    },
+                    {
+                        "slug":  "v10_c78",
+                        "path":  "volume_10/chapter_78",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 78"
+                    },
+                    {
+                        "slug":  "v10_c79",
+                        "path":  "volume_10/chapter_79",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 79"
+                    },
+                    {
+                        "slug":  "v10_c80",
+                        "path":  "volume_10/chapter_80",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 80"
+                    },
+                    {
+                        "slug":  "v10_c81",
+                        "path":  "volume_10/chapter_81",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 81"
+                    },
+                    {
+                        "slug":  "v10_c82",
+                        "path":  "volume_10/chapter_82",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 82"
+                    },
+                    {
+                        "slug":  "v10_c83",
+                        "path":  "volume_10/chapter_83",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 83"
+                    },
+                    {
+                        "slug":  "v11_c84",
+                        "path":  "volume_11/chapter_84",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 84"
+                    },
+                    {
+                        "slug":  "v11_c85",
+                        "path":  "volume_11/chapter_85",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 85"
+                    },
+                    {
+                        "slug":  "v11_c86",
+                        "path":  "volume_11/chapter_86",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 86"
+                    },
+                    {
+                        "slug":  "v11_c87",
+                        "path":  "volume_11/chapter_87",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 87"
+                    },
+                    {
+                        "slug":  "v11_c88",
+                        "path":  "volume_11/chapter_88",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 88"
+                    },
+                    {
+                        "slug":  "v11_c89",
+                        "path":  "volume_11/chapter_89",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 89"
+                    },
+                    {
+                        "slug":  "v11_c90",
+                        "path":  "volume_11/chapter_90",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 90"
+                    },
+                    {
+                        "slug":  "v11_c91",
+                        "path":  "volume_11/chapter_91",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 91"
+                    },
+                    {
+                        "slug":  "v12_c92",
+                        "path":  "volume_12/chapter_92",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 92"
+                    },
+                    {
+                        "slug":  "v12_c93",
+                        "path":  "volume_12/chapter_93",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 93"
+                    },
+                    {
+                        "slug":  "v12_c94",
+                        "path":  "volume_12/chapter_94",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 94"
+                    },
+                    {
+                        "slug":  "v12_c95",
+                        "path":  "volume_12/chapter_95",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 95"
+                    },
+                    {
+                        "slug":  "v12_c96",
+                        "path":  "volume_12/chapter_96",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 96"
+                    },
+                    {
+                        "slug":  "v12_c97",
+                        "path":  "volume_12/chapter_97",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 97"
+                    },
+                    {
+                        "slug":  "v12_c98",
+                        "path":  "volume_12/chapter_98",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 98"
+                    },
+                    {
+                        "slug":  "v12_c99",
+                        "path":  "volume_12/chapter_99",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 99"
+                    },
+                    {
+                        "slug":  "v12_c100",
+                        "path":  "volume_12/chapter_100",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 100"
+                    },
+                    {
+                        "slug":  "v12_c101",
+                        "path":  "volume_12/chapter_101",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 101"
+                    },
+                    {
+                        "slug":  "v13_c102",
+                        "path":  "volume_13/chapter_102",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 102"
+                    },
+                    {
+                        "slug":  "v13_c103",
+                        "path":  "volume_13/chapter_103",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 103"
+                    },
+                    {
+                        "slug":  "v13_c104",
+                        "path":  "volume_13/chapter_104",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 104"
+                    },
+                    {
+                        "slug":  "v13_c105",
+                        "path":  "volume_13/chapter_105",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 105"
+                    },
+                    {
+                        "slug":  "v13_c106",
+                        "path":  "volume_13/chapter_106",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 106"
+                    },
+                    {
+                        "slug":  "v13_c107",
+                        "path":  "volume_13/chapter_107",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 107"
+                    },
+                    {
+                        "slug":  "v13_c108",
+                        "path":  "volume_13/chapter_108",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 108"
+                    },
+                    {
+                        "slug":  "v13_c109",
+                        "path":  "volume_13/chapter_109",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 109"
+                    },
+                    {
+                        "slug":  "v13_c110",
+                        "path":  "volume_13/chapter_110",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 110"
+                    },
+                    {
+                        "slug":  "v14_c111",
+                        "path":  "volume_14/chapter_111",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 111"
+                    },
+                    {
+                        "slug":  "v14_c112",
+                        "path":  "volume_14/chapter_112",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 112"
+                    },
+                    {
+                        "slug":  "v14_c113",
+                        "path":  "volume_14/chapter_113",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 113"
+                    },
+                    {
+                        "slug":  "v14_c114",
+                        "path":  "volume_14/chapter_114",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 114"
+                    },
+                    {
+                        "slug":  "v14_c115",
+                        "path":  "volume_14/chapter_115",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 115"
+                    },
+                    {
+                        "slug":  "v14_c116",
+                        "path":  "volume_14/chapter_116",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 116"
+                    },
+                    {
+                        "slug":  "v14_c117",
+                        "path":  "volume_14/chapter_117",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 117"
+                    },
+                    {
+                        "slug":  "v14_c118",
+                        "path":  "volume_14/chapter_118",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 118"
+                    },
+                    {
+                        "slug":  "v14_c119",
+                        "path":  "volume_14/chapter_119",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 119"
+                    },
+                    {
+                        "slug":  "v15_c120",
+                        "path":  "volume_15/chapter_120",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 120"
+                    },
+                    {
+                        "slug":  "v15_c121",
+                        "path":  "volume_15/chapter_121",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 121"
+                    },
+                    {
+                        "slug":  "v15_c122",
+                        "path":  "volume_15/chapter_122",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 122"
+                    },
+                    {
+                        "slug":  "v15_c123",
+                        "path":  "volume_15/chapter_123",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 123"
+                    },
+                    {
+                        "slug":  "v15_c124",
+                        "path":  "volume_15/chapter_124",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 124"
+                    },
+                    {
+                        "slug":  "v15_c125",
+                        "path":  "volume_15/chapter_125",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 125"
+                    },
+                    {
+                        "slug":  "v15_c126",
+                        "path":  "volume_15/chapter_126",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 126"
+                    },
+                    {
+                        "slug":  "v15_c127",
+                        "path":  "volume_15/chapter_127",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 127"
+                    },
+                    {
+                        "slug":  "v15_c128",
+                        "path":  "volume_15/chapter_128",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 15 - Chapter 128"
+                    },
+                    {
+                        "slug":  "v16_c129",
+                        "path":  "volume_16/chapter_129",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 129"
+                    },
+                    {
+                        "slug":  "v16_c130",
+                        "path":  "volume_16/chapter_130",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 130"
+                    },
+                    {
+                        "slug":  "v16_c131",
+                        "path":  "volume_16/chapter_131",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 131"
+                    },
+                    {
+                        "slug":  "v16_c132",
+                        "path":  "volume_16/chapter_132",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 132"
+                    },
+                    {
+                        "slug":  "v16_c133",
+                        "path":  "volume_16/chapter_133",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 133"
+                    },
+                    {
+                        "slug":  "v16_c134",
+                        "path":  "volume_16/chapter_134",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 134"
+                    },
+                    {
+                        "slug":  "v16_c135",
+                        "path":  "volume_16/chapter_135",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 135"
+                    },
+                    {
+                        "slug":  "v16_c136",
+                        "path":  "volume_16/chapter_136",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 136"
+                    },
+                    {
+                        "slug":  "v16_c137",
+                        "path":  "volume_16/chapter_137",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 16 - Chapter 137"
+                    },
+                    {
+                        "slug":  "v17_c138",
+                        "path":  "volume_17/chapter_138",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 138"
+                    },
+                    {
+                        "slug":  "v17_c139",
+                        "path":  "volume_17/chapter_139",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 139"
+                    },
+                    {
+                        "slug":  "v17_c140",
+                        "path":  "volume_17/chapter_140",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 140"
+                    },
+                    {
+                        "slug":  "v17_c141",
+                        "path":  "volume_17/chapter_141",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 141"
+                    },
+                    {
+                        "slug":  "v17_c142",
+                        "path":  "volume_17/chapter_142",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 142"
+                    },
+                    {
+                        "slug":  "v17_c143",
+                        "path":  "volume_17/chapter_143",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 143"
+                    },
+                    {
+                        "slug":  "v17_c144",
+                        "path":  "volume_17/chapter_144",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 144"
+                    },
+                    {
+                        "slug":  "v17_c145",
+                        "path":  "volume_17/chapter_145",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 145"
+                    },
+                    {
+                        "slug":  "v17_c146",
+                        "path":  "volume_17/chapter_146",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 17 - Chapter 146"
+                    },
+                    {
+                        "slug":  "v18_c147",
+                        "path":  "volume_18/chapter_147",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 147"
+                    },
+                    {
+                        "slug":  "v18_c148",
+                        "path":  "volume_18/chapter_148",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 148"
+                    },
+                    {
+                        "slug":  "v18_c149",
+                        "path":  "volume_18/chapter_149",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 149"
+                    },
+                    {
+                        "slug":  "v18_c150",
+                        "path":  "volume_18/chapter_150",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 150"
+                    },
+                    {
+                        "slug":  "v18_c151",
+                        "path":  "volume_18/chapter_151",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 151"
+                    },
+                    {
+                        "slug":  "v18_c152",
+                        "path":  "volume_18/chapter_152",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 152"
+                    },
+                    {
+                        "slug":  "v18_c153",
+                        "path":  "volume_18/chapter_153",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 153"
+                    },
+                    {
+                        "slug":  "v18_c154",
+                        "path":  "volume_18/chapter_154",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 154"
+                    },
+                    {
+                        "slug":  "v18_c155",
+                        "path":  "volume_18/chapter_155",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 155"
+                    },
+                    {
+                        "slug":  "v18_c156",
+                        "path":  "volume_18/chapter_156",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 18 - Chapter 156"
                     }
                 ]
 },{
@@ -9389,6 +10950,86 @@
                         "subtitle":  "Volume 1 - Chapter 12"
                     }
                 ]
+},{
+  "id": 919,
+  "slug": "Nijigahara_Holograph",
+  "display": "Nijigahara Holograph",
+  "top_pill": true,
+  "source": "e",
+  "entries": [
+    {
+      "slug": "v1_c1",
+      "path": "volume_1/chapter_1",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 1"
+    },
+    {
+      "slug": "v1_c2",
+      "path": "volume_1/chapter_2",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 2"
+    },
+    {
+      "slug": "v1_c3",
+      "path": "volume_1/chapter_3",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 3"
+    },
+    {
+      "slug": "v1_c4",
+      "path": "volume_1/chapter_4",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 4"
+    },
+    {
+      "slug": "v1_c5",
+      "path": "volume_1/chapter_5",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 5"
+    },
+    {
+      "slug": "v1_c6",
+      "path": "volume_1/chapter_6",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 6"
+    },
+    {
+      "slug": "v1_c7",
+      "path": "volume_1/chapter_7",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 7"
+    },
+    {
+      "slug": "v1_c8",
+      "path": "volume_1/chapter_8",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 8"
+    },
+    {
+      "slug": "v1_c9",
+      "path": "volume_1/chapter_9",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 9"
+    },
+    {
+      "slug": "v1_c10",
+      "path": "volume_1/chapter_10",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 10"
+    },
+    {
+      "slug": "v1_c11",
+      "path": "volume_1/chapter_11",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 11"
+    },
+    {
+      "slug": "v1_c12",
+      "path": "volume_1/chapter_12",
+      "type": "chapter",
+      "subtitle": "Volume 1 - Chapter 12"
+    }
+  ]
 },
     {
     "id":  9161967,
@@ -13841,6 +15482,506 @@
         { "slug": "chapter_48", "path": "compendium/chapter_48", "type": "chapter", "subtitle": "Chapter 48" }
 ]
 },{
+    "id":  512013,
+    "slug":  "Dance_in_the_Vampire_Bund",
+    "display":  "Dance in the Vampire Bund",
+    "top_pill":  true,
+    "source":  "e",
+    "entries":  [
+                    {
+                        "slug":  "v1_c1",
+                        "path":  "volume_1/chapter_1",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 1"
+                    },
+                    {
+                        "slug":  "v1_c2",
+                        "path":  "volume_1/chapter_2",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 2"
+                    },
+                    {
+                        "slug":  "v1_c3",
+                        "path":  "volume_1/chapter_3",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 3"
+                    },
+                    {
+                        "slug":  "v1_c4",
+                        "path":  "volume_1/chapter_4",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 4"
+                    },
+                    {
+                        "slug":  "v1_c5",
+                        "path":  "volume_1/chapter_5",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 5"
+                    },
+                    {
+                        "slug":  "v1_c6",
+                        "path":  "volume_1/chapter_6",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 6"
+                    },
+                    {
+                        "slug":  "v2_c7",
+                        "path":  "volume_2/chapter_7",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 7"
+                    },
+                    {
+                        "slug":  "v2_c8",
+                        "path":  "volume_2/chapter_8",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 8"
+                    },
+                    {
+                        "slug":  "v2_c9",
+                        "path":  "volume_2/chapter_9",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 9"
+                    },
+                    {
+                        "slug":  "v2_c10",
+                        "path":  "volume_2/chapter_10",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 10"
+                    },
+                    {
+                        "slug":  "v2_c11",
+                        "path":  "volume_2/chapter_11",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 11"
+                    },
+                    {
+                        "slug":  "v2_c12",
+                        "path":  "volume_2/chapter_12",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 12"
+                    },
+                    {
+                        "slug":  "v3_c13",
+                        "path":  "volume_3/chapter_13",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 13"
+                    },
+                    {
+                        "slug":  "v3_c14",
+                        "path":  "volume_3/chapter_14",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 14"
+                    },
+                    {
+                        "slug":  "v3_c15",
+                        "path":  "volume_3/chapter_15",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 15"
+                    },
+                    {
+                        "slug":  "v3_c16",
+                        "path":  "volume_3/chapter_16",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 16"
+                    },
+                    {
+                        "slug":  "v3_c17",
+                        "path":  "volume_3/chapter_17",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 17"
+                    },
+                    {
+                        "slug":  "v3_c18",
+                        "path":  "volume_3/chapter_18",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 18"
+                    },
+                    {
+                        "slug":  "v3_c19",
+                        "path":  "volume_3/chapter_19",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 19"
+                    },
+                    {
+                        "slug":  "v4_c20",
+                        "path":  "volume_4/chapter_20",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 20"
+                    },
+                    {
+                        "slug":  "v4_c21",
+                        "path":  "volume_4/chapter_21",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 21"
+                    },
+                    {
+                        "slug":  "v4_c22",
+                        "path":  "volume_4/chapter_22",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 22"
+                    },
+                    {
+                        "slug":  "v4_c23",
+                        "path":  "volume_4/chapter_23",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 23"
+                    },
+                    {
+                        "slug":  "v4_c24",
+                        "path":  "volume_4/chapter_24",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 24"
+                    },
+                    {
+                        "slug":  "v5_c25",
+                        "path":  "volume_5/chapter_25",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 25"
+                    },
+                    {
+                        "slug":  "v5_c26",
+                        "path":  "volume_5/chapter_26",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 26"
+                    },
+                    {
+                        "slug":  "v5_c27",
+                        "path":  "volume_5/chapter_27",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 27"
+                    },
+                    {
+                        "slug":  "v5_c28",
+                        "path":  "volume_5/chapter_28",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 28"
+                    },
+                    {
+                        "slug":  "v5_c29",
+                        "path":  "volume_5/chapter_29",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 29"
+                    },
+                    {
+                        "slug":  "v5_c30",
+                        "path":  "volume_5/chapter_30",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 30"
+                    },
+                    {
+                        "slug":  "v5_c31",
+                        "path":  "volume_5/chapter_31",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 31"
+                    },
+                    {
+                        "slug":  "v6_c32",
+                        "path":  "volume_6/chapter_32",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 32"
+                    },
+                    {
+                        "slug":  "v6_c33",
+                        "path":  "volume_6/chapter_33",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 33"
+                    },
+                    {
+                        "slug":  "v6_c34",
+                        "path":  "volume_6/chapter_34",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 34"
+                    },
+                    {
+                        "slug":  "v6_c35",
+                        "path":  "volume_6/chapter_35",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 35"
+                    },
+                    {
+                        "slug":  "v6_c36",
+                        "path":  "volume_6/chapter_36",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 36"
+                    },
+                    {
+                        "slug":  "v6_c37",
+                        "path":  "volume_6/chapter_37",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 37"
+                    },
+                    {
+                        "slug":  "v7_c38",
+                        "path":  "volume_7/chapter_38",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 38"
+                    },
+                    {
+                        "slug":  "v7_c39",
+                        "path":  "volume_7/chapter_39",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 39"
+                    },
+                    {
+                        "slug":  "v7_c40",
+                        "path":  "volume_7/chapter_40",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 40"
+                    },
+                    {
+                        "slug":  "v7_c41",
+                        "path":  "volume_7/chapter_41",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 41"
+                    },
+                    {
+                        "slug":  "v7_c42",
+                        "path":  "volume_7/chapter_42",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 42"
+                    },
+                    {
+                        "slug":  "v7_c43",
+                        "path":  "volume_7/chapter_43",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 43"
+                    },
+                    {
+                        "slug":  "v8_c44",
+                        "path":  "volume_8/chapter_44",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 44"
+                    },
+                    {
+                        "slug":  "v8_c45",
+                        "path":  "volume_8/chapter_45",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 45"
+                    },
+                    {
+                        "slug":  "v8_c46",
+                        "path":  "volume_8/chapter_46",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 46"
+                    },
+                    {
+                        "slug":  "v8_c47",
+                        "path":  "volume_8/chapter_47",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 47"
+                    },
+                    {
+                        "slug":  "v8_c48",
+                        "path":  "volume_8/chapter_48",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 48"
+                    },
+                    {
+                        "slug":  "v8_c49",
+                        "path":  "volume_8/chapter_49",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 49"
+                    },
+                    {
+                        "slug":  "v9_c50",
+                        "path":  "volume_9/chapter_50",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 50"
+                    },
+                    {
+                        "slug":  "v9_c51",
+                        "path":  "volume_9/chapter_51",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 51"
+                    },
+                    {
+                        "slug":  "v9_c52",
+                        "path":  "volume_9/chapter_52",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 52"
+                    },
+                    {
+                        "slug":  "v9_c53",
+                        "path":  "volume_9/chapter_53",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 53"
+                    },
+                    {
+                        "slug":  "v10_c54",
+                        "path":  "volume_10/chapter_54",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 54"
+                    },
+                    {
+                        "slug":  "v10_c55",
+                        "path":  "volume_10/chapter_55",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 55"
+                    },
+                    {
+                        "slug":  "v10_c56",
+                        "path":  "volume_10/chapter_56",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 56"
+                    },
+                    {
+                        "slug":  "v10_c57",
+                        "path":  "volume_10/chapter_57",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 57"
+                    },
+                    {
+                        "slug":  "v10_c58",
+                        "path":  "volume_10/chapter_58",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 58"
+                    },
+                    {
+                        "slug":  "v10_c59",
+                        "path":  "volume_10/chapter_59",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 59"
+                    },
+                    {
+                        "slug":  "v11_c60",
+                        "path":  "volume_11/chapter_60",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 60"
+                    },
+                    {
+                        "slug":  "v11_c61",
+                        "path":  "volume_11/chapter_61",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 61"
+                    },
+                    {
+                        "slug":  "v11_c62",
+                        "path":  "volume_11/chapter_62",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 62"
+                    },
+                    {
+                        "slug":  "v11_c63",
+                        "path":  "volume_11/chapter_63",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 63"
+                    },
+                    {
+                        "slug":  "v11_c64",
+                        "path":  "volume_11/chapter_64",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 64"
+                    },
+                    {
+                        "slug":  "v12_c65",
+                        "path":  "volume_12/chapter_65",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 65"
+                    },
+                    {
+                        "slug":  "v12_c66",
+                        "path":  "volume_12/chapter_66",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 66"
+                    },
+                    {
+                        "slug":  "v12_c67",
+                        "path":  "volume_12/chapter_67",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 67"
+                    },
+                    {
+                        "slug":  "v12_c68",
+                        "path":  "volume_12/chapter_68",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 68"
+                    },
+                    {
+                        "slug":  "v12_c69",
+                        "path":  "volume_12/chapter_69",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 69"
+                    },
+                    {
+                        "slug":  "v12_c70",
+                        "path":  "volume_12/chapter_70",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 70"
+                    },
+                    {
+                        "slug":  "v13_c71",
+                        "path":  "volume_13/chapter_71",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 71"
+                    },
+                    {
+                        "slug":  "v13_c72",
+                        "path":  "volume_13/chapter_72",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 72"
+                    },
+                    {
+                        "slug":  "v13_c73",
+                        "path":  "volume_13/chapter_73",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 73"
+                    },
+                    {
+                        "slug":  "v13_c74",
+                        "path":  "volume_13/chapter_74",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 74"
+                    },
+                    {
+                        "slug":  "v13_c75",
+                        "path":  "volume_13/chapter_75",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 75"
+                    },
+                    {
+                        "slug":  "v14_c76",
+                        "path":  "volume_14/chapter_76",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 76"
+                    },
+                    {
+                        "slug":  "v14_c77",
+                        "path":  "volume_14/chapter_77",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 77"
+                    },
+                    {
+                        "slug":  "v14_c78",
+                        "path":  "volume_14/chapter_78",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 78"
+                    },
+                    {
+                        "slug":  "v14_c79",
+                        "path":  "volume_14/chapter_79",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 79"
+                    },
+                    {
+                        "slug":  "v14_c80",
+                        "path":  "volume_14/chapter_80",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 80"
+                    },
+                    {
+                        "slug":  "v14_c81",
+                        "path":  "volume_14/chapter_81",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 81"
+                    },
+                    {
+                        "slug":  "v14_c82",
+                        "path":  "volume_14/chapter_82",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 82"
+                    }
+                ]
+}, {
     "id":  219,
     "slug":  "To_Love-Ru_Darkness",
     "display":  "To Love Ru Darkness",
@@ -15133,6 +17274,992 @@
                         "path":  "volume_12/chapter_118",
                         "type":  "chapter",
                         "subtitle":  "Volume 12 - Chapter 118"
+                    }
+                ]
+},{
+    "id":  315124,
+    "slug":  "The_World_is_Mine",
+    "display":  "The World is Mine",
+    "top_pill":  true,
+    "source":  "e",
+    "entries":  [
+                    {
+                        "slug":  "v1_c1",
+                        "path":  "volume_1/chapter_1",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 1"
+                    },
+                    {
+                        "slug":  "v1_c2",
+                        "path":  "volume_1/chapter_2",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 2"
+                    },
+                    {
+                        "slug":  "v1_c3",
+                        "path":  "volume_1/chapter_3",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 3"
+                    },
+                    {
+                        "slug":  "v1_c4",
+                        "path":  "volume_1/chapter_4",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 4"
+                    },
+                    {
+                        "slug":  "v1_c5",
+                        "path":  "volume_1/chapter_5",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 5"
+                    },
+                    {
+                        "slug":  "v1_c6",
+                        "path":  "volume_1/chapter_6",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 6"
+                    },
+                    {
+                        "slug":  "v1_c7",
+                        "path":  "volume_1/chapter_7",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 7"
+                    },
+                    {
+                        "slug":  "v1_c8",
+                        "path":  "volume_1/chapter_8",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 8"
+                    },
+                    {
+                        "slug":  "v2_i9",
+                        "path":  "volume_2/chapterme_9",
+                        "type":  "chapter",
+                        "subtitle":  "Chapterme 9"
+                    },
+                    {
+                        "slug":  "v2_c10",
+                        "path":  "volume_2/chapter_10",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 10"
+                    },
+                    {
+                        "slug":  "v2_c11",
+                        "path":  "volume_2/chapter_11",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 11"
+                    },
+                    {
+                        "slug":  "v2_c12",
+                        "path":  "volume_2/chapter_12",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 12"
+                    },
+                    {
+                        "slug":  "v2_c13",
+                        "path":  "volume_2/chapter_13",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 13"
+                    },
+                    {
+                        "slug":  "v2_c14",
+                        "path":  "volume_2/chapter_14",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 14"
+                    },
+                    {
+                        "slug":  "v2_c15",
+                        "path":  "volume_2/chapter_15",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 15"
+                    },
+                    {
+                        "slug":  "v2_c16",
+                        "path":  "volume_2/chapter_16",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 16"
+                    },
+                    {
+                        "slug":  "v2_c17",
+                        "path":  "volume_2/chapter_17",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 17"
+                    },
+                    {
+                        "slug":  "v2_c18",
+                        "path":  "volume_2/chapter_18",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 18"
+                    },
+                    {
+                        "slug":  "v2_c19",
+                        "path":  "volume_2/chapter_19",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 2 - Chapter 19"
+                    },
+                    {
+                        "slug":  "v3_c20",
+                        "path":  "volume_3/chapter_20",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 20"
+                    },
+                    {
+                        "slug":  "v3_c21",
+                        "path":  "volume_3/chapter_21",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 21"
+                    },
+                    {
+                        "slug":  "v3_c22",
+                        "path":  "volume_3/chapter_22",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 22"
+                    },
+                    {
+                        "slug":  "v3_c23",
+                        "path":  "volume_3/chapter_23",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 23"
+                    },
+                    {
+                        "slug":  "v3_c24",
+                        "path":  "volume_3/chapter_24",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 24"
+                    },
+                    {
+                        "slug":  "v3_c25",
+                        "path":  "volume_3/chapter_25",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 25"
+                    },
+                    {
+                        "slug":  "v3_c26",
+                        "path":  "volume_3/chapter_26",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 26"
+                    },
+                    {
+                        "slug":  "v3_c27",
+                        "path":  "volume_3/chapter_27",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 27"
+                    },
+                    {
+                        "slug":  "v3_c28",
+                        "path":  "volume_3/chapter_28",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 28"
+                    },
+                    {
+                        "slug":  "v3_c29",
+                        "path":  "volume_3/chapter_29",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 29"
+                    },
+                    {
+                        "slug":  "v3_c30",
+                        "path":  "volume_3/chapter_30",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 30"
+                    },
+                    {
+                        "slug":  "v3_c31",
+                        "path":  "volume_3/chapter_31",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 3 - Chapter 31"
+                    },
+                    {
+                        "slug":  "v4_c32",
+                        "path":  "volume_4/chapter_32",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 32"
+                    },
+                    {
+                        "slug":  "v4_c33",
+                        "path":  "volume_4/chapter_33",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 33"
+                    },
+                    {
+                        "slug":  "v4_c34",
+                        "path":  "volume_4/chapter_34",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 34"
+                    },
+                    {
+                        "slug":  "v4_c35",
+                        "path":  "volume_4/chapter_35",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 35"
+                    },
+                    {
+                        "slug":  "v4_c36",
+                        "path":  "volume_4/chapter_36",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 36"
+                    },
+                    {
+                        "slug":  "v4_c37",
+                        "path":  "volume_4/chapter_37",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 37"
+                    },
+                    {
+                        "slug":  "v4_c38",
+                        "path":  "volume_4/chapter_38",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 38"
+                    },
+                    {
+                        "slug":  "v4_c39",
+                        "path":  "volume_4/chapter_39",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 39"
+                    },
+                    {
+                        "slug":  "v4_c40",
+                        "path":  "volume_4/chapter_40",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 40"
+                    },
+                    {
+                        "slug":  "v4_c41",
+                        "path":  "volume_4/chapter_41",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 41"
+                    },
+                    {
+                        "slug":  "v4_c42",
+                        "path":  "volume_4/chapter_42",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 42"
+                    },
+                    {
+                        "slug":  "v4_c43",
+                        "path":  "volume_4/chapter_43",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 4 - Chapter 43"
+                    },
+                    {
+                        "slug":  "v5_c44",
+                        "path":  "volume_5/chapter_44",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 44"
+                    },
+                    {
+                        "slug":  "v5_c45",
+                        "path":  "volume_5/chapter_45",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 45"
+                    },
+                    {
+                        "slug":  "v5_c46",
+                        "path":  "volume_5/chapter_46",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 46"
+                    },
+                    {
+                        "slug":  "v5_c47",
+                        "path":  "volume_5/chapter_47",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 47"
+                    },
+                    {
+                        "slug":  "v5_c48",
+                        "path":  "volume_5/chapter_48",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 48"
+                    },
+                    {
+                        "slug":  "v5_c49",
+                        "path":  "volume_5/chapter_49",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 49"
+                    },
+                    {
+                        "slug":  "v5_c50",
+                        "path":  "volume_5/chapter_50",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 50"
+                    },
+                    {
+                        "slug":  "v5_c51",
+                        "path":  "volume_5/chapter_51",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 51"
+                    },
+                    {
+                        "slug":  "v5_c52",
+                        "path":  "volume_5/chapter_52",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 52"
+                    },
+                    {
+                        "slug":  "v5_c53",
+                        "path":  "volume_5/chapter_53",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 53"
+                    },
+                    {
+                        "slug":  "v5_c54",
+                        "path":  "volume_5/chapter_54",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 54"
+                    },
+                    {
+                        "slug":  "v5_c55",
+                        "path":  "volume_5/chapter_55",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 5 - Chapter 55"
+                    },
+                    {
+                        "slug":  "v6_c56",
+                        "path":  "volume_6/chapter_56",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 56"
+                    },
+                    {
+                        "slug":  "v6_c57",
+                        "path":  "volume_6/chapter_57",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 57"
+                    },
+                    {
+                        "slug":  "v6_c58",
+                        "path":  "volume_6/chapter_58",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 58"
+                    },
+                    {
+                        "slug":  "v6_c59",
+                        "path":  "volume_6/chapter_59",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 59"
+                    },
+                    {
+                        "slug":  "v6_c60",
+                        "path":  "volume_6/chapter_60",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 60"
+                    },
+                    {
+                        "slug":  "v6_c61",
+                        "path":  "volume_6/chapter_61",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 61"
+                    },
+                    {
+                        "slug":  "v6_c62",
+                        "path":  "volume_6/chapter_62",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 62"
+                    },
+                    {
+                        "slug":  "v6_c63",
+                        "path":  "volume_6/chapter_63",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 63"
+                    },
+                    {
+                        "slug":  "v6_c64",
+                        "path":  "volume_6/chapter_64",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 64"
+                    },
+                    {
+                        "slug":  "v6_c65",
+                        "path":  "volume_6/chapter_65",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 65"
+                    },
+                    {
+                        "slug":  "v6_c66",
+                        "path":  "volume_6/chapter_66",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 66"
+                    },
+                    {
+                        "slug":  "v6_c67",
+                        "path":  "volume_6/chapter_67",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 6 - Chapter 67"
+                    },
+                    {
+                        "slug":  "v7_c68",
+                        "path":  "volume_7/chapter_68",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 68"
+                    },
+                    {
+                        "slug":  "v7_c69",
+                        "path":  "volume_7/chapter_69",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 69"
+                    },
+                    {
+                        "slug":  "v7_c70",
+                        "path":  "volume_7/chapter_70",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 70"
+                    },
+                    {
+                        "slug":  "v7_c71",
+                        "path":  "volume_7/chapter_71",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 71"
+                    },
+                    {
+                        "slug":  "v7_c72",
+                        "path":  "volume_7/chapter_72",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 72"
+                    },
+                    {
+                        "slug":  "v7_c73",
+                        "path":  "volume_7/chapter_73",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 73"
+                    },
+                    {
+                        "slug":  "v7_c74",
+                        "path":  "volume_7/chapter_74",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 74"
+                    },
+                    {
+                        "slug":  "v7_c75",
+                        "path":  "volume_7/chapter_75",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 75"
+                    },
+                    {
+                        "slug":  "v7_c76",
+                        "path":  "volume_7/chapter_76",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 76"
+                    },
+                    {
+                        "slug":  "v7_c77",
+                        "path":  "volume_7/chapter_77",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 77"
+                    },
+                    {
+                        "slug":  "v7_c78",
+                        "path":  "volume_7/chapter_78",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 78"
+                    },
+                    {
+                        "slug":  "v7_c79",
+                        "path":  "volume_7/chapter_79",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 7 - Chapter 79"
+                    },
+                    {
+                        "slug":  "v8_c80",
+                        "path":  "volume_8/chapter_80",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 80"
+                    },
+                    {
+                        "slug":  "v8_c81",
+                        "path":  "volume_8/chapter_81",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 81"
+                    },
+                    {
+                        "slug":  "v8_c82",
+                        "path":  "volume_8/chapter_82",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 82"
+                    },
+                    {
+                        "slug":  "v8_c83",
+                        "path":  "volume_8/chapter_83",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 83"
+                    },
+                    {
+                        "slug":  "v8_c84",
+                        "path":  "volume_8/chapter_84",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 84"
+                    },
+                    {
+                        "slug":  "v8_c85",
+                        "path":  "volume_8/chapter_85",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 85"
+                    },
+                    {
+                        "slug":  "v8_c86",
+                        "path":  "volume_8/chapter_86",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 86"
+                    },
+                    {
+                        "slug":  "v8_c87",
+                        "path":  "volume_8/chapter_87",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 87"
+                    },
+                    {
+                        "slug":  "v8_c88",
+                        "path":  "volume_8/chapter_88",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 88"
+                    },
+                    {
+                        "slug":  "v8_c89",
+                        "path":  "volume_8/chapter_89",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 89"
+                    },
+                    {
+                        "slug":  "v8_c90",
+                        "path":  "volume_8/chapter_90",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 90"
+                    },
+                    {
+                        "slug":  "v8_c91",
+                        "path":  "volume_8/chapter_91",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 8 - Chapter 91"
+                    },
+                    {
+                        "slug":  "v9_c92",
+                        "path":  "volume_9/chapter_92",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 92"
+                    },
+                    {
+                        "slug":  "v9_c93",
+                        "path":  "volume_9/chapter_93",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 93"
+                    },
+                    {
+                        "slug":  "v9_c94",
+                        "path":  "volume_9/chapter_94",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 94"
+                    },
+                    {
+                        "slug":  "v9_c95",
+                        "path":  "volume_9/chapter_95",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 95"
+                    },
+                    {
+                        "slug":  "v9_c96",
+                        "path":  "volume_9/chapter_96",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 96"
+                    },
+                    {
+                        "slug":  "v9_c97",
+                        "path":  "volume_9/chapter_97",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 97"
+                    },
+                    {
+                        "slug":  "v9_c98",
+                        "path":  "volume_9/chapter_98",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 98"
+                    },
+                    {
+                        "slug":  "v9_c99",
+                        "path":  "volume_9/chapter_99",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 99"
+                    },
+                    {
+                        "slug":  "v9_c100",
+                        "path":  "volume_9/chapter_100",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 100"
+                    },
+                    {
+                        "slug":  "v9_c101",
+                        "path":  "volume_9/chapter_101",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 101"
+                    },
+                    {
+                        "slug":  "v9_c102",
+                        "path":  "volume_9/chapter_102",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 102"
+                    },
+                    {
+                        "slug":  "v9_c103",
+                        "path":  "volume_9/chapter_103",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 9 - Chapter 103"
+                    },
+                    {
+                        "slug":  "v10_c104",
+                        "path":  "volume_10/chapter_104",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 104"
+                    },
+                    {
+                        "slug":  "v10_c105",
+                        "path":  "volume_10/chapter_105",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 105"
+                    },
+                    {
+                        "slug":  "v10_c106",
+                        "path":  "volume_10/chapter_106",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 106"
+                    },
+                    {
+                        "slug":  "v10_c107",
+                        "path":  "volume_10/chapter_107",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 107"
+                    },
+                    {
+                        "slug":  "v10_c108",
+                        "path":  "volume_10/chapter_108",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 108"
+                    },
+                    {
+                        "slug":  "v10_c109",
+                        "path":  "volume_10/chapter_109",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 109"
+                    },
+                    {
+                        "slug":  "v10_c110",
+                        "path":  "volume_10/chapter_110",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 110"
+                    },
+                    {
+                        "slug":  "v10_c111",
+                        "path":  "volume_10/chapter_111",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 111"
+                    },
+                    {
+                        "slug":  "v10_c112",
+                        "path":  "volume_10/chapter_112",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 112"
+                    },
+                    {
+                        "slug":  "v10_c113",
+                        "path":  "volume_10/chapter_113",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 113"
+                    },
+                    {
+                        "slug":  "v10_c114",
+                        "path":  "volume_10/chapter_114",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 114"
+                    },
+                    {
+                        "slug":  "v10_c115",
+                        "path":  "volume_10/chapter_115",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 10 - Chapter 115"
+                    },
+                    {
+                        "slug":  "v11_c116",
+                        "path":  "volume_11/chapter_116",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 116"
+                    },
+                    {
+                        "slug":  "v11_c117",
+                        "path":  "volume_11/chapter_117",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 117"
+                    },
+                    {
+                        "slug":  "v11_c118",
+                        "path":  "volume_11/chapter_118",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 118"
+                    },
+                    {
+                        "slug":  "v11_c119",
+                        "path":  "volume_11/chapter_119",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 119"
+                    },
+                    {
+                        "slug":  "v11_c120",
+                        "path":  "volume_11/chapter_120",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 120"
+                    },
+                    {
+                        "slug":  "v11_c121",
+                        "path":  "volume_11/chapter_121",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 121"
+                    },
+                    {
+                        "slug":  "v11_c122",
+                        "path":  "volume_11/chapter_122",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 122"
+                    },
+                    {
+                        "slug":  "v11_c123",
+                        "path":  "volume_11/chapter_123",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 123"
+                    },
+                    {
+                        "slug":  "v11_c124",
+                        "path":  "volume_11/chapter_124",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 124"
+                    },
+                    {
+                        "slug":  "v11_c125",
+                        "path":  "volume_11/chapter_125",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 125"
+                    },
+                    {
+                        "slug":  "v11_c126",
+                        "path":  "volume_11/chapter_126",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 126"
+                    },
+                    {
+                        "slug":  "v11_c127",
+                        "path":  "volume_11/chapter_127",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 11 - Chapter 127"
+                    },
+                    {
+                        "slug":  "v12_c128",
+                        "path":  "volume_12/chapter_128",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 128"
+                    },
+                    {
+                        "slug":  "v12_c129",
+                        "path":  "volume_12/chapter_129",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 129"
+                    },
+                    {
+                        "slug":  "v12_c130",
+                        "path":  "volume_12/chapter_130",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 130"
+                    },
+                    {
+                        "slug":  "v12_c131",
+                        "path":  "volume_12/chapter_131",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 131"
+                    },
+                    {
+                        "slug":  "v12_c132",
+                        "path":  "volume_12/chapter_132",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 132"
+                    },
+                    {
+                        "slug":  "v12_c133",
+                        "path":  "volume_12/chapter_133",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 133"
+                    },
+                    {
+                        "slug":  "v12_c134",
+                        "path":  "volume_12/chapter_134",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 134"
+                    },
+                    {
+                        "slug":  "v12_c135",
+                        "path":  "volume_12/chapter_135",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 135"
+                    },
+                    {
+                        "slug":  "v12_c136",
+                        "path":  "volume_12/chapter_136",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 136"
+                    },
+                    {
+                        "slug":  "v12_c137",
+                        "path":  "volume_12/chapter_137",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 137"
+                    },
+                    {
+                        "slug":  "v12_c138",
+                        "path":  "volume_12/chapter_138",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 138"
+                    },
+                    {
+                        "slug":  "v12_c139",
+                        "path":  "volume_12/chapter_139",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 12 - Chapter 139"
+                    },
+                    {
+                        "slug":  "v13_c140",
+                        "path":  "volume_13/chapter_140",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 140"
+                    },
+                    {
+                        "slug":  "v13_c141",
+                        "path":  "volume_13/chapter_141",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 141"
+                    },
+                    {
+                        "slug":  "v13_c142",
+                        "path":  "volume_13/chapter_142",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 142"
+                    },
+                    {
+                        "slug":  "v13_c143",
+                        "path":  "volume_13/chapter_143",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 143"
+                    },
+                    {
+                        "slug":  "v13_c144",
+                        "path":  "volume_13/chapter_144",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 144"
+                    },
+                    {
+                        "slug":  "v13_c145",
+                        "path":  "volume_13/chapter_145",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 145"
+                    },
+                    {
+                        "slug":  "v13_c146",
+                        "path":  "volume_13/chapter_146",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 146"
+                    },
+                    {
+                        "slug":  "v13_c147",
+                        "path":  "volume_13/chapter_147",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 147"
+                    },
+                    {
+                        "slug":  "v13_c148",
+                        "path":  "volume_13/chapter_148",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 148"
+                    },
+                    {
+                        "slug":  "v13_c149",
+                        "path":  "volume_13/chapter_149",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 149"
+                    },
+                    {
+                        "slug":  "v13_c150",
+                        "path":  "volume_13/chapter_150",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 150"
+                    },
+                    {
+                        "slug":  "v13_c151",
+                        "path":  "volume_13/chapter_151",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 13 - Chapter 151"
+                    },
+                    {
+                        "slug":  "v14_c152",
+                        "path":  "volume_14/chapter_152",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 152"
+                    },
+                    {
+                        "slug":  "v14_c153",
+                        "path":  "volume_14/chapter_153",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 153"
+                    },
+                    {
+                        "slug":  "v14_c154",
+                        "path":  "volume_14/chapter_154",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 154"
+                    },
+                    {
+                        "slug":  "v14_c155",
+                        "path":  "volume_14/chapter_155",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 155"
+                    },
+                    {
+                        "slug":  "v14_c156",
+                        "path":  "volume_14/chapter_156",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 156"
+                    },
+                    {
+                        "slug":  "v14_c157",
+                        "path":  "volume_14/chapter_157",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 157"
+                    },
+                    {
+                        "slug":  "v14_c158",
+                        "path":  "volume_14/chapter_158",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 158"
+                    },
+                    {
+                        "slug":  "v14_c159",
+                        "path":  "volume_14/chapter_159",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 159"
+                    },
+                    {
+                        "slug":  "v14_c160",
+                        "path":  "volume_14/chapter_160",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 160"
+                    },
+                    {
+                        "slug":  "v14_c161",
+                        "path":  "volume_14/chapter_161",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 161"
+                    },
+                    {
+                        "slug":  "v14_c162",
+                        "path":  "volume_14/chapter_162",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 162"
+                    },
+                    {
+                        "slug":  "v14_c163",
+                        "path":  "volume_14/chapter_163",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 14 - Chapter 163"
                     }
                 ]
 },{
