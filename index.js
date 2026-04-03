@@ -432,35 +432,42 @@ window.__STATE = STATE;
   // Ads
   // ------------------------------------------------------------
 
-  function rawServeAds() {
-    (window.AdProvider = window.AdProvider || []).push({ serve: {} });
+function rawServeAds() {
+  try {
+    window.AdProvider = window.AdProvider || [];
+    window.AdProvider.push({ serve: {} });
     STATE.lastServeAt = now();
     STATE.adServeScheduled = false;
+  } catch (err) {
+    console.warn("rawServeAds failed, continuing anyway:", err);
+    STATE.adServeScheduled = false;
   }
- 
+}
 
-  function serveAds(force = false) {
-    const elapsed = now() - STATE.lastServeAt;
+function serveAds(force = false) {
+  const elapsed = now() - STATE.lastServeAt;
 
-    if (force || elapsed >= CONFIG.minGlobalServeGapMs) {
-      rawServeAds();
-      return;
-    }
-
-    if (STATE.adServeScheduled) return;
-    STATE.adServeScheduled = true;
-
-    window.setTimeout(() => rawServeAds(), Math.max(0, CONFIG.minGlobalServeGapMs - elapsed));
+  if (force || elapsed >= CONFIG.minGlobalServeGapMs) {
+    rawServeAds();
+    return;
   }
 
-  function burstServeAds() {
-    if (document.hidden) return;
-    if (now() < STATE.adActionBurstCooldownUntil) return;
+  if (STATE.adServeScheduled) return;
+  STATE.adServeScheduled = true;
 
-    STATE.adActionBurstCooldownUntil = now() + 3500;
-    serveAds(true);
-    window.setTimeout(() => serveAds(true), 700);
-  }
+  window.setTimeout(() => {
+    rawServeAds();
+  }, Math.max(0, CONFIG.minGlobalServeGapMs - elapsed));
+}
+
+function burstServeAds() {
+  if (document.hidden) return;
+  if (now() < STATE.adActionBurstCooldownUntil) return;
+
+  STATE.adActionBurstCooldownUntil = now() + 3500;
+  serveAds(true);
+  window.setTimeout(() => serveAds(true), 700);
+}
 
   function ensureAdProviderScript(src) {
     if (!src) return Promise.resolve();
@@ -542,46 +549,74 @@ window.__STATE = STATE;
   }
 
   async function mountRuntimeSpecial(id, cfg) {
-    if (!cfg) return null;
+  if (!cfg) return null;
+
+  try {
     await ensureAdProviderScript(cfg.host);
-
-    let mount = document.getElementById(id);
-    if (!mount) {
-      mount = createRuntimeMount(id);
-      document.body.appendChild(mount);
-    }
-
-    mount.innerHTML = "";
-    mount.appendChild(makeSpecialIns(cfg.zoneId, cfg.className));
-    serveAds(true);
-    return mount;
+  } catch (err) {
+    console.warn("Runtime special ad failed, continuing anyway:", err);
+    return null;
   }
 
-  async function fireChapterInterstitial() {
-    const cfg = STATE.isMobileReader ? SPECIAL_ZONES.mobileInterstitial : SPECIAL_ZONES.desktopInterstitial;
-    const id = STATE.isMobileReader ? "runtime-mobile-interstitial" : "runtime-desktop-interstitial";
+  let mount = document.getElementById(id);
+  if (!mount) {
+    mount = createRuntimeMount(id);
+    document.body.appendChild(mount);
+  }
 
+  mount.innerHTML = "";
+  mount.appendChild(makeSpecialIns(cfg.zoneId, cfg.className));
+
+  try {
+    serveAds(true);
+  } catch (err) {
+    console.warn("serveAds failed for runtime special:", err);
+  }
+
+  return mount;
+}
+ async function fireChapterInterstitial() {
+  const cfg = STATE.isMobileReader ? SPECIAL_ZONES.mobileInterstitial : SPECIAL_ZONES.desktopInterstitial;
+  const id = STATE.isMobileReader ? "runtime-mobile-interstitial" : "runtime-desktop-interstitial";
+
+  try {
     await mountRuntimeSpecial(id, cfg);
     await delay(CONFIG.interstitialDelayMs);
+  } catch (err) {
+    console.warn("Interstitial failed, continuing anyway:", err);
   }
+}
 
-  async function loadMobileStickyBanner(force = false) {
-    if (!STATE.isMobileReader) return;
+ async function loadMobileStickyBanner(force = false) {
+  if (!STATE.isMobileReader) return false;
 
-    const mount = document.getElementById("mobileStickyMount");
-    if (!mount) return;
-    if (STATE.mobileStickyLoaded && !force) return;
+  const mount = document.getElementById("mobileStickyMount");
+  if (!mount) return false;
+  if (STATE.mobileStickyLoaded && !force) return true;
 
+  try {
     await ensureAdProviderScript(SPECIAL_ZONES.mobileSticky.host);
-    mount.innerHTML = "";
-    mount.appendChild(
-      makeSpecialIns(SPECIAL_ZONES.mobileSticky.zoneId, SPECIAL_ZONES.mobileSticky.className)
-    );
-    stampSlotRefresh(mount);
-    serveAds(true);
-    STATE.mobileStickyLoaded = true;
+  } catch (err) {
+    console.warn("Mobile sticky ad provider failed, continuing anyway:", err);
+    return false;
   }
 
+  mount.innerHTML = "";
+  mount.appendChild(
+    makeSpecialIns(SPECIAL_ZONES.mobileSticky.zoneId, SPECIAL_ZONES.mobileSticky.className)
+  );
+
+  stampSlotRefresh(mount);
+
+  try {
+    serveAds(true);
+  } catch (err) {
+    console.warn("serveAds failed for mobile sticky:", err);
+  }
+
+  STATE.mobileStickyLoaded = true;
+  return true;
+}
   function positionDesktopStickyAwayFromVideo() {
     if (STATE.isMobileReader) return;
 
@@ -684,15 +719,19 @@ window.__STATE = STATE;
   }
 
   async function refreshMobileSticky() {
-    if (!STATE.isMobileReader) return false;
+  if (!STATE.isMobileReader) return false;
 
-    const mount = document.getElementById("mobileStickyMount");
-    if (!mount || document.hidden) return false;
-    if (!canRefreshSlot(mount)) return false;
+  const mount = document.getElementById("mobileStickyMount");
+  if (!mount || document.hidden) return false;
+  if (!canRefreshSlot(mount)) return false;
 
-    await loadMobileStickyBanner(true);
-    return true;
+  try {
+    return await loadMobileStickyBanner(true);
+  } catch (err) {
+    console.warn("refreshMobileSticky failed:", err);
+    return false;
   }
+}
 
   function clearRefreshTimers() {
     if (STATE.railRefreshTimer) clearInterval(STATE.railRefreshTimer);
@@ -1731,10 +1770,15 @@ window.__STATE = STATE;
     reader.appendChild(buildTraversal("bottom"));
 
     const recommend = buildRecommendationWidget();
-    if (recommend) {
-      reader.appendChild(recommend);
-      await ensureAdProviderScript(SPECIAL_ZONES.desktopRecommend.host);
-    }
+if (recommend) {
+  reader.appendChild(recommend);
+
+  try {
+    await ensureAdProviderScript(SPECIAL_ZONES.desktopRecommend.host);
+  } catch (err) {
+    console.warn("Recommend ad provider failed, continuing anyway:", err);
+  }
+}
 
     const bottomAnchor = createEl("span", "reader-anchor");
     bottomAnchor.id = "readerBottomAnchor";
@@ -1817,46 +1861,53 @@ window.__STATE = STATE;
   // ------------------------------------------------------------
 
   async function boot() {
-    await Promise.all([
-      ensureAdProviderScript("https://a.magsrv.com/ad-provider.js"),
-      ensureAdProviderScript("https://a.pemsrv.com/ad-provider.js")
-    ]);
+  const adLoads = await Promise.allSettled([
+    ensureAdProviderScript("https://a.magsrv.com/ad-provider.js"),
+    ensureAdProviderScript("https://a.pemsrv.com/ad-provider.js")
+  ]);
 
-    await loadLibrary();
-
-    wireTopFlyouts();
-    wireStickyControls();
-    wireProgressWatch();
-    wireSearch();
-    wireMobileWorksNav();
-    wireMobileDial();
-    wireDocumentVisibility();
-    wireReaderClickMonetization();
-
-    await buildReader();
-
-    window.addEventListener("popstate", async () => {
-      await buildReader();
-      scrollToReaderContentStartInstant();
-    });
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    boot().catch(err => {
-      console.error(err);
-      clearRefreshTimers();
-
-      const workTitleEl = document.getElementById("workTitle");
-      if (workTitleEl) workTitleEl.textContent = "Failed to load work";
-
-      const reader = document.getElementById("reader");
-      if (reader) {
-        reader.innerHTML = `
-          <div class="note">
-            Failed to load this work. Please check library.json, sources, item.json, base_url, and image filenames.
-          </div>
-        `;
-      }
-    });
+  adLoads.forEach(result => {
+    if (result.status === "rejected") {
+      console.warn("Ad provider failed, continuing anyway:", result.reason);
+    }
   });
+
+  await loadLibrary();
+
+  wireTopFlyouts();
+  wireStickyControls();
+  wireProgressWatch();
+  wireSearch();
+  wireMobileWorksNav();
+  wireMobileDial();
+  wireDocumentVisibility();
+  wireReaderClickMonetization();
+
+  await buildReader();
+
+  window.addEventListener("popstate", async () => {
+    await buildReader();
+    scrollToReaderContentStartInstant();
+  });
+}
+document.addEventListener("DOMContentLoaded", () => {
+  boot().catch(err => {
+    console.error(err);
+    clearRefreshTimers();
+
+    const workTitleEl = document.getElementById("workTitle");
+    if (workTitleEl) workTitleEl.textContent = "Failed to load work";
+
+    const reader = document.getElementById("reader");
+    if (reader) {
+      reader.innerHTML = `
+        <div class="note">
+          Failed to load this work.<br><br>
+          <strong>Error:</strong> ${escapeHtml(String(err?.message || err))}
+        </div>
+      `;
+    }
+  });
+});
+
 })();
